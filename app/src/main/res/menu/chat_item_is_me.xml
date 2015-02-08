@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/copy_item"
+        android:title="@string/copy_item" />
+    <item
+        android:id="@+id/copy_to_input"
+        android:title="@string/copy_to_input" />
+    <item
+        android:id="@+id/add_chat_item_to_shortcut"
+        android:title="@string/add_chat_item_to_shortcut" />
+    <item
+        android:id="@+id/resend_item"
+        android:title="@string/com_resend" />
+
+</menu>

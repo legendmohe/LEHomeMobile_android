@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/shortcut_wrapper"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left|center_vertical">
+
+    <TextView
+        android:id="@+id/shortcut_item"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        android:gravity="left|center"
+        android:lineSpacingExtra="2dp"
+        android:paddingLeft="@dimen/item_horizontal_margin"
+        android:text="Hello World!"
+        android:textColor="#333333"
+        android:textSize="20sp" />
+
+</LinearLayout>

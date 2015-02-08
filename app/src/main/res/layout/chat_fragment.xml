@@ -1,0 +1,151 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="my.home.lehome.activity.MainActivity$PlaceholderFragment">
+
+    <ListView
+        android:id="@+id/chat_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/send_cmd_layout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent"
+        android:longClickable="true"
+        android:smoothScrollbar="true"
+        android:stackFromBottom="true">
+
+    </ListView>
+
+    <ProgressBar
+        android:id="@+id/load_more_progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-7dp"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
+    <RelativeLayout
+        android:id="@+id/send_cmd_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="false"
+        android:background="@drawable/chat_footer_bg"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/switch_input_button"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="false"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/chatting_setmode_msg_btn" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="false"
+            android:layout_toRightOf="@+id/switch_input_button">
+
+            <Button
+                android:id="@+id/speech_button"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="3dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/button_speech"
+                android:textColor="#eeeeee"
+                android:textSize="@dimen/font_size"
+                android:visibility="invisible" />
+
+            <AutoCompleteTextView
+                android:id="@+id/send_cmd_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="false"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/cmd_clear_button"
+                android:ems="10"
+                android:inputType="text"
+                android:hint="@string/edittext_hint"
+                android:textColor="#eeeeee"
+                android:textCursorDrawable="@null" />
+
+            <Button
+                android:id="@+id/cmd_clear_button"
+                android:text="@string/button_clear"
+                android:textColor="#555555"
+                android:textSize="@dimen/font_size"
+                android:background="#00000000"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="gone"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/send_msg_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="-7dp"
+            android:indeterminate="true"
+            android:visibility="invisible" />
+        <!--<fr.castorflex.android.smoothprogressbar.SmoothProgressBar-->
+        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--android:id="@+id/send_msg_progressbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:indeterminate="true"-->
+        <!--android:visibility="invisible"-->
+        <!--android:layout_alignParentLeft="false"-->
+        <!--android:layout_alignParentTop="false"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_centerInParent="false"-->
+        <!--android:layout_centerVertical="false"-->
+        <!--android:layout_marginTop="-7dp"-->
+        <!--/>-->
+
+    </RelativeLayout>
+
+</RelativeLayout>

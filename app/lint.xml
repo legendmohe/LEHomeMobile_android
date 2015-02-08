@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <issue id="HandlerLeak">
+        <ignore path="src/my/home/lehome/view/SpeechDialog.java" />
+    </issue>
+</lint>

@@ -1,0 +1,17 @@
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/classes/debug
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/model-7770265b61b746b41e66686564c2965dc70e1b3d.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/domain-ba26c0daa34afa42f01b83dec21ff3d2e352ba0d.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/common-284340e3f507422c1d7ea27c5c142e313edbee67.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-eb1bf706e0f19ca6d9dc137ff35d3fdf27a78b54.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-6572bbb99ae6f0ef7cfc12aaa18c17eb13231ada.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-2c465284ada82d64b99ec8d7ef597c935701b706.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-1ae94096d96a158afe8741bf69bf9052a0bf83ac.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-833531bc3223a3b67335ff041f6e2ed869ffcd93.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/otto-1.3.6-e0bada54fa7a21df399508132a3c9d28a09a87f8.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-66596e4886a5043989e270ac23b854fec26a65a4.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-0cd0204bbb13b692f71e4c33d84bafa8bebcf82e.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/greendao-1.3.0-beta-1-fcd2468340ee1d5e332a8fd90e563c5d2352cda0.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/library-2.4.0-8361d127f90a74348fe94dea525236981fb15aed.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/VoiceRecognition-9641f086db49a61fdb0dba5d4f2fc8d42dda7cd6.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-fdc4a7753200f3da33de27225aa7518e85e98b80.jar
+/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/pushservice-4.2.0.63-608d01c68b363a520431d4760c736146f333df40.jar

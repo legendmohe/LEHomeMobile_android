@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: file:/home/hasan/developer/android/studio/LDrawer/library/src/main/res/values/colors.xml -->
+    <eat-comment />
+
+    <color name="ldrawer_color">#FFFFFF</color>
+    <!-- From: file:/home/hasan/developer/android/studio/LDrawer/library/src/main/res/values/dimens.xml -->
+    <eat-comment />
+
+    <dimen name="ldrawer_barSize">18dp</dimen>
+    <dimen name="ldrawer_drawableSize">50dp</dimen>
+    <dimen name="ldrawer_gapBetweenBars">3dp</dimen>
+    <dimen name="ldrawer_middleBarArrowSize">16dp</dimen>
+    <dimen name="ldrawer_thickness">2dp</dimen>
+    <dimen name="ldrawer_topBottomBarArrowSize">11dp</dimen>
+
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/speech_dialog_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical|center_horizontal"
+    android:background="#c8000000">
+
+
+    <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/speech_rippleBackground"
+        android:layout_gravity="end"
+        app:rb_color="#0099CC"
+        app:rb_radius="24dp"
+        app:rb_rippleAmount="2"
+        app:rb_duration="1000"
+        app:rb_scale="2">
+
+    </com.skyfishjy.library.RippleBackground>
+
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/speech_imageButton"
+        android:clickable="false"
+        android:focusable="false"
+        android:background="@drawable/chat_profile_chatto7"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:id="@+id/speeching_content"
+        android:padding="5dp"
+        android:visibility="visible"
+        android:layout_below="@+id/speech_imageButton"
+        android:layout_centerHorizontal="true">
+
+
+        <TextView
+            android:id="@+id/status_textview"
+            android:layout_width="250dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:gravity="center"
+            android:textColor="@android:color/background_light" />
+
+        <ProgressBar
+            android:id="@+id/volumn_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/speech_release_cancel_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:text="@string/speech_release_cancel"
+        android:textColor="#ffd7d7d7"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        android:textSize="24sp"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_below="@+id/speech_imageButton"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

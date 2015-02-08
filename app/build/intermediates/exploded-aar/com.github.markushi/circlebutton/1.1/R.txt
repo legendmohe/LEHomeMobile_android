@@ -1,0 +1,5 @@
+int attr cb_color 0x7f010000
+int attr cb_pressedRingWidth 0x7f010001
+int[] styleable CircleButton { 0x7f010000, 0x7f010001 }
+int styleable CircleButton_cb_color 0
+int styleable CircleButton_cb_pressedRingWidth 1

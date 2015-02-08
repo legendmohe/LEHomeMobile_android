@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/action_settings" />
+    <item
+        android:id="@+id/local_ip_item"
+        android:orderInCategory="100"
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/local_ip_item" />
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="100"
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/action_exit" />
+
+</menu>

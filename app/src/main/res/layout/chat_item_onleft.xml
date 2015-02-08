@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="right"
+    android:gravity="right"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/date_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="false"
+        android:layout_marginTop="10dp"
+        android:shadowColor="#ffffff"
+        android:shadowDx="1"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        android:text="asdasdasdasdasdasdasd"
+        android:layout_marginBottom="3dp" />
+
+    <RelativeLayout
+        android:id="@+id/wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/date_textview">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:id="@+id/profile_imageButton"
+            android:clickable="false"
+            android:focusable="false"
+            android:background="@drawable/chat_profile_chatto5"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/linearLayout"
+            android:layout_marginLeft="5dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="42dp"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:id="@+id/linearLayout">
+
+            <TextView
+                android:id="@+id/chat_content_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/resend_imagebutton"
+                android:background="@drawable/chat_left_bg"
+                android:lineSpacingExtra="2dp"
+                android:textColor="#ff2f2f2f"
+                android:textSize="@dimen/font_size"
+                android:autoLink="web"
+                android:layout_marginLeft="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

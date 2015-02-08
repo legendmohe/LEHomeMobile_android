@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.1"
+
+    defaultConfig {
+        applicationId "my.home.lehome"
+        minSdkVersion 17
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile project(':common')
+    compile project(':domain')
+    compile project(':model')
+
+    compile 'com.android.support:support-v4:20.0.0'
+    compile files('libs/VoiceRecognition.jar')
+    compile files('libs/greendao-1.3.0-beta-1.jar')
+    compile files('libs/pushservice-4.2.0.63.jar')
+    compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
+    compile 'com.skyfishjy.ripplebackground:library:1.0.1'
+    compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
+    compile 'com.nhaarman.listviewanimations:lib-manipulation:3.1.0@aar'
+    compile 'com.nhaarman.listviewanimations:lib-core-slh:3.1.0@aar'
+    compile 'com.nineoldandroids:library:2.4.0'
+}

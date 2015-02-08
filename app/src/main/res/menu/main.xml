@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="my.home.lehome.MainActivity">
+
+    <item
+        android:id="@+id/voice_input"
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/voice_input" />
+</menu>

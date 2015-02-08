@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/delete_shortcut_item"
+        android:title="@string/delete_shortcut_item" />
+    <item
+        android:id="@+id/copy_shortcut_item"
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/copy_shortcut_item" />
+</menu>

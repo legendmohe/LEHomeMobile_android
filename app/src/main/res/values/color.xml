@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_color">#333333</color>
+    <color name="chat_left_focus">#ffafafaf</color>
+    <color name="chat_left_pressed">#ffafafaf</color>
+    <color name="chat_left_normal">#ffbfbfbf</color>
+    <color name="chat_right_focus">#ffc5c5c5</color>
+    <color name="chat_right_pressed">#ffc5c5c5</color>
+    <color name="chat_right_normal">#ffe5e5e5</color>
+</resources>

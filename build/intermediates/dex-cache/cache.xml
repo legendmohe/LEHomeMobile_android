@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2">
+
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/libs/pushservice-4.2.0.63.jar"
+        jumboMode="false" revision="21.1.1" sha1="7622f50771aaca9dab54519f7bb223f4a7578b82">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/pushservice-4.2.0.63-608d01c68b363a520431d4760c736146f333df40.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="8694693636ab36910c8100ce527c258ff3ebece0">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-fdc4a7753200f3da33de27225aa7518e85e98b80.jar" />
+    </item>
+    <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/common/build/libs/common.jar"
+        jumboMode="false" revision="21.1.1" sha1="adc5a0aef842530667bd65047368bc6f45bf559f">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/common-284340e3f507422c1d7ea27c5c142e313edbee67.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
+        jumboMode="false" revision="21.1.1" sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-0cd0204bbb13b692f71e4c33d84bafa8bebcf82e.jar" />
+    </item>
+    <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/libs/VoiceRecognition.jar"
+        jumboMode="false" revision="21.1.1" sha1="32399e2caa2013321c9d497ca04f7af505959037">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/VoiceRecognition-9641f086db49a61fdb0dba5d4f2fc8d42dda7cd6.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/Documents/adt-bundle-mac-x86_64-20140702/sdk/extras/android/m2repository/com/android/support/support-annotations/20.0.0/support-annotations-20.0.0.jar"
+        jumboMode="false" revision="21.1.1" sha1="9d9013e9ff35fc3756411e62873c363c70c638fa">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-eb1bf706e0f19ca6d9dc137ff35d3fdf27a78b54.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-manipulation/3.1.0/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="5660e4bf78904137e90e62a5d4cc2e987258f02c">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-66596e4886a5043989e270ac23b854fec26a65a4.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/libs/greendao-1.3.0-beta-1.jar"
+        jumboMode="false" revision="21.1.1" sha1="185a8ff3f50dbd99e5238d6d411ee86dd87d2b0a">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/greendao-1.3.0-beta-1-fcd2468340ee1d5e332a8fd90e563c5d2352cda0.jar" />
+    </item>
+    <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/model/build/libs/model.jar"
+        jumboMode="false" revision="21.1.1" sha1="54946f25b75beb63844d2c39949bed340023def7">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/model-7770265b61b746b41e66686564c2965dc70e1b3d.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
+        jumboMode="false" revision="21.1.1" sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/library-2.4.0-8361d127f90a74348fe94dea525236981fb15aed.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core-slh/3.1.0/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="49223278ec2ede1d05d00868c5ce3e077b4016f8">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-6572bbb99ae6f0ef7cfc12aaa18c17eb13231ada.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.skyfishjy.ripplebackground/library/1.0.1/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="5a7cf2a41aedccc427107ebb37762a5e2f5be590">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-2c465284ada82d64b99ec8d7ef597c935701b706.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/.gradle/caches/modules-2/files-2.1/com.squareup/otto/1.3.6/ee373b6d0d6ea36a0a9b0cbabaf16be7e7fc3e30/otto-1.3.6.jar"
+        jumboMode="false" revision="21.1.1" sha1="ee373b6d0d6ea36a0a9b0cbabaf16be7e7fc3e30">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/otto-1.3.6-e0bada54fa7a21df399508132a3c9d28a09a87f8.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core/3.1.0/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="acf66033b1418ccf9e15c8e77750981e4809c4ea">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-833531bc3223a3b67335ff041f6e2ed869ffcd93.jar" />
+    </item>
+    <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/domain/build/libs/domain.jar"
+        jumboMode="false" revision="21.1.1" sha1="142f25bddfcbcfeab44b693b11e62aba0a2f9a33">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/domain-ba26c0daa34afa42f01b83dec21ff3d2e352ba0d.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.akexorcist/RoundCornerProgressBar/1.0.0/classes.jar"
+        jumboMode="false" revision="21.1.1" sha1="17267d6813298019bcfe7639497f8c5c72f54a21">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-1ae94096d96a158afe8741bf69bf9052a0bf83ac.jar" />
+    </item>
+
+</items>
