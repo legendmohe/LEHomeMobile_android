@@ -25,8 +25,8 @@ dependencies {
 
     compile 'com.android.support:support-v4:20.0.0'
     compile files('libs/VoiceRecognition.jar')
-    compile files('libs/greendao-1.3.0-beta-1.jar')
     compile files('libs/pushservice-4.2.0.63.jar')
+    compile files('libs/greendao-1.3.0-beta-1.jar')
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'

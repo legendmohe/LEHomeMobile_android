@@ -19,13 +19,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import de.greenrobot.lehome.ChatItem;
 import my.home.common.Constants;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.model.ChatItem;
 
 //import org.zeromq.ZMQ;
 

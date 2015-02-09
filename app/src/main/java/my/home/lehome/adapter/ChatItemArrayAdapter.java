@@ -14,9 +14,9 @@ import com.skyfishjy.library.RippleBackground;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import de.greenrobot.lehome.ChatItem;
 import my.home.common.Constants;
 import my.home.lehome.R;
+import my.home.model.ChatItem;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
@@ -138,7 +138,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     }
 
 	/*
-	 * delegate
+     * delegate
 	 */
 
     public ResendButtonClickListener getResendButtonClickListener() {
