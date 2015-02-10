@@ -7,11 +7,11 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
+import my.home.entities.ChatItem;
 import my.home.lehome.R;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
-import my.home.model.ChatItem;
 
 public class LoadMoreChatItemAsyncTask extends
         AsyncTask<Integer, String, List<ChatItem>> {

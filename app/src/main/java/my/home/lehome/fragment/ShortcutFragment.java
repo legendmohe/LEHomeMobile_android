@@ -20,12 +20,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import my.home.entities.Shortcut;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
 import my.home.lehome.asynctask.SendCommandAsyncTask;
 import my.home.lehome.helper.DBHelper;
-import my.home.model.Shortcut;
 
 public class ShortcutFragment extends ListFragment {
 

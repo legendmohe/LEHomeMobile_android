@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Set;
 
 import my.home.common.Constants;
+import my.home.entities.ChatItem;
+import my.home.entities.Shortcut;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
@@ -66,8 +68,6 @@ import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.SpeechDialog;
 import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
-import my.home.model.ChatItem;
-import my.home.model.Shortcut;
 
 public class ChatFragment extends Fragment implements SpeechDialogResultListener, ResendButtonClickListener {
     public static final String TAG = ChatFragment.class.getName();

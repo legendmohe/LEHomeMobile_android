@@ -1,4 +1,4 @@
-package my.home.model;
+package my.home.entities;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

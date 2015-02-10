@@ -7,13 +7,13 @@ import java.util.List;
 
 import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.QueryBuilder;
-import my.home.model.ChatItem;
-import my.home.model.ChatItemDao;
-import my.home.model.DaoMaster;
-import my.home.model.DaoMaster.OpenHelper;
-import my.home.model.DaoSession;
-import my.home.model.Shortcut;
-import my.home.model.ShortcutDao;
+import my.home.entities.ChatItem;
+import my.home.entities.ChatItemDao;
+import my.home.entities.DaoMaster;
+import my.home.entities.DaoMaster.OpenHelper;
+import my.home.entities.DaoSession;
+import my.home.entities.Shortcut;
+import my.home.entities.ShortcutDao;
 
 public class DBHelper {
     private static final String TAG = DBHelper.class.getName();

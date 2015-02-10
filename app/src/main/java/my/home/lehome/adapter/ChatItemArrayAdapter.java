@@ -15,8 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.common.Constants;
+import my.home.entities.ChatItem;
 import my.home.lehome.R;
-import my.home.model.ChatItem;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
@@ -75,7 +75,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         RelativeLayout wrapper = (RelativeLayout) row.findViewById(R.id.wrapper);
         chatTextView = (TextView) row.findViewById(R.id.chat_content_textview);
         chatTextView.setText(chatItem.getContent());
-//		chatTextView.setBackgroundResource(!chatItem.getIsMe() ? R.drawable.chat_right_bg : R.drawable.chat_left_bg);
 
         if (chatItem.getIsMe()) {
             RippleBackground rippleBackground = (RippleBackground) row.findViewById(R.id.profile_rippleBackground);
@@ -116,7 +115,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             dateTextView.setVisibility(View.INVISIBLE);
         }
 
-//		wrapper.setGravity(!chatItem.getIsMe() ? Gravity.LEFT : Gravity.RIGHT);
 
         return row;
     }

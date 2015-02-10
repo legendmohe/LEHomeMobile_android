@@ -12,14 +12,13 @@
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="false"
         android:layout_centerVertical="false"
-        android:layout_marginTop="10dp"
-        android:shadowColor="#ffffff"
-        android:shadowDx="1"
+        android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#999999"
         android:textSize="12sp"
         android:text="asdasdasdasdasdasdasd"
-        android:layout_marginBottom="3dp" />
+        android:layout_marginBottom="5dp"
+        android:phoneNumber="false" />
 
     <RelativeLayout
         android:id="@+id/wrapper"

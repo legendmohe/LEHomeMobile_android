@@ -17,11 +17,11 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
+import my.home.entities.ChatItem;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.util.PushUtils;
-import my.home.model.ChatItem;
 
 public class MessageHelper {
 
