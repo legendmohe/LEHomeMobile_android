@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import my.home.entities.Shortcut;
 import my.home.lehome.R;
+import my.home.model.entities.Shortcut;
 
 public class ShortcutArrayAdapter extends ArrayAdapter<Shortcut> {
 

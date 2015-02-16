@@ -8,9 +8,15 @@
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/pushservice-4.2.0.63-608d01c68b363a520431d4760c736146f333df40.jar" />
     </item>
     <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/common/build/libs/common.jar"
-        jumboMode="false" revision="21.1.1" sha1="a8537808e8a7a185f174604ba0ef4342319771b9">
+        jumboMode="false" revision="21.1.1" sha1="282d174f1278331a2ae7d162d430fc6ffdaacada">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/common-284340e3f507422c1d7ea27c5c142e313edbee67.jar" />
+    </item>
+    <item
+        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/model/unspecified/libs/greendao-1.3.0-beta-1.jar"
+        jumboMode="false" revision="21.1.1" sha1="185a8ff3f50dbd99e5238d6d411ee86dd87d2b0a">
+        <dex
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/greendao-1.3.0-beta-1-39a06ac3214e0711b31799372c6fada2976d425d.jar" />
     </item>
     <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/libs/VoiceRecognition.jar"
         jumboMode="false" revision="21.1.1" sha1="32399e2caa2013321c9d497ca04f7af505959037">
@@ -40,12 +46,6 @@
         jumboMode="false" revision="21.1.1" sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-5ec3bfa4899f9a5ca07ed1bea4c55cbcbd2f53fa.jar" />
-    </item>
-    <item
-        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/libs/greendao-1.3.0-beta-1.jar"
-        jumboMode="false" revision="21.1.1" sha1="185a8ff3f50dbd99e5238d6d411ee86dd87d2b0a">
-        <dex
-            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/greendao-1.3.0-beta-1-fcd2468340ee1d5e332a8fd90e563c5d2352cda0.jar" />
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
@@ -79,7 +79,7 @@
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/domain/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="57d29f51199278a451ca0fd6f3eecdb099944123">
+        jumboMode="false" revision="21.1.1" sha1="a56b2fbd2cd5341bcf1301d90855790f8e0eb596">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-2f52456e1ce9dd93536df7b9b44df9bc51dd1f38.jar" />
     </item>
@@ -91,7 +91,7 @@
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/model/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="2f39e6ffcd482e42aaf3b3801f8723c0d4445986">
+        jumboMode="false" revision="21.1.1" sha1="aca5100a3e04935379d14b9ee201dd9ce83693db">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-abfc1e0531b00fdd06aa3e70602619a99451dc07.jar" />
     </item>

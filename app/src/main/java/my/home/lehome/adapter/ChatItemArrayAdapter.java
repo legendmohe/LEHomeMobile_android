@@ -15,8 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.common.Constants;
-import my.home.entities.ChatItem;
 import my.home.lehome.R;
+import my.home.model.entities.ChatItem;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 

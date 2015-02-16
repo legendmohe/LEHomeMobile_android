@@ -1,4 +1,4 @@
-package my.home.entities;
+package my.home.model.entities;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

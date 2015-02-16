@@ -43,5 +43,8 @@
         <Preference
             android:title="@string/pref_clean_cmd_history"
             android:key="clean_cmd_history" />
+        <Preference
+            android:title="@string/pref_load_auto_item"
+            android:key="load_auto_item" />
     </PreferenceCategory>
 </PreferenceScreen>

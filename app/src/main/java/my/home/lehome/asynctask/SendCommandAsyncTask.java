@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.util.Date;
 
 import my.home.common.Constants;
-import my.home.entities.ChatItem;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.model.entities.ChatItem;
 
 //import org.zeromq.ZMQ;
 

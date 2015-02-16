@@ -23,14 +23,14 @@ public final class R {
 		public static final int round_corner_progress_icon = 0x7f020052;
 	}
 	public static final class id {
-		public static final int round_corner_progress_background = 0x7f0a0053;
-		public static final int round_corner_progress_header = 0x7f0a0055;
-		public static final int round_corner_progress_icon = 0x7f0a0056;
-		public static final int round_corner_progress_progress = 0x7f0a0054;
+		public static final int round_corner_progress_background = 0x7f0a0055;
+		public static final int round_corner_progress_header = 0x7f0a0057;
+		public static final int round_corner_progress_icon = 0x7f0a0058;
+		public static final int round_corner_progress_progress = 0x7f0a0056;
 	}
 	public static final class layout {
-		public static final int round_corner_layout = 0x7f03001d;
-		public static final int round_corner_with_icon_layout = 0x7f03001e;
+		public static final int round_corner_layout = 0x7f03001e;
+		public static final int round_corner_with_icon_layout = 0x7f03001f;
 	}
 	public static final class styleable {
 		public static final int[] RoundCornerProgress = { 0x7f010039, 0x7f01003a, 0x7f01003b, 0x7f01003c, 0x7f01003d, 0x7f01003e, 0x7f01003f, 0x7f010040, 0x7f010041, 0x7f010042 };

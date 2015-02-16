@@ -34,6 +34,7 @@
     <string name="pref_others_profile">其他功能</string>
     <string name="pref_homescreen_shortcut_smy">在homescreen添加快捷方式</string>
     <string name="pref_clean_cmd_history">清空输入历史</string>
+    <string name="pref_load_auto_item">下载自动补全数据</string>
     <string name="speech_cmd_need_confirm">确认发送语音命令</string>
     <string name="qs_default_input">开灯</string>
     <string name="add_shortcut_item_summ">键入命令</string>
@@ -72,5 +73,8 @@
     <string name="noti_bref_msg">%1$s&#8230;[点击查看]</string>
     <string name="title_activity_wakeup">WakeupActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="pref_loading_auto_item">正在下载自动补全数据...</string>
+    <string name="pref_load_auto_item_success">自动补全数据下载完成</string>
+    <string name="pref_load_auto_item_faild">自动补全数据下载失败</string>
 
 </resources>

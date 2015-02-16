@@ -16,6 +16,7 @@ import java.util.HashSet;
 import my.home.common.Constants;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
+import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
     @Override
@@ -111,6 +112,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                         , R.string.pref_clean_cmd_history
                         , Toast.LENGTH_SHORT)
                         .show();
+                return true;
+            }
+        });
+        final String device_id = sharedPreferences.getString("pref_bind_device", "");
+        button = (Preference) findPreference("load_auto_item");
+        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                new LoadAutoCompleteConfAsyncTask(getActivity(), device_id).execute();
                 return true;
             }
         });

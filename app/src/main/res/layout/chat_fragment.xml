@@ -85,7 +85,7 @@
                 android:textSize="@dimen/font_size"
                 android:visibility="invisible" />
 
-            <AutoCompleteTextView
+            <my.home.lehome.view.DelayAutoCompleteTextView
                 android:id="@+id/send_cmd_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,6 +93,7 @@
                 android:layout_alignParentTop="false"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/cmd_clear_button"
+                android:completionThreshold="1"
                 android:ems="10"
                 android:inputType="text"
                 android:hint="@string/edittext_hint"

@@ -4,6 +4,8 @@ import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -69,6 +71,7 @@ public class SpeechDialog extends Dialog {
     private RippleBackground mRippleBg;
 
     private boolean mUseBluetooth = false;
+    private boolean isMusicPlaying = false;
 //	private List<String> mResult = null;
 
     private static final int POWER_UPDATE_INTERVAL = 50;
@@ -258,6 +261,11 @@ public class SpeechDialog extends Dialog {
                 mSpeechImageView.setVisibility(View.VISIBLE);
                 animatorSet.start();
 
+                if (isMusicPlaying(mContextActivity.get())) {
+                    ToggleMusicPlay(mContextActivity.get());
+                    isMusicPlaying = true;
+                }
+
                 mStatusTextView.setText(R.string.speech_speaking);
                 CUR_STATE = State.LISTENING;
                 if (!startListening()) {
@@ -391,6 +399,8 @@ public class SpeechDialog extends Dialog {
             case State.FINISHED:
             case State.ERROR:
 //			CUR_STATE = State.IDLE;
+                if (isMusicPlaying && !isMusicPlaying(mContextActivity.get()))
+                    ToggleMusicPlay(mContextActivity.get());
                 if (this != null
                         && this.isShowing())
                     this.dismiss();
@@ -588,6 +598,17 @@ public class SpeechDialog extends Dialog {
                 break;
         }
         return "UNKNOWN ERROR TYPE OR CODE";
+    }
+
+    public boolean isMusicPlaying(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        return audioManager.isMusicActive();
+    }
+
+    public void ToggleMusicPlay(Context context) {
+        Intent intent = new Intent("com.android.music.musicservicecommand");
+        intent.putExtra("command", "togglepause");
+        context.sendBroadcast(intent);
     }
 
     public boolean ismUseBluetooth() {
