@@ -79,7 +79,7 @@
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/domain/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="a56b2fbd2cd5341bcf1301d90855790f8e0eb596">
+        jumboMode="false" revision="21.1.1" sha1="1b49845070f40d5b827c76ab6901f2077de16898">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-2f52456e1ce9dd93536df7b9b44df9bc51dd1f38.jar" />
     </item>
@@ -91,7 +91,7 @@
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/model/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="aca5100a3e04935379d14b9ee201dd9ce83693db">
+        jumboMode="false" revision="21.1.1" sha1="90266cd757422dfa3f2014bdacb7bc9bc6b16122">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-abfc1e0531b00fdd06aa3e70602619a99451dc07.jar" />
     </item>

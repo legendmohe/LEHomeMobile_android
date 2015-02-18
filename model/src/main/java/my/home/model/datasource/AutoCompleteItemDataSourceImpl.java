@@ -10,6 +10,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,18 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     private String mMessageSeq;
     private String mInitState;
     private boolean mLoadSuccess = false;
+
+    private static Comparator<AutoCompleteItem> mResultComparator;
+
+    static {
+        mResultComparator = new Comparator<AutoCompleteItem>() {
+            @Override
+            public int compare(AutoCompleteItem lhs, AutoCompleteItem rhs) {
+                return Float.compare(rhs.getWeight(), lhs.getWeight());
+            }
+        };
+    }
+
 
     public static AutoCompleteItemDataSourceImpl getInstance() {
 
@@ -131,7 +145,10 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             BusProvider.getRestBusInstance().post(new GetAutoCompleteItemEvent(resultList));
 
         boolean in_msg_state = false;
+        boolean in_if_or_while_state = false;
         StringBuffer inputBuffer = new StringBuffer(currentInput);
+        String leftString = "";
+//        String lastString = "";
         StringBuffer cmdBuffer = new StringBuffer();
         String curState = mInitState;
         while (inputBuffer.length() > 0) {
@@ -150,14 +167,23 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 return;
             }
             for (String nextState : (List<String>) mLinks.get(curState)) {
+                if (!in_if_or_while_state && nextState.equals("then")) {
+                    continue;
+                }
                 for (String val : (List<String>) mNodes.get(nextState)) {
                     if (tempInput.startsWith(val)) {
+//                        lastString = val;
+                        leftString = inputBuffer.toString();
                         curState = nextState;
                         inputBuffer.delete(0, val.length());
                         cmdBuffer.append(val);
                         found = true;
                         if (curState.equals("message")) {
                             in_msg_state = true;
+                        } else if (curState.equals("if") || curState.equals("while")) {
+                            in_if_or_while_state = true;
+                        } else if (curState.equals("then")) {
+                            in_if_or_while_state = false;
                         }
                         break;
                     }
@@ -166,14 +192,34 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
             if (found == false) break;
         }
+
+        String cmdBufferString = cmdBuffer.toString();
+
         if (in_msg_state == true) {
-            String cmd = cmdBuffer.append(mMessageSeq).toString();
+            String cmd = cmdBufferString + mMessageSeq;
             resultList.add(new AutoCompleteItem("message", 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
+            for (String val : (List<String>) mNodes.get(curState)) {
+                if (val.startsWith(leftString) && !val.equals(leftString)) {
+                    String cmd = cmdBufferString + val;
+                    resultList.add(new AutoCompleteItem(curState, 1.0f, val, cmd));
+                }
+            }
             for (String nextState : (List<String>) mLinks.get(curState)) {
-                for (String val : (List<String>) mNodes.get(nextState)) {
-                    String cmd = cmdBuffer.toString() + val;
-                    resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                if (nextState.equals("then")) {
+                    if (!in_if_or_while_state) {
+                        continue;
+                    } else {
+                        for (String val : (List<String>) mNodes.get(nextState)) {
+                            String cmd = cmdBufferString + val;
+                            resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                        }
+                    }
+                } else {
+                    for (String val : (List<String>) mNodes.get(nextState)) {
+                        String cmd = cmdBufferString + val;
+                        resultList.add(new AutoCompleteItem(nextState, 0.1f, val, cmd));
+                    }
                 }
             }
         } else {
@@ -181,12 +227,13 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             for (String nextState : (List<String>) mLinks.get(curState)) {
                 for (String val : (List<String>) mNodes.get(nextState)) {
                     if (val.startsWith(tempInput)) {
-                        String cmd = cmdBuffer.toString() + val;
+                        String cmd = cmdBufferString + val;
                         resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                     }
                 }
             }
         }
+        Collections.sort(resultList, mResultComparator);
         BusProvider.getRestBusInstance().post(new GetAutoCompleteItemEvent(resultList));
     }
 }

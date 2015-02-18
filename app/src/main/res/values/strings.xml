@@ -76,5 +76,6 @@
     <string name="pref_loading_auto_item">正在下载自动补全数据...</string>
     <string name="pref_load_auto_item_success">自动补全数据下载完成</string>
     <string name="pref_load_auto_item_faild">自动补全数据下载失败</string>
+    <string name="pref_network_profile">网络</string>
 
 </resources>

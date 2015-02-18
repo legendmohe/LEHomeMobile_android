@@ -32,6 +32,11 @@
             android:key="pref_message_end"
             android:enabled="false" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_network_profile">
+        <Preference
+            android:title="@string/pref_load_auto_item"
+            android:key="load_auto_item" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference
             android:key="pref_auto_connect_sco"
@@ -43,8 +48,5 @@
         <Preference
             android:title="@string/pref_clean_cmd_history"
             android:key="clean_cmd_history" />
-        <Preference
-            android:title="@string/pref_load_auto_item"
-            android:key="load_auto_item" />
     </PreferenceCategory>
 </PreferenceScreen>
