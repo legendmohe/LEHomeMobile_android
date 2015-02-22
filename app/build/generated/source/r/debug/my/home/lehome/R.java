@@ -1748,22 +1748,24 @@ containing a value of this type.
         public static final int pref_sub_only_summ=0x7f0c0049;
         public static final int pref_user_profile=0x7f0c004a;
         public static final int qs_default_input=0x7f0c004b;
-        public static final int speech_cmd_need_confirm=0x7f0c004c;
-        public static final int speech_error=0x7f0c004d;
-        public static final int speech_initializing=0x7f0c004e;
-        public static final int speech_no_result=0x7f0c004f;
-        public static final int speech_processing=0x7f0c0050;
-        public static final int speech_release_cancel=0x7f0c0051;
-        public static final int speech_speaking=0x7f0c0052;
-        public static final int speech_start_faild=0x7f0c0053;
-        public static final int speech_too_short=0x7f0c0054;
-        public static final int title_activity_settings=0x7f0c0055;
-        public static final int title_activity_wakeup=0x7f0c0056;
-        public static final int title_section1=0x7f0c0057;
-        public static final int title_section2=0x7f0c0058;
-        public static final int title_section3=0x7f0c0059;
-        public static final int voice_input=0x7f0c005a;
-        public static final int welcome=0x7f0c005b;
+        public static final int save_local_history_error=0x7f0c004c;
+        public static final int save_local_history_success=0x7f0c004d;
+        public static final int speech_cmd_need_confirm=0x7f0c004e;
+        public static final int speech_error=0x7f0c004f;
+        public static final int speech_initializing=0x7f0c0050;
+        public static final int speech_no_result=0x7f0c0051;
+        public static final int speech_processing=0x7f0c0052;
+        public static final int speech_release_cancel=0x7f0c0053;
+        public static final int speech_speaking=0x7f0c0054;
+        public static final int speech_start_faild=0x7f0c0055;
+        public static final int speech_too_short=0x7f0c0056;
+        public static final int title_activity_settings=0x7f0c0057;
+        public static final int title_activity_wakeup=0x7f0c0058;
+        public static final int title_section1=0x7f0c0059;
+        public static final int title_section2=0x7f0c005a;
+        public static final int title_section3=0x7f0c005b;
+        public static final int voice_input=0x7f0c005c;
+        public static final int welcome=0x7f0c005d;
     }
     public static final class style {
         /** 

@@ -1,4 +1,4 @@
-package my.home.domain;
+package my.home.domain.usecase;
 
 
 import android.content.Context;
@@ -9,12 +9,12 @@ import com.squareup.otto.Subscribe;
 import java.lang.ref.WeakReference;
 
 import my.home.common.BusProvider;
-import my.home.domain.events.LoadAutoCompleteConfEvent;
-import my.home.domain.events.ShowAutoCompleteItemEvent;
+import my.home.domain.events.DLoadAutoCompleteConfEvent;
+import my.home.domain.events.DShowAutoCompleteItemEvent;
 import my.home.model.datasource.AutoCompleteItemDataSource;
 import my.home.model.datasource.AutoCompleteItemDataSourceImpl;
-import my.home.model.events.ConfAutoCompleteItemEvent;
-import my.home.model.events.GetAutoCompleteItemEvent;
+import my.home.model.events.MConfAutoCompleteItemEvent;
+import my.home.model.events.MGetAutoCompleteItemEvent;
 
 /**
  * Created by legendmohe on 15/2/8.
@@ -62,13 +62,13 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
     }
 
     @Subscribe
-    public void onGetAutoCompleteItems(GetAutoCompleteItemEvent event) {
-        BusProvider.getRestBusInstance().post(new ShowAutoCompleteItemEvent(event.getResultList()));
+    public void onGetAutoCompleteItems(MGetAutoCompleteItemEvent event) {
+        BusProvider.getRestBusInstance().post(new DShowAutoCompleteItemEvent(event.getResultList()));
     }
 
     @Subscribe
-    public void onConfAutoCompleteItems(ConfAutoCompleteItemEvent event) {
-        BusProvider.getRestBusInstance().post(new LoadAutoCompleteConfEvent(event.getReturnCode()));
+    public void onConfAutoCompleteItems(MConfAutoCompleteItemEvent event) {
+        BusProvider.getRestBusInstance().post(new DLoadAutoCompleteConfEvent(event.getReturnCode()));
     }
 
     @Override

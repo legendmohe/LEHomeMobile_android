@@ -77,5 +77,7 @@
     <string name="pref_load_auto_item_success">自动补全数据下载完成</string>
     <string name="pref_load_auto_item_faild">自动补全数据下载失败</string>
     <string name="pref_network_profile">网络</string>
+    <string name="save_local_history_success">输入历史保存完成</string>
+    <string name="save_local_history_error">保存输入历史出错</string>
 
 </resources>

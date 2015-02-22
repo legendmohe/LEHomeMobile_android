@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import my.home.common.BusProvider;
+import my.home.model.entities.AutoCompleteCountHolder;
 import my.home.model.entities.AutoCompleteItem;
-import my.home.model.events.ConfAutoCompleteItemEvent;
-import my.home.model.events.GetAutoCompleteItemEvent;
+import my.home.model.events.MConfAutoCompleteItemEvent;
+import my.home.model.events.MGetAutoCompleteItemEvent;
+import my.home.model.events.MSaveAutoCompleteLocalHistoryEvent;
 
 /**
  * Created by legendmohe on 15/2/13.
@@ -29,13 +35,17 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
 
     public static final String TAG = "AutoCompleteItemDataSourceImpl";
 
+    public static final float DEFAULT_AUTOCOMPLETE_WEIGHT = 0.0f;
+
     public static AutoCompleteItemDataSourceImpl INSTANCE;
 
-    private Map mNodes;
-    private Map mLinks;
+    private Map<String, List<String>> mNodes;
+    private Map<String, List<String>> mLinks;
     private String mMessageSeq;
     private String mInitState;
     private boolean mLoadSuccess = false;
+    private Map<String, AutoCompleteCountHolder> mAutoCompleteCountHolderMap;
+    private HashMap<String, Integer> mWeightDivides;
 
     private static Comparator<AutoCompleteItem> mResultComparator;
 
@@ -65,34 +75,35 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     public void saveConf(Context context, String confJSONString) {
         if (context == null) {
             Log.e(TAG, "invaild mcontext.");
-            BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.ERROR));
+            BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.ERROR));
             return;
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CONF_KEY, confJSONString);
+        editor.putString(CONF_KEY_GET_AUTOCOMPLETE_ITEM, confJSONString);
         editor.apply();
-        BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.SUCCESS));
+        BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.SUCCESS));
     }
 
     @Override
     public void loadConf(Context context) {
         if (context == null) {
             Log.e(TAG, "invaild mcontext.");
-            BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.ERROR));
+            BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.ERROR));
             return;
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
         if (sharedPreferences == null) {
             Log.e(TAG, "invaild share preference.");
-            BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.ERROR));
+            BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.ERROR));
             return;
         }
-        String confSrc = sharedPreferences.getString(CONF_KEY, "{}");
+        String confSrc = sharedPreferences.getString(CONF_KEY_GET_AUTOCOMPLETE_ITEM, "{}");
         if (initConf(confSrc)) {
-            BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.SUCCESS));
+            loadAutoCompleteLocalHistory(context);
+            BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.SUCCESS));
         } else {
-            BusProvider.getRestBusInstance().post(new ConfAutoCompleteItemEvent(ConfAutoCompleteItemEvent.ERROR));
+            BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.ERROR));
         }
     }
 
@@ -100,8 +111,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         try {
             JSONObject confJSONObject = new JSONObject(confSrc);
 
-            mNodes = new HashMap();
-            mLinks = new HashMap();
+            mNodes = new HashMap<>();
+            mLinks = new HashMap<>();
 
             JSONObject jLinks = confJSONObject.getJSONObject("links");
             for (Iterator iter = jLinks.keys(); iter.hasNext(); ) {
@@ -140,21 +151,22 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
 
     @Override
     public void getAutoCompleteItems(String currentInput) {
-        List resultList = new ArrayList();
-        if (mLoadSuccess == false)
-            BusProvider.getRestBusInstance().post(new GetAutoCompleteItemEvent(resultList));
+        if (!mLoadSuccess) {
+            BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(new ArrayList()));
+            return;
+        }
 
-        boolean in_msg_state = false;
+        boolean in_msg_ind_state = false;
         boolean in_if_or_while_state = false;
-        StringBuffer inputBuffer = new StringBuffer(currentInput);
         String leftString = "";
-//        String lastString = "";
+        String lastString = "";
         StringBuffer cmdBuffer = new StringBuffer();
+        StringBuffer inputBuffer = new StringBuffer(currentInput);
         String curState = mInitState;
         while (inputBuffer.length() > 0) {
-            if (in_msg_state) {
+            if (in_msg_ind_state) {
                 if (inputBuffer.toString().startsWith(mMessageSeq)) {
-                    in_msg_state = false;
+                    in_msg_ind_state = false;
                 }
                 cmdBuffer.append(inputBuffer.charAt(0));
                 inputBuffer.deleteCharAt(0);
@@ -163,23 +175,26 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             boolean found = false;
             String tempInput = inputBuffer.toString();
             if (!mLinks.containsKey(curState)) {
-                BusProvider.getRestBusInstance().post(new GetAutoCompleteItemEvent(resultList));
+                BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(new ArrayList()));
                 return;
             }
-            for (String nextState : (List<String>) mLinks.get(curState)) {
-                if (!in_if_or_while_state && nextState.equals("then")) {
-                    continue;
+            for (String nextState : mLinks.get(curState)) {
+                if (!in_if_or_while_state) {
+                    if (nextState.equals("then")
+                            || nextState.equals("compare")
+                            || nextState.equals("logical"))
+                        continue;
                 }
-                for (String val : (List<String>) mNodes.get(nextState)) {
+                for (String val : mNodes.get(nextState)) {
                     if (tempInput.startsWith(val)) {
-//                        lastString = val;
+                        lastString = val;
                         leftString = inputBuffer.toString();
                         curState = nextState;
                         inputBuffer.delete(0, val.length());
                         cmdBuffer.append(val);
                         found = true;
                         if (curState.equals("message")) {
-                            in_msg_state = true;
+                            in_msg_ind_state = true;
                         } else if (curState.equals("if") || curState.equals("while")) {
                             in_if_or_while_state = true;
                         } else if (curState.equals("then")) {
@@ -188,52 +203,222 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         break;
                     }
                 }
-                if (found == true) break;
+                if (found)
+                    break;
+                else if (curState.equals("message") || mLinks.get(curState).contains("message")) {
+                    found = true;
+                    curState = "message";
+                    cmdBuffer.append(inputBuffer.charAt(0));
+                    inputBuffer.deleteCharAt(0);
+                    break;
+                }
             }
-            if (found == false) break;
+            if (!found) break;
         }
 
-        String cmdBufferString = cmdBuffer.toString();
+        String cmdString = cmdBuffer.toString();
+        List<AutoCompleteItem> resultList = new ArrayList<>();
 
-        if (in_msg_state == true) {
-            String cmd = cmdBufferString + mMessageSeq;
+        if (in_msg_ind_state) {
+            String cmd = cmdString + mMessageSeq;
             resultList.add(new AutoCompleteItem("message", 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
-            for (String val : (List<String>) mNodes.get(curState)) {
+            for (String val : mNodes.get(curState)) {
                 if (val.startsWith(leftString) && !val.equals(leftString)) {
-                    String cmd = cmdBufferString + val;
+                    String cmd = cmdString + val;
                     resultList.add(new AutoCompleteItem(curState, 1.0f, val, cmd));
                 }
             }
-            for (String nextState : (List<String>) mLinks.get(curState)) {
+            for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
-                    if (!in_if_or_while_state) {
-                        continue;
-                    } else {
-                        for (String val : (List<String>) mNodes.get(nextState)) {
-                            String cmd = cmdBufferString + val;
+                    if (in_if_or_while_state) {
+                        for (String val : mNodes.get(nextState)) {
+                            String cmd = cmdString + val;
                             resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                         }
                     }
                 } else {
-                    for (String val : (List<String>) mNodes.get(nextState)) {
-                        String cmd = cmdBufferString + val;
-                        resultList.add(new AutoCompleteItem(nextState, 0.1f, val, cmd));
+                    if (nextState.equals("compare") || nextState.equals("logical"))
+                        if (!in_if_or_while_state)
+                            continue;
+                    for (String val : mNodes.get(nextState)) {
+                        String cmd = cmdString + val;
+                        resultList.add(
+                                autoCompleteItemWithWeight(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd), lastString)
+                        );
                     }
                 }
             }
         } else {
             String tempInput = inputBuffer.toString();
-            for (String nextState : (List<String>) mLinks.get(curState)) {
-                for (String val : (List<String>) mNodes.get(nextState)) {
+            for (String nextState : mLinks.get(curState)) {
+                for (String val : mNodes.get(nextState)) {
                     if (val.startsWith(tempInput)) {
-                        String cmd = cmdBufferString + val;
+                        String cmd = cmdString + val;
                         resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                     }
                 }
             }
         }
         Collections.sort(resultList, mResultComparator);
-        BusProvider.getRestBusInstance().post(new GetAutoCompleteItemEvent(resultList));
+        BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(resultList));
+    }
+
+    private void loadAutoCompleteLocalHistory(Context context) {
+        mAutoCompleteCountHolderMap = loadLocalHistory(context);
+        if (mAutoCompleteCountHolderMap != null) {
+            mWeightDivides = getWeightDivides(mAutoCompleteCountHolderMap);
+        }
+    }
+
+    private AutoCompleteItem autoCompleteItemWithWeight(AutoCompleteItem toItem, String from) {
+        String key = from + toItem.getContent();
+        AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
+        if (countHolder == null) {
+            toItem.setWeight(DEFAULT_AUTOCOMPLETE_WEIGHT);
+            return toItem;
+        }
+        float weight = mAutoCompleteCountHolderMap.get(key).count * 1.0f / mWeightDivides.get(from);
+        toItem.setWeight(weight);
+
+        Log.d(TAG, "from: " + from + " to: " + toItem.getContent() + " weight: " + weight);
+        return toItem;
+    }
+
+    private void incAutoCompleteItemWeight(String from, String to) {
+        String key = from + to;
+        AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
+        if (countHolder == null) {
+            countHolder = new AutoCompleteCountHolder(from, to, 0);
+            mAutoCompleteCountHolderMap.put(key, countHolder);
+            if (!mWeightDivides.containsKey(from)) {
+                mWeightDivides.put(from, 0);
+            }
+        }
+        countHolder.count = countHolder.count + 1;
+        mWeightDivides.put(from, mWeightDivides.get(from) + 1);
+        Log.d(TAG, "from: " + from + ", to: " + to + " count: " + countHolder.count + " div: " + mWeightDivides.get(from));
+    }
+
+    public void markCurrentInput(String inputString) {
+        Log.d(TAG, "mark: " + inputString);
+        StringBuffer inputBuffer = new StringBuffer(inputString);
+        boolean in_if_or_while_state = false;
+        boolean in_msg_ind_state = false;
+        String lastString = null;
+        String curState = mInitState;
+        while (inputBuffer.length() > 0) {
+            if (in_msg_ind_state) {
+                if (inputBuffer.toString().startsWith(mMessageSeq)) {
+                    in_msg_ind_state = false;
+                }
+                inputBuffer.deleteCharAt(0);
+                continue;
+            }
+            boolean found = false;
+            String tempInput = inputBuffer.toString();
+            if (!mLinks.containsKey(curState)) {
+                return;
+            }
+            for (String nextState : mLinks.get(curState)) {
+                if (!in_if_or_while_state) {
+                    if (nextState.equals("then")
+                            || nextState.equals("compare")
+                            || nextState.equals("logical"))
+                        continue;
+                }
+                for (String val : mNodes.get(nextState)) {
+                    if (tempInput.startsWith(val)) {
+                        if (lastString != null)
+                            incAutoCompleteItemWeight(lastString, val);
+
+                        lastString = val;
+                        curState = nextState;
+                        inputBuffer.delete(0, val.length());
+                        found = true;
+                        if (curState.equals("message")) {
+                            in_msg_ind_state = true;
+                        } else if (curState.equals("if") || curState.equals("while")) {
+                            in_if_or_while_state = true;
+                        } else if (curState.equals("then")) {
+                            in_if_or_while_state = false;
+                        }
+                        break;
+                    }
+                }
+                if (found)
+                    break;
+                else if (curState.equals("message") || mLinks.get(curState).contains("message")) {
+                    found = true;
+                    curState = "message";
+                    inputBuffer.deleteCharAt(0);
+                    break;
+                }
+            }
+            if (!found) break;
+        }
+    }
+
+    @Override
+    public void saveLocalHistory(Context context) {
+        if (saveLocalHistory(context, mAutoCompleteCountHolderMap)) {
+            BusProvider.getRestBusInstance().post(
+                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.SUCCESS)
+            );
+        } else {
+            BusProvider.getRestBusInstance().post(
+                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.ERROR)
+            );
+        }
+    }
+
+    private boolean saveLocalHistory(Context context, Map<String, AutoCompleteCountHolder> localHistorys) {
+        if (context == null) {
+            Log.e(TAG, "invaild mcontext.");
+            return false;
+        }
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String objJson = new Gson().toJson(localHistorys);
+        editor.putString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, objJson);
+        editor.apply();
+        return true;
+    }
+
+    private Map<String, AutoCompleteCountHolder> loadLocalHistory(Context context) {
+        if (context == null) {
+            Log.e(TAG, "invaild mcontext.");
+            return null;
+        }
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+        if (sharedPreferences == null) {
+            Log.e(TAG, "invaild share preference.");
+            return null;
+        }
+        String savedJson = sharedPreferences.getString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, null);
+        if (savedJson == null)
+            return new HashMap<String, AutoCompleteCountHolder>();
+
+        Type type = new TypeToken<Map<String, AutoCompleteCountHolder>>() {
+        }.getType();
+        Map<String, AutoCompleteCountHolder> result = new Gson().fromJson(savedJson, type);
+        if (result != null) {
+            return result;
+        }
+        return null;
+    }
+
+    public static HashMap<String, Integer> getWeightDivides(Map<String, AutoCompleteCountHolder> weightHolders) {
+        HashMap<String, Integer> result = new HashMap<String, Integer>(weightHolders.size());
+        for (AutoCompleteCountHolder holder : weightHolders.values()) {
+            String key = holder.from; // only 'from' as key
+            Integer val = result.get(key);
+            if (val == null) {
+                result.put(key, holder.count);
+            } else {
+                result.put(key, val + holder.count);
+            }
+        }
+        return result;
     }
 }

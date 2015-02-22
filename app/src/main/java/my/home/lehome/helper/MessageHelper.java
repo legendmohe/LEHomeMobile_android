@@ -98,7 +98,7 @@ public class MessageHelper {
 
     public static void sendToast(String content) {
         Message msg = new Message();
-        msg.what = ChatFragment.TOAST;
+        msg.what = ChatFragment.MSG_TYPE_TOAST;
         msg.obj = content;
         ChatFragment.sendMessage(msg);
     }
@@ -136,7 +136,7 @@ public class MessageHelper {
         } else {
             unreadMsgCount = 0;
             Message msg = new Message();
-            msg.what = ChatFragment.CHATITEM;
+            msg.what = ChatFragment.MSG_TYPE_CHATITEM;
             msg.obj = newItem;
             ChatFragment.sendMessage(msg);
         }

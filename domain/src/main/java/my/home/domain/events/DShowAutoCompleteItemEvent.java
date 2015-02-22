@@ -1,14 +1,14 @@
-package my.home.model.events;
+package my.home.domain.events;
 
 import java.util.List;
 
 /**
- * Created by legendmohe on 15/2/13.
+ * Created by legendmohe on 15/2/15.
  */
-public class GetAutoCompleteItemEvent {
+public class DShowAutoCompleteItemEvent {
     private List resultList;
 
-    public GetAutoCompleteItemEvent(List resultList) {
+    public DShowAutoCompleteItemEvent(List resultList) {
         this.resultList = resultList;
     }
 

@@ -1,15 +1,15 @@
-package my.home.domain.events;
+package my.home.model.events;
 
 /**
- * Created by legendmohe on 15/2/15.
+ * Created by legendmohe on 15/2/19.
  */
-public class LoadAutoCompleteConfEvent {
+public class MSaveAutoCompleteLocalHistoryEvent {
     public static final int SUCCESS = 0;
     public static final int ERROR = 1;
 
     private int returnCode;
 
-    public LoadAutoCompleteConfEvent(int code) {
+    public MSaveAutoCompleteLocalHistoryEvent(int code) {
         this.returnCode = code;
     }
 

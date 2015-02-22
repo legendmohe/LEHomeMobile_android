@@ -33,8 +33,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -47,8 +45,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import my.home.common.Constants;
@@ -58,9 +54,11 @@ import my.home.lehome.adapter.AutoCompleteAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter.ResendButtonClickListener;
 import my.home.lehome.asynctask.LoadMoreChatItemAsyncTask;
-import my.home.lehome.asynctask.SendCommandAsyncTask;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
+import my.home.lehome.mvp.views.ChatItemListView;
+import my.home.lehome.mvp.views.SaveLocalHistoryView;
 import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.SpeechDialog;
@@ -69,7 +67,11 @@ import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.Shortcut;
 
-public class ChatFragment extends Fragment implements SpeechDialogResultListener, ResendButtonClickListener, AutoCompleteAdapter.onLoadConfListener {
+public class ChatFragment extends Fragment implements SpeechDialogResultListener
+        , ResendButtonClickListener
+        , AutoCompleteAdapter.onLoadConfListener
+        , SaveLocalHistoryView
+        , ChatItemListView {
     public static final String TAG = ChatFragment.class.getName();
 
     /*
@@ -82,7 +84,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     private OnGlobalLayoutListener mKeyboardListener;
     private ListView mCmdListview;
     private DelayAutoCompleteTextView mSendCmdEdittext;
-//    private ArrayAdapter<String> mAutoCompleteAdapter;
+    private ChatFragmentPresenter mChatFragmentPresenter;
 
     /*
      * common variables
@@ -98,7 +100,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     /*
      * history
      */
-    private HashSet<String> mAutoCompleteHashSet = new HashSet<String>();
     private AutoCompleteAdapter mAutoCompleteAdapter;
 
     /*
@@ -113,16 +114,9 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     /*
      * constant
      */
-    public static final int CHATITEM = 1;
-    public static final int TOAST = 2;
-    public static final int VOICE_CMD = 3;
-
-    /*
-     * settings
-     */
-    public static final int CHATITEM_LOAD_LIMIT = 20;
-    public static final int CHATITEM_LOWEST_INDEX = 1;
-    public static final float DIALOG_CANCEL_Y_PERSENT = 0.57f;
+    public static final int MSG_TYPE_CHATITEM = 1;
+    public static final int MSG_TYPE_TOAST = 2;
+    public static final int MSG_TYPE_VOICE_CMD = 3;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -137,7 +131,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                if (msg.what == CHATITEM) {
+                if (msg.what == MSG_TYPE_CHATITEM) {
                     ChatItem newItem = (ChatItem) msg.obj;
                     if (newItem != null) {
                         Log.d(TAG, "onSubscribalbeReceiveMsg : " + newItem.getContent());
@@ -152,7 +146,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                             ChatFragment.this.scrollMyListViewToBottom();
                         }
                     }
-                } else if (msg.what == TOAST) {
+                } else if (msg.what == MSG_TYPE_TOAST) {
                     if (getActivity() != null) {
                         Context context = getActivity().getApplicationContext();
                         if (context != null) {
@@ -163,13 +157,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                                     .show();
                         }
                     }
-                } else if (msg.what == VOICE_CMD) {
+                } else if (msg.what == MSG_TYPE_VOICE_CMD) {
                     startRecognize(getActivity());
                 }
             }
 
         };
-
+        mChatFragmentPresenter = new ChatFragmentPresenter(this, this);
+        mChatFragmentPresenter.start();
     }
 
     ;
@@ -178,6 +173,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public void onDestroy() {
         super.onDestroy();
         mAutoCompleteAdapter.destory();
+        mChatFragmentPresenter.stop();
     }
 
     public static boolean sendMessage(Message msg) {
@@ -195,8 +191,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
 
         mCmdListview = (ListView) rootView.findViewById(R.id.chat_list);
-//        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(mAdapter);
-//        animationAdapter.setAbsListView(mCmdListview);
         mCmdListview.setAdapter(mAdapter);
 
 
@@ -212,8 +206,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                             InputMethodManager.HIDE_NOT_ALWAYS);
                 } else if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                     if (mTopVisibleIndex == 0
-                            && mAdapter.getItem(0).getId() > CHATITEM_LOWEST_INDEX) {
-                        new LoadMoreChatItemAsyncTask(ChatFragment.this).execute(CHATITEM_LOAD_LIMIT);
+                            && mAdapter.getItem(0).getId() > Constants.CHATITEM_LOWEST_INDEX) {
+                        new LoadMoreChatItemAsyncTask(ChatFragment.this).execute(Constants.CHATITEM_LOAD_LIMIT);
                     }
                 }
             }
@@ -291,7 +285,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     }
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getRawY() / mScreenHeight <= DIALOG_CANCEL_Y_PERSENT) {
+                    if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
                         Log.d(TAG, "cancelListening.");
                         mSpeechDialog.cancelListening();
                     } else {
@@ -302,7 +296,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 //                	Log.d(TAG, String.valueOf(event.getRawY()/mScreenHeight));
                     if (mSpeechDialog != null) {
-                        if (event.getRawY() / mScreenHeight <= DIALOG_CANCEL_Y_PERSENT) {
+                        if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
                             mSpeechDialog.setReleaseCancelVisible(true);
                         } else {
                             mSpeechDialog.setReleaseCancelVisible(false);
@@ -321,9 +315,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     // Perform action on key press
                     String messageString = mSendCmdEdittext.getText().toString();
                     if (!messageString.trim().equals("")) {
-                        MainActivity mainActivity = (MainActivity) getActivity();
-                        new SendCommandAsyncTask(mainActivity, messageString).execute();
-                        ChatFragment.this.addCmdHistory(messageString);
+                        mChatFragmentPresenter.markAndSendCurrentInput(messageString);
                         mSendCmdEdittext.setText("");
                     }
                     return true;
@@ -345,7 +337,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 Editable editable = mSendCmdEdittext.getText();
                 Selection.setSelection(editable, editable.length());
                 mSendCmdEdittext.performFiltering(editable);
-//                mSendCmdEdittext.showDropDown();
             }
         });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
@@ -394,9 +385,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
         });
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(mKeyboardListener);
-
-//        mProgressBar = (ProgressBar) rootView.findViewById(R.id.send_msg_progressbar);
-//        mProgressBar.setVisibility(View.INVISIBLE);
 
         mToast = Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT);
 
@@ -450,9 +438,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
                 return true;
             case R.id.resend_item:
-                MainActivity mainActivity = (MainActivity) getActivity();
-                new SendCommandAsyncTask(mainActivity, selectedString).execute();
-                this.addCmdHistory(selectedString);
+                mChatFragmentPresenter.markAndSendCurrentInput(selectedString);
                 return true;
             case R.id.copy_item:
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -483,13 +469,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         display.getSize(size);
         mScreenWidth = size.x;
         mScreenHeight = size.y;
-//		scrollMyListViewToBottom();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mKeyboard_open) {
+        if (mKeyboard_open && getActivity() != null) {
             InputMethodManager inputManager =
                     (InputMethodManager) getActivity().
                             getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -523,78 +508,34 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         Log.d(TAG, "onResume");
 
         MessageHelper.resetUnreadCount();
-        this.resetDatas();
-
-//		this.registerBTSCO(getActivity().getApplicationContext());
+        mChatFragmentPresenter.resetDatas(getActivity());
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause");
-//    	this.unregisterBTSCO(getActivity().getApplicationContext());
-//    	this.closeSCO(getActivity().getApplicationContext());
     }
 
     @Override
     public void onStart() {
-//        mSendCmdEdittext.setAdapter(this.setupAutoComplete(getActivity()));
         super.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        this.saveCmdHistory(getActivity());
+        mChatFragmentPresenter.saveSaveLocalHistory();
     }
 
 
     // =========================================================================================
-
-
-//    private ArrayAdapter<String> setupAutoComplete(Context context) {
-//        SharedPreferences pref = context.getSharedPreferences(Constants.PREF_NAME, 0);
-//        Set<String> cmdSet = pref.getStringSet(Constants.CMD_HISTORY_PREF_NAME, new HashSet<String>());
-//
-//        mAutoCompleteHashSet.clear();
-//        mAutoCompleteHashSet.addAll(cmdSet);
-//        mAutoCompleteAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
-//        mAutoCompleteAdapter.addAll(cmdSet);
-//
-//        Log.d(TAG, "setupAutoCompleteArrayAdapter: " + cmdSet.size());
-//        return mAutoCompleteAdapter;
-//    }
-
-    private void addCmdHistory(String cmd) {
-        if (!mAutoCompleteHashSet.contains(cmd)) {
-            mAutoCompleteHashSet.add(cmd);
-//            mAutoCompleteAdapter.add(cmd);
-
-            Log.d(TAG, "addCmdHistory: " + cmd);
-        }
-    }
-
-    private void saveCmdHistory(Context context) {
-        SharedPreferences pref = context.getSharedPreferences(Constants.PREF_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putStringSet(Constants.CMD_HISTORY_PREF_NAME, mAutoCompleteHashSet);
-        editor.commit();
-
-        Log.d(TAG, "saveCmdHistory: " + mAutoCompleteHashSet.size());
-    }
 
     @Override
     public void onLoadComplete(boolean loadSuccess) {
         Log.i(TAG, "load autocomplete conf: " + loadSuccess);
     }
 
-    public void resetDatas() {
-        List<ChatItem> chatItems = DBHelper.loadLatest(this.getActivity(), CHATITEM_LOAD_LIMIT);
-        if (chatItems != null) {
-            Collections.reverse(chatItems); // reverse descend items
-            mAdapter.setData(chatItems);
-        }
-    }
 
     private void showTip(String str) {
         if (!TextUtils.isEmpty(str)) {
@@ -612,24 +553,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 //                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
             }
         });
-    }
-
-    public void addChatItem(ChatItem item) {
-        Animation anim = AnimationUtils.loadAnimation(
-                this.getActivity(), android.R.anim.slide_out_right
-        );
-        anim.setDuration(500);
-        mAdapter.add(item);
-        mCmdListview.getChildAt(mAdapter.getPosition(item)).startAnimation(anim);
-
-        new Handler().postDelayed(new Runnable() {
-
-            public void run() {
-                mAdapter.notifyDataSetChanged();
-
-            }
-
-        }, anim.getDuration());
     }
 
     public ChatItemArrayAdapter getAdapter() {
@@ -678,8 +601,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             boolean need_confirm = mySharedPreferences.getBoolean("pref_speech_cmd_need_confirm", true);
             if (!need_confirm) {
-                new SendCommandAsyncTask(context, msgString).execute();
-                ChatFragment.this.addCmdHistory(msgString);
+                mChatFragmentPresenter.markAndSendCurrentInput(msgString);
                 inRecogintion = false;
             } else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -701,8 +623,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 alert.setPositiveButton(getResources().getString(R.string.com_comfirm)
                         , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        new SendCommandAsyncTask(context, msgString).execute();
-                        ChatFragment.this.addCmdHistory(msgString);
+                        mChatFragmentPresenter.markAndSendCurrentInput(msgString);
                         inRecogintion = false;
                     }
                 });
@@ -729,9 +650,27 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     @Override
     public void onResendButtonClicked(int pos) {
         ChatItem item = this.getAdapter().getItem(pos);
-        MainActivity mainActivity = (MainActivity) getActivity();
-        new SendCommandAsyncTask(mainActivity, item).execute();
-        //this.addCmdHistory(item.getContent());
+        mChatFragmentPresenter.markAndSendCurrentChatItem(item);
     }
 
+    @Override
+    public void onSaveLocalHistoryFinish(boolean success) {
+        if (!success) {
+            Toast.makeText(
+                    getActivity()
+                    , getString(R.string.save_local_history_error)
+                    , Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    @Override
+    public void onResetDatas(List<ChatItem> chatItems) {
+        mAdapter.setData(chatItems);
+    }
+
+    @Override
+    public Context getContext() {
+        return getActivity();
+    }
 }

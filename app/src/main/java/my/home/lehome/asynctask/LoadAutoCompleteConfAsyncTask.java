@@ -19,10 +19,10 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 
 import my.home.common.BusProvider;
-import my.home.domain.AutoCompleteItemUsecase;
-import my.home.domain.AutoCompleteItemUsecaseImpl;
+import my.home.domain.usecase.AutoCompleteItemUsecase;
+import my.home.domain.usecase.AutoCompleteItemUsecaseImpl;
 import my.home.lehome.R;
-import my.home.model.events.ConfAutoCompleteItemEvent;
+import my.home.model.events.MConfAutoCompleteItemEvent;
 
 /**
  * Created by legendmohe on 15/2/15.
@@ -93,8 +93,8 @@ public class LoadAutoCompleteConfAsyncTask extends AsyncTask<String, String, Boo
     }
 
     @Subscribe
-    public void onConfAutoCompleteItems(ConfAutoCompleteItemEvent event) {
-        if (event.getReturnCode() == ConfAutoCompleteItemEvent.ERROR) {
+    public void onConfAutoCompleteItems(MConfAutoCompleteItemEvent event) {
+        if (event.getReturnCode() == MConfAutoCompleteItemEvent.ERROR) {
             mResult = false;
         } else {
             mResult = true;

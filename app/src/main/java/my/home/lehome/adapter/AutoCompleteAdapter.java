@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import my.home.common.BusProvider;
-import my.home.domain.AutoCompleteItemUsecase;
-import my.home.domain.AutoCompleteItemUsecaseImpl;
-import my.home.domain.events.LoadAutoCompleteConfEvent;
-import my.home.domain.events.ShowAutoCompleteItemEvent;
+import my.home.domain.events.DLoadAutoCompleteConfEvent;
+import my.home.domain.events.DShowAutoCompleteItemEvent;
+import my.home.domain.usecase.AutoCompleteItemUsecase;
+import my.home.domain.usecase.AutoCompleteItemUsecaseImpl;
 import my.home.lehome.R;
 import my.home.model.entities.AutoCompleteItem;
 
@@ -118,15 +118,15 @@ public class AutoCompleteAdapter extends BaseAdapter implements Filterable {
     }
 
     @Subscribe
-    public void onGetAutoCompleteItems(ShowAutoCompleteItemEvent event) {
+    public void onGetAutoCompleteItems(DShowAutoCompleteItemEvent event) {
         mResultList = event.getResultList();
     }
 
     @Subscribe
-    public void onConfAutoCompleteItems(LoadAutoCompleteConfEvent event) {
+    public void onConfAutoCompleteItems(DLoadAutoCompleteConfEvent event) {
         if (mLoadConfListener == null || mLoadConfListener.get() == null)
             return;
-        if (event.getReturnCode() == LoadAutoCompleteConfEvent.ERROR) {
+        if (event.getReturnCode() == DLoadAutoCompleteConfEvent.ERROR) {
             mLoadConfListener.get().onLoadComplete(false);
         } else {
             mLoadConfListener.get().onLoadComplete(true);

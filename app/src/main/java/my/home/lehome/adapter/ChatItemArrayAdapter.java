@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.skyfishjy.library.RippleBackground;
@@ -61,42 +60,40 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
         ChatItem chatItem = getItem(position);
-        if (row == null) {
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if (chatItem.getIsMe())
-                row = inflater.inflate(R.layout.chat_item_onright, parent, false);
+                convertView = inflater.inflate(R.layout.chat_item_onright, parent, false);
             else
-                row = inflater.inflate(R.layout.chat_item_onleft, parent, false);
+                convertView = inflater.inflate(R.layout.chat_item_onleft, parent, false);
 
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.chatTextView = (TextView) convertView.findViewById(R.id.chat_content_textview);
+            viewHolder.rippleBackground = (RippleBackground) convertView.findViewById(R.id.profile_rippleBackground);
+            viewHolder.errorButton = (ImageButton) convertView.findViewById(R.id.resend_imagebutton);
+            viewHolder.dateTextView = (TextView) convertView.findViewById(R.id.date_textview);
+            convertView.setTag(viewHolder);
         }
 
-        RelativeLayout wrapper = (RelativeLayout) row.findViewById(R.id.wrapper);
-        chatTextView = (TextView) row.findViewById(R.id.chat_content_textview);
-        chatTextView.setText(chatItem.getContent());
+        ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+        viewHolder.chatTextView.setText(chatItem.getContent());
 
         if (chatItem.getIsMe()) {
-            RippleBackground rippleBackground = (RippleBackground) row.findViewById(R.id.profile_rippleBackground);
-            rippleBackground.startRippleAnimation();
-            ImageButton errorButton = (ImageButton) row.findViewById(R.id.resend_imagebutton);
-//            ProgressBar pendingButton = (ProgressBar) row.findViewById(R.id.pending_progressbar);
+            viewHolder.rippleBackground.startRippleAnimation();
             if (chatItem.getState() == Constants.CHATITEM_STATE_SUCCESS
                     || !chatItem.getIsMe()) {
-                errorButton.setVisibility(View.GONE);
-//                rippleBackground.setVisibility(View.GONE);
-                rippleBackground.stopRippleAnimation();
+                viewHolder.errorButton.setVisibility(View.GONE);
+                viewHolder.rippleBackground.stopRippleAnimation();
             } else if (chatItem.getState() == Constants.CHATITEM_STATE_PENDING) {
-                errorButton.setVisibility(View.GONE);
-//                rippleBackground.setVisibility(View.VISIBLE);
-                rippleBackground.startRippleAnimation();
+                viewHolder.errorButton.setVisibility(View.GONE);
+                viewHolder.rippleBackground.startRippleAnimation();
             } else {
-                errorButton.setVisibility(View.VISIBLE);
-//                rippleBackground.setVisibility(View.GONE);
-                rippleBackground.stopRippleAnimation();
+                viewHolder.errorButton.setVisibility(View.VISIBLE);
+                viewHolder.rippleBackground.stopRippleAnimation();
                 if (mResendButtonClickListener != null) {
                     final int pos = position;
-                    errorButton.setOnClickListener(new View.OnClickListener() {
+                    viewHolder.errorButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             mResendButtonClickListener.onResendButtonClicked(pos);
@@ -106,17 +103,16 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             }
         }
 
-        TextView dateTextView = (TextView) row.findViewById(R.id.date_textview);
         String dateString = getTimeWithFormat(position);
         if (dateString != null) {
-            dateTextView.setText(dateString);
-            dateTextView.setVisibility(View.VISIBLE);
+            viewHolder.dateTextView.setText(dateString);
+            viewHolder.dateTextView.setVisibility(View.VISIBLE);
         } else {
-            dateTextView.setVisibility(View.INVISIBLE);
+            viewHolder.dateTextView.setVisibility(View.INVISIBLE);
         }
 
 
-        return row;
+        return convertView;
     }
 
     private String getTimeWithFormat(int position) {
@@ -133,6 +129,13 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                 return null;
             }
         }
+    }
+
+    static class ViewHolder {
+        TextView chatTextView;
+        RippleBackground rippleBackground;
+        ImageButton errorButton;
+        TextView dateTextView;
     }
 
 	/*

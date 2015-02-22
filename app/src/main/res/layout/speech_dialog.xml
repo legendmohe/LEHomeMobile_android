@@ -21,11 +21,11 @@
 
     </com.skyfishjy.library.RippleBackground>
 
-    <ImageView
+    <ImageButton
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/speech_imageButton"
-        android:clickable="false"
+        android:clickable="true"
         android:focusable="false"
         android:background="@drawable/chat_profile_chatto7"
         android:layout_centerInParent="true" />

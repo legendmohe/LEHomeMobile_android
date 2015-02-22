@@ -12,7 +12,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,7 +66,7 @@ public class SpeechDialog extends Dialog {
     private TextView mReleaseTextView;
     private ProgressBar mVolumnProgressBar;
     private View mSpeechContentView;
-    private ImageView mSpeechImageView;
+    private ImageButton mSpeechImageButton;
     private final WeakReference<Activity> mContextActivity;
     private RippleBackground mRippleBg;
 
@@ -106,7 +106,13 @@ public class SpeechDialog extends Dialog {
         mReleaseTextView = (TextView) contentView.findViewById(R.id.speech_release_cancel_textview);
         mSpeechContentView = contentView.findViewById(R.id.speeching_content);
         mRippleBg = (RippleBackground) contentView.findViewById(R.id.speech_rippleBackground);
-        mSpeechImageView = (ImageView) contentView.findViewById(R.id.speech_imageButton);
+        mSpeechImageButton = (ImageButton) contentView.findViewById(R.id.speech_imageButton);
+        mSpeechImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishListening();
+            }
+        });
 
         mContextActivity = new WeakReference<Activity>(context);
     }
@@ -182,7 +188,7 @@ public class SpeechDialog extends Dialog {
         mVolumnProgressBar.setVisibility(View.INVISIBLE);
         mStatusTextView.setVisibility(View.VISIBLE);
         mReleaseTextView.setVisibility(View.INVISIBLE);
-        mSpeechImageView.setVisibility(View.INVISIBLE);
+        mSpeechImageButton.setVisibility(View.INVISIBLE);
         mStatusTextView.setText(R.string.speech_initializing);
     }
 
@@ -257,8 +263,8 @@ public class SpeechDialog extends Dialog {
                 break;
             case State.IDLE:
 //            mResult = null;
-                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSpeechImageView);
-                mSpeechImageView.setVisibility(View.VISIBLE);
+                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSpeechImageButton);
+                mSpeechImageButton.setVisibility(View.VISIBLE);
                 animatorSet.start();
 
                 if (isMusicPlaying(mContextActivity.get())) {

@@ -8,7 +8,7 @@
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/pushservice-4.2.0.63-608d01c68b363a520431d4760c736146f333df40.jar" />
     </item>
     <item jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/common/build/libs/common.jar"
-        jumboMode="false" revision="21.1.1" sha1="282d174f1278331a2ae7d162d430fc6ffdaacada">
+        jumboMode="false" revision="21.1.1" sha1="2f6940df0a82e025e683915ea288130865750b4d">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/common-284340e3f507422c1d7ea27c5c142e313edbee67.jar" />
     </item>
@@ -24,10 +24,10 @@
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/VoiceRecognition-9641f086db49a61fdb0dba5d4f2fc8d42dda7cd6.jar" />
     </item>
     <item
-        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-manipulation/3.1.0/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="5660e4bf78904137e90e62a5d4cc2e987258f02c">
+        jar="/Users/legendmohe/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.3.1/ecb6e1f8e4b0e84c4b886c2f14a1500caf309757/gson-2.3.1.jar"
+        jumboMode="false" revision="21.1.1" sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
         <dex
-            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-66596e4886a5043989e270ac23b854fec26a65a4.jar" />
+            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/gson-2.3.1-f016e8baa12c850300f0c0b634d4625008f3bdc6.jar" />
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
@@ -54,18 +54,6 @@
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-e9990a18a5da41d311db6e57c3822a03b7c73073.jar" />
     </item>
     <item
-        jar="/Users/legendmohe/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
-        jumboMode="false" revision="21.1.1" sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
-        <dex
-            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/library-2.4.0-8361d127f90a74348fe94dea525236981fb15aed.jar" />
-    </item>
-    <item
-        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core-slh/3.1.0/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="49223278ec2ede1d05d00868c5ce3e077b4016f8">
-        <dex
-            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-6572bbb99ae6f0ef7cfc12aaa18c17eb13231ada.jar" />
-    </item>
-    <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.skyfishjy.ripplebackground/library/1.0.1/classes.jar"
         jumboMode="false" revision="21.1.1" sha1="5a7cf2a41aedccc427107ebb37762a5e2f5be590">
         <dex
@@ -79,19 +67,13 @@
     </item>
     <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/domain/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="1b49845070f40d5b827c76ab6901f2077de16898">
+        jumboMode="false" revision="21.1.1" sha1="4dbb07010dc837751ba0291a3cf680fbabb47cf2">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-2f52456e1ce9dd93536df7b9b44df9bc51dd1f38.jar" />
     </item>
     <item
-        jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core/3.1.0/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="acf66033b1418ccf9e15c8e77750981e4809c4ea">
-        <dex
-            dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-833531bc3223a3b67335ff041f6e2ed869ffcd93.jar" />
-    </item>
-    <item
         jar="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/exploded-aar/LEHome_android/model/unspecified/classes.jar"
-        jumboMode="false" revision="21.1.1" sha1="90266cd757422dfa3f2014bdacb7bc9bc6b16122">
+        jumboMode="false" revision="21.1.1" sha1="c9920df3c664d361aeecb155c544b2136bc6b0ad">
         <dex
             dex="/Users/legendmohe/AndroidstudioProjects/LEHome_android/app/build/intermediates/pre-dexed/debug/classes-abfc1e0531b00fdd06aa3e70602619a99451dc07.jar" />
     </item>
