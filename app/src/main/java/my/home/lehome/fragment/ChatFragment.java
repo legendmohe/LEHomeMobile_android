@@ -40,19 +40,24 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.List;
 
 import my.home.common.Constants;
+import my.home.common.Utils;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.adapter.AutoCompleteAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter.ResendButtonClickListener;
+import my.home.lehome.adapter.ShortcutArrayAdapter;
 import my.home.lehome.asynctask.LoadMoreChatItemAsyncTask;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
@@ -71,7 +76,9 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , ResendButtonClickListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
-        , ChatItemListView {
+        , ChatItemListView
+        , PopupMenu.OnMenuItemClickListener
+        , DateTimePickerFragmentListener {
     public static final String TAG = ChatFragment.class.getName();
 
     /*
@@ -229,15 +236,20 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         });
 
 
-        final Button clearButton = (Button) rootView.findViewById(R.id.cmd_clear_button);
-        clearButton.setOnClickListener(new OnClickListener() {
+        final Button toolButton = (Button) rootView.findViewById(R.id.cmd_tool_button);
+        toolButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mSendCmdEdittext.setText("");
+//                mSendCmdEdittext.setText("");
+                PopupMenu popup = new PopupMenu(getActivity(), toolButton);
+                popup.setOnMenuItemClickListener(ChatFragment.this);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.cmd_tool, popup.getMenu());
+                popup.show();
             }
         });
-        clearButton.setVisibility(View.GONE);
+        toolButton.setVisibility(View.GONE);
 
         switchButton = (Button) rootView.findViewById(R.id.switch_input_button);
         switchButton.setOnClickListener(new OnClickListener() {
@@ -250,8 +262,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
                     mInSpeechMode = true;
-                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(clearButton);
-                    clearButton.setVisibility(View.GONE);
+                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
+                    toolButton.setVisibility(View.GONE);
                     animatorSet.start();
 
                     if (mKeyboard_open) {
@@ -268,7 +280,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
                     mInSpeechMode = false;
-//					clearButton.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -353,14 +364,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
-                    if (clearButton.getVisibility() == View.INVISIBLE
-                            || clearButton.getVisibility() == View.GONE) {
-                        AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(clearButton);
-                        clearButton.setVisibility(View.VISIBLE);
+                    if (toolButton.getVisibility() == View.INVISIBLE
+                            || toolButton.getVisibility() == View.GONE) {
+                        AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(toolButton);
+                        toolButton.setVisibility(View.VISIBLE);
                         animatorSet.start();
                     }
                 } else {
-                    clearButton.setVisibility(View.GONE);
+                    toolButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -672,5 +683,79 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     @Override
     public Context getContext() {
         return getActivity();
+    }
+
+    /*
+     * Date Time picker callback
+     */
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_tool_date:
+                DatePickerFragment dateFragment = new DatePickerFragment();
+                dateFragment.setDateTimePickerFragmentListener(this);
+                dateFragment.show(getFragmentManager(), "datePicker");
+                return true;
+            case R.id.menu_tool_time:
+                TimePickerFragment timeFragment = new TimePickerFragment();
+                timeFragment.setDateTimePickerFragmentListener(this);
+                timeFragment.show(getFragmentManager(), "timePicker");
+                return true;
+            case R.id.menu_tool_favor:
+                List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());
+                showShortcutDialog(items);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onTimeSelected(TimePicker view, int hourOfDay, int minute) {
+        appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
+    }
+
+    @Override
+    public void onDateSelected(DatePicker view, int year, int month, int day) {
+        appendSendCmdEditText(Utils.DateToCmdString(year, month, day));
+    }
+
+    private void showShortcutDialog(List<Shortcut> items) {
+        if (items == null || items.size() == 0) {
+            showTip(getString(R.string.menu_tool_favor_empty));
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.menu_tool_favor_title);
+        builder.setNegativeButton("cancel",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        final ShortcutArrayAdapter adapter = new ShortcutArrayAdapter(getActivity(), R.layout.shortcut_item);
+        adapter.setData(items);
+        builder.setAdapter(adapter,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedContent = adapter.getItem(which).getContent();
+                        Log.d(TAG, "selected shortcut: " + selectedContent);
+                        appendSendCmdEditText(selectedContent);
+                    }
+                });
+        builder.show();
+    }
+
+    private void appendSendCmdEditText(String content) {
+        mSendCmdEdittext.setText(mSendCmdEdittext.getText() + content);
+        mSendCmdEdittext.requestFocus();
+        Editable editable = mSendCmdEdittext.getText();
+        Selection.setSelection(editable, editable.length());
     }
 }

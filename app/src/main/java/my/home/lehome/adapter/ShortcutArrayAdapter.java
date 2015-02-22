@@ -16,11 +16,6 @@ public class ShortcutArrayAdapter extends ArrayAdapter<Shortcut> {
 
     private TextView chatTextView;
 
-    @Override
-    public void add(Shortcut object) {
-        super.add(object);
-    }
-
     public void setData(List<Shortcut> items) {
         clear();
         setNotifyOnChange(false);

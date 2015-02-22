@@ -23,7 +23,7 @@ dependencies {
     compile project(':domain')
     compile project(':model')
 
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:support-v4:21.0.3'
     compile files('libs/VoiceRecognition.jar')
     compile files('libs/pushservice-4.2.0.63.jar')
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'

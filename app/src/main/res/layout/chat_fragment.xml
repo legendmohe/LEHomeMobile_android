@@ -92,7 +92,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="false"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/cmd_clear_button"
+                android:layout_toLeftOf="@+id/cmd_tool_button"
                 android:completionThreshold="1"
                 android:ems="10"
                 android:inputType="text"
@@ -101,14 +101,13 @@
                 android:textCursorDrawable="@null" />
 
             <Button
-                android:id="@+id/cmd_clear_button"
-                android:text="@string/button_clear"
-                android:textColor="#555555"
-                android:textSize="@dimen/font_size"
+                android:id="@+id/cmd_tool_button"
+                android:text="@string/button_extend_tool"
+                android:textColor="#ff969696"
+                android:textSize="24sp"
                 android:background="#00000000"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:visibility="gone"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="5dp"

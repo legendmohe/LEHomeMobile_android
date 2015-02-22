@@ -4,7 +4,7 @@ public class Constants {
 
     public static final int CHATITEM_LOAD_LIMIT = 20;
     public static final int CHATITEM_LOWEST_INDEX = 1;
-    public static final float DIALOG_CANCEL_Y_PERSENT = 0.45f;
+    public static final float DIALOG_CANCEL_Y_PERSENT = 0.70f;
     public static final int CHATITEM_STATE_SUCCESS = 0;
     public static final int CHATITEM_STATE_PENDING = 1;
     public static final int CHATITEM_STATE_ERROR = 2;

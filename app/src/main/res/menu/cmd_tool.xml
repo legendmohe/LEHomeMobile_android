@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_tool_time"
+        android:title="@string/menu_tool_time" />
+    <item
+        android:id="@+id/menu_tool_date"
+        android:title="@string/menu_tool_date" />
+    <item
+        android:id="@+id/menu_tool_favor"
+        android:title="@string/menu_tool_favor" />
+</menu>

@@ -15,6 +15,6 @@
         android:paddingLeft="@dimen/item_horizontal_margin"
         android:text="Hello World!"
         android:textColor="#333333"
-        android:textSize="20sp" />
+        android:textSize="16sp" />
 
 </LinearLayout>

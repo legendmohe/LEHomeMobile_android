@@ -79,5 +79,11 @@
     <string name="pref_network_profile">网络</string>
     <string name="save_local_history_success">输入历史保存完成</string>
     <string name="save_local_history_error">保存输入历史出错</string>
+    <string name="button_extend_tool">+</string>
+    <string name="menu_tool_time">时间</string>
+    <string name="menu_tool_date">日期</string>
+    <string name="menu_tool_favor">收藏</string>
+    <string name="menu_tool_favor_title">添加收藏</string>
+    <string name="menu_tool_favor_empty">无收藏</string>
 
 </resources>

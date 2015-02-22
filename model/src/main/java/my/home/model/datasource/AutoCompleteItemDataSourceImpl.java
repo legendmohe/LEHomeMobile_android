@@ -42,6 +42,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     private Map<String, List<String>> mNodes;
     private Map<String, List<String>> mLinks;
     private String mMessageSeq;
+    private String mTimeSeq;
     private String mInitState;
     private boolean mLoadSuccess = false;
     private Map<String, AutoCompleteCountHolder> mAutoCompleteCountHolderMap;
@@ -137,8 +138,10 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
 
             mMessageSeq = confJSONObject.getString("message_seq");
+            mTimeSeq = confJSONObject.getString("time_seq");
             mInitState = confJSONObject.getString("init_state");
             mNodes.put("message", new ArrayList<String>(Arrays.asList(mMessageSeq)));
+            mNodes.put("time", new ArrayList<String>(Arrays.asList(mTimeSeq)));
 
             mLoadSuccess = true;
             return true;
@@ -156,7 +159,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             return;
         }
 
-        boolean in_msg_ind_state = false;
+        boolean in_msg_or_time_ind_state = false;
         boolean in_if_or_while_state = false;
         String leftString = "";
         String lastString = "";
@@ -164,9 +167,10 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         StringBuffer inputBuffer = new StringBuffer(currentInput);
         String curState = mInitState;
         while (inputBuffer.length() > 0) {
-            if (in_msg_ind_state) {
-                if (inputBuffer.toString().startsWith(mMessageSeq)) {
-                    in_msg_ind_state = false;
+            if (in_msg_or_time_ind_state) {
+                if (inputBuffer.toString().startsWith(mMessageSeq)
+                        || inputBuffer.toString().startsWith(mTimeSeq)) {
+                    in_msg_or_time_ind_state = false;
                 }
                 cmdBuffer.append(inputBuffer.charAt(0));
                 inputBuffer.deleteCharAt(0);
@@ -193,8 +197,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         inputBuffer.delete(0, val.length());
                         cmdBuffer.append(val);
                         found = true;
-                        if (curState.equals("message")) {
-                            in_msg_ind_state = true;
+                        if (curState.equals("message") || curState.equals("time")) {
+                            in_msg_or_time_ind_state = true;
                         } else if (curState.equals("if") || curState.equals("while")) {
                             in_if_or_while_state = true;
                         } else if (curState.equals("then")) {
@@ -211,6 +215,12 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     cmdBuffer.append(inputBuffer.charAt(0));
                     inputBuffer.deleteCharAt(0);
                     break;
+                } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
+                    found = true;
+                    curState = "time";
+                    cmdBuffer.append(inputBuffer.charAt(0));
+                    inputBuffer.deleteCharAt(0);
+                    break;
                 }
             }
             if (!found) break;
@@ -219,7 +229,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         String cmdString = cmdBuffer.toString();
         List<AutoCompleteItem> resultList = new ArrayList<>();
 
-        if (in_msg_ind_state) {
+        if (in_msg_or_time_ind_state) {
             String cmd = cmdString + mMessageSeq;
             resultList.add(new AutoCompleteItem("message", 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
@@ -304,13 +314,14 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         Log.d(TAG, "mark: " + inputString);
         StringBuffer inputBuffer = new StringBuffer(inputString);
         boolean in_if_or_while_state = false;
-        boolean in_msg_ind_state = false;
+        boolean in_msg_or_time_ind_state = false;
         String lastString = null;
         String curState = mInitState;
         while (inputBuffer.length() > 0) {
-            if (in_msg_ind_state) {
-                if (inputBuffer.toString().startsWith(mMessageSeq)) {
-                    in_msg_ind_state = false;
+            if (in_msg_or_time_ind_state) {
+                if (inputBuffer.toString().startsWith(mMessageSeq)
+                        || inputBuffer.toString().startsWith(mTimeSeq)) {
+                    in_msg_or_time_ind_state = false;
                 }
                 inputBuffer.deleteCharAt(0);
                 continue;
@@ -336,8 +347,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         curState = nextState;
                         inputBuffer.delete(0, val.length());
                         found = true;
-                        if (curState.equals("message")) {
-                            in_msg_ind_state = true;
+                        if (curState.equals("message") || curState.equals("time")) {
+                            in_msg_or_time_ind_state = true;
                         } else if (curState.equals("if") || curState.equals("while")) {
                             in_if_or_while_state = true;
                         } else if (curState.equals("then")) {
@@ -351,6 +362,11 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 else if (curState.equals("message") || mLinks.get(curState).contains("message")) {
                     found = true;
                     curState = "message";
+                    inputBuffer.deleteCharAt(0);
+                    break;
+                } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
+                    found = true;
+                    curState = "time";
                     inputBuffer.deleteCharAt(0);
                     break;
                 }
@@ -379,7 +395,10 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        String objJson = new Gson().toJson(localHistorys);
+        String objJson = null;
+        if (localHistorys != null) {
+            objJson = new Gson().toJson(localHistorys);
+        }
         editor.putString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, objJson);
         editor.apply();
         return true;
@@ -396,7 +415,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             return null;
         }
         String savedJson = sharedPreferences.getString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, null);
-        if (savedJson == null)
+        if (savedJson == null || savedJson.equals("null"))
             return new HashMap<String, AutoCompleteCountHolder>();
 
         Type type = new TypeToken<Map<String, AutoCompleteCountHolder>>() {

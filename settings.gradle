@@ -1,1 +1,1 @@
-include ':app', ':common', ':model', ':domain'
+include ':app', ':common', ':model', ':domain', ':slideDateTimePicker'
