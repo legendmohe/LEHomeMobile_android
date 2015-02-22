@@ -23,7 +23,7 @@ limitations under the License.
     android:background="#AAAAAA"
     android:orientation="horizontal">
 
-    <LinearLayout
+<LinearLayout
         android:id="@+id/round_corner_progress_progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

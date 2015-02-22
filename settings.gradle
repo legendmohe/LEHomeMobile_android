@@ -12,4 +12,4 @@
  * limitations under the License.
  */
 
-include ':app', ':common', ':model', ':domain', ':slideDateTimePicker'
+include ':app', ':common', ':model', ':domain'
