@@ -175,9 +175,11 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
 
         boolean in_msg_or_time_ind_state = false;
+        boolean in_msg_or_time_state = false;
         boolean in_if_or_while_state = false;
         String leftString = "";
         String lastString = "";
+        String lastState = "";
         StringBuffer cmdBuffer = new StringBuffer();
         StringBuffer inputBuffer = new StringBuffer(currentInput);
         String curState = mInitState;
@@ -209,9 +211,12 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         lastString = val;
                         leftString = inputBuffer.toString();
                         curState = nextState;
+                        lastState = nextState;
                         inputBuffer.delete(0, val.length());
                         cmdBuffer.append(val);
                         found = true;
+                        in_msg_or_time_state = false;
+
                         if (curState.equals("message") || curState.equals("time")) {
                             in_msg_or_time_ind_state = true;
                         } else if (curState.equals("if") || curState.equals("while")) {
@@ -220,25 +225,32 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             in_if_or_while_state = false;
                         }
                         break;
+                    } else if (nextState.equals("message") && val.startsWith(tempInput)) {
+                        lastState = nextState;
                     }
                 }
-                if (found)
+                if (inputBuffer.length() == 0)
                     break;
-                else if (curState.equals("message") || mLinks.get(curState).contains("message")) {
-                    found = true;
-                    curState = "message";
-                    cmdBuffer.append(inputBuffer.charAt(0));
-                    inputBuffer.deleteCharAt(0);
-                    break;
-                } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
-                    found = true;
-                    curState = "time";
-                    cmdBuffer.append(inputBuffer.charAt(0));
-                    inputBuffer.deleteCharAt(0);
-                    break;
-                }
             }
-            if (!found) break;
+            if (inputBuffer.length() == 0)
+                break;
+            if (found)
+                continue;
+            if (curState.equals("message") || mLinks.get(curState).contains("message")) {
+                in_msg_or_time_state = true;
+                found = true;
+                curState = "message";
+                cmdBuffer.append(inputBuffer.charAt(0));
+                inputBuffer.deleteCharAt(0);
+            } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
+                in_msg_or_time_state = true;
+                found = true;
+                curState = "time";
+                cmdBuffer.append(inputBuffer.charAt(0));
+                inputBuffer.deleteCharAt(0);
+            }
+            if (!found)
+                break;
         }
 
         String cmdString = cmdBuffer.toString();
@@ -253,11 +265,33 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             addFavorToolItemToResultList(resultList);
             resultList.add(new AutoCompleteItem(curState, 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
-            for (String val : mNodes.get(curState)) {
-                if (val.startsWith(leftString) && !val.equals(leftString)) {
-                    String cmd = cmdString + val;
-                    resultList.add(new AutoCompleteItem(curState, 1.0f, val, cmd));
+            String tempLeft = new StringBuilder(leftString).delete(0, lastString.length()).toString();
+            if (tempLeft.length() != 0) {
+                if (curState.equals("message") || curState.equals("time")) {
+                    for (String nextState : mLinks.get(lastState)) {
+                        for (String val : mNodes.get(nextState)) {
+                            if (val.startsWith(tempLeft)) {
+                                String tempCmd = new StringBuilder(val).delete(0, tempLeft.length()).toString();
+                                String cmd = cmdString + tempCmd;
+                                resultList.add(new AutoCompleteItem(lastState, Float.MAX_VALUE, val, cmd));
+                            }
+                        }
+                    }
+                } else {
+                    for (String val : mNodes.get(curState)) {
+                        if (val.startsWith(tempLeft) && !val.equals(tempLeft)) {
+                            String tempCmd = new StringBuilder(val).delete(0, lastString.length()).toString();
+                            String cmd = cmdString + tempCmd;
+                            resultList.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
+                        }
+                    }
                 }
+            }
+
+            if (in_msg_or_time_state) {
+                addTimeToolItemToResultList(resultList);
+                addDateToolItemToResultList(resultList);
+                addFavorToolItemToResultList(resultList);
             }
             for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
@@ -267,14 +301,15 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                         }
                     }
-                } else if (nextState.equals("message") || nextState.equals("time")) {
-                    addTimeToolItemToResultList(resultList);
-                    addDateToolItemToResultList(resultList);
-                    addFavorToolItemToResultList(resultList);
                 } else {
                     if (nextState.equals("compare") || nextState.equals("logical"))
                         if (!in_if_or_while_state)
                             continue;
+                    if (nextState.equals("message") || nextState.equals("time")) {
+                        addTimeToolItemToResultList(resultList);
+                        addDateToolItemToResultList(resultList);
+                        addFavorToolItemToResultList(resultList);
+                    }
                     for (String val : mNodes.get(nextState)) {
                         String cmd = cmdString + val;
                         resultList.add(
@@ -285,11 +320,13 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
         } else {
             String tempInput = inputBuffer.toString();
-            for (String nextState : mLinks.get(curState)) {
-                for (String val : mNodes.get(nextState)) {
-                    if (val.startsWith(tempInput)) {
-                        String cmd = cmdString + val;
-                        resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+            if (tempInput.length() != 0) {
+                for (String nextState : mLinks.get(curState)) {
+                    for (String val : mNodes.get(nextState)) {
+                        if (val.startsWith(tempInput)) {
+                            String cmd = cmdString + val;
+                            resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                        }
                     }
                 }
             }

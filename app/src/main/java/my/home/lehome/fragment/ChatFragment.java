@@ -14,7 +14,6 @@
 
 package my.home.lehome.fragment;
 
-import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,7 +31,6 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -77,7 +75,6 @@ import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
-import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.SpeechDialog;
 import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
@@ -249,20 +246,20 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         });
 
 
-        final Button toolButton = (Button) rootView.findViewById(R.id.cmd_tool_button);
-        toolButton.setOnClickListener(new OnClickListener() {
+//        final Button toolButton = (Button) rootView.findViewById(R.id.cmd_tool_button);
+//        toolButton.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
+//            @Override
+//            public void onClick(View v) {
 //                mSendCmdEdittext.setText("");
 //                PopupMenu popup = new PopupMenu(getActivity(), toolButton);
 //                popup.setOnMenuItemClickListener(ChatFragment.this);
 //                MenuInflater inflater = popup.getMenuInflater();
 //                inflater.inflate(R.menu.cmd_tool, popup.getMenu());
 //                popup.show();
-            }
-        });
-        toolButton.setVisibility(View.GONE);
+//            }
+//        });
+//        toolButton.setVisibility(View.GONE);
 
         switchButton = (Button) rootView.findViewById(R.id.switch_input_button);
         switchButton.setOnClickListener(new OnClickListener() {
@@ -275,9 +272,9 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
                     mInSpeechMode = true;
-                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
-                    toolButton.setVisibility(View.GONE);
-                    animatorSet.start();
+//                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
+//                    toolButton.setVisibility(View.GONE);
+//                    animatorSet.start();
 
                     if (mKeyboard_open) {
                         InputMethodManager inputManager =
@@ -368,31 +365,31 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
-        mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() > 0) {
-                    if (toolButton.getVisibility() == View.INVISIBLE
-                            || toolButton.getVisibility() == View.GONE) {
-                        AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(toolButton);
-                        toolButton.setVisibility(View.VISIBLE);
-                        animatorSet.start();
-                    }
-                } else {
-                    toolButton.setVisibility(View.GONE);
-                }
-            }
-        });
+//        mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count,
+//                                          int after) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (s.length() > 0) {
+//                    if (toolButton.getVisibility() == View.INVISIBLE
+//                            || toolButton.getVisibility() == View.GONE) {
+//                        AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(toolButton);
+//                        toolButton.setVisibility(View.VISIBLE);
+//                        animatorSet.start();
+//                    }
+//                } else {
+//                    toolButton.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
         mKeyboardListener = (new OnGlobalLayoutListener() {
             @Override
