@@ -91,12 +91,13 @@
                 android:id="@+id/speech_button"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginBottom="3dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/button_speech"
                 android:textColor="#eeeeee"
-                android:textSize="@dimen/font_size"
+                android:textSize="16sp"
+                android:background="#ff2e2e2e"
                 android:visibility="invisible" />
 
             <my.home.lehome.view.DelayAutoCompleteTextView
@@ -131,19 +132,19 @@
 
         </RelativeLayout>
 
-        <ProgressBar
-            android:id="@+id/send_msg_progressbar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentTop="false"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="false"
-            android:layout_centerVertical="false"
-            android:layout_marginTop="-7dp"
-            android:indeterminate="true"
-            android:visibility="invisible" />
+        <!--<ProgressBar-->
+        <!--android:id="@+id/send_msg_progressbar"-->
+        <!--style="?android:attr/progressBarStyleHorizontal"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="false"-->
+        <!--android:layout_alignParentTop="false"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_centerInParent="false"-->
+        <!--android:layout_centerVertical="false"-->
+        <!--android:layout_marginTop="-7dp"-->
+        <!--android:indeterminate="true"-->
+        <!--android:visibility="invisible" />-->
         <!--<fr.castorflex.android.smoothprogressbar.SmoothProgressBar-->
         <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
         <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->

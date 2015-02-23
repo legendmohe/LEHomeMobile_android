@@ -56,7 +56,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.TimePicker;
@@ -83,6 +82,7 @@ import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.SpeechDialog;
 import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
 import my.home.model.entities.AutoCompleteItem;
+import my.home.model.entities.AutoCompleteToolItem;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.Shortcut;
 
@@ -91,7 +91,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
         , ChatItemListView
-        , PopupMenu.OnMenuItemClickListener
         , DateTimePickerFragmentListener {
     public static final String TAG = ChatFragment.class.getName();
 
@@ -256,11 +255,11 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void onClick(View v) {
 //                mSendCmdEdittext.setText("");
-                PopupMenu popup = new PopupMenu(getActivity(), toolButton);
-                popup.setOnMenuItemClickListener(ChatFragment.this);
-                MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(R.menu.cmd_tool, popup.getMenu());
-                popup.show();
+//                PopupMenu popup = new PopupMenu(getActivity(), toolButton);
+//                popup.setOnMenuItemClickListener(ChatFragment.this);
+//                MenuInflater inflater = popup.getMenuInflater();
+//                inflater.inflate(R.menu.cmd_tool, popup.getMenu());
+//                popup.show();
             }
         });
         toolButton.setVisibility(View.GONE);
@@ -298,18 +297,20 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
         });
         mSpeechDialog = SpeechDialog.getInstance(getActivity());
-        Button speechButton = (Button) rootView.findViewById(R.id.speech_button);
+        final Button speechButton = (Button) rootView.findViewById(R.id.speech_button);
 
         speechButton.setOnTouchListener(new OnTouchListener() {
 
             @Override
             public boolean onTouch(View arg0, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    speechButton.setSelected(true);
                     if (!mSpeechDialog.isShowing()) {
                         startRecognize(getActivity());
                     }
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    speechButton.setSelected(false);
                     if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
                         Log.d(TAG, "cancelListening.");
                         mSpeechDialog.cancelListening();
@@ -358,10 +359,13 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AutoCompleteItem item = (AutoCompleteItem) parent.getItemAtPosition(position);
-                mSendCmdEdittext.setText(item.getCmd());
-                Editable editable = mSendCmdEdittext.getText();
-                Selection.setSelection(editable, editable.length());
-                mSendCmdEdittext.performFiltering(editable);
+                if (item instanceof AutoCompleteToolItem) {
+                    Log.d(TAG, "selected AutoCompleteToolItem: " + item.getContent());
+                    AutoCompleteToolItem toolItem = (AutoCompleteToolItem) item;
+                    performToolItem(toolItem);
+                } else {
+                    setSendCmdEditText(item.getCmd());
+                }
             }
         });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
@@ -704,28 +708,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      */
 
     @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_tool_date:
-                DatePickerFragment dateFragment = new DatePickerFragment();
-                dateFragment.setDateTimePickerFragmentListener(this);
-                dateFragment.show(getFragmentManager(), "datePicker");
-                return true;
-            case R.id.menu_tool_time:
-                TimePickerFragment timeFragment = new TimePickerFragment();
-                timeFragment.setDateTimePickerFragmentListener(this);
-                timeFragment.show(getFragmentManager(), "timePicker");
-                return true;
-            case R.id.menu_tool_favor:
-                List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());
-                showShortcutDialog(items);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override
     public void onTimeSelected(TimePicker view, int hourOfDay, int minute) {
         appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
     }
@@ -767,9 +749,32 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     }
 
     private void appendSendCmdEditText(String content) {
-        mSendCmdEdittext.setText(mSendCmdEdittext.getText() + content);
+        setSendCmdEditText(mSendCmdEdittext.getText() + content);
+    }
+
+    private void setSendCmdEditText(String content) {
+        mSendCmdEdittext.setText(content);
         mSendCmdEdittext.requestFocus();
         Editable editable = mSendCmdEdittext.getText();
         Selection.setSelection(editable, editable.length());
+    }
+
+    private void performToolItem(AutoCompleteToolItem item) {
+        switch (item.getSpecType()) {
+            case AutoCompleteToolItem.SPEC_TYPE_DATE:
+                DatePickerFragment dateFragment = new DatePickerFragment();
+                dateFragment.setDateTimePickerFragmentListener(this);
+                dateFragment.show(getFragmentManager(), "datePicker");
+                break;
+            case AutoCompleteToolItem.SPEC_TYPE_TIME:
+                TimePickerFragment timeFragment = new TimePickerFragment();
+                timeFragment.setDateTimePickerFragmentListener(this);
+                timeFragment.show(getFragmentManager(), "timePicker");
+                break;
+            case AutoCompleteToolItem.SPEC_TYPE_FAVOR:
+                List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());
+                showShortcutDialog(items);
+                break;
+        }
     }
 }

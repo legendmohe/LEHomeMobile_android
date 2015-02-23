@@ -38,6 +38,7 @@ import java.util.Map;
 import my.home.common.BusProvider;
 import my.home.model.entities.AutoCompleteCountHolder;
 import my.home.model.entities.AutoCompleteItem;
+import my.home.model.entities.AutoCompleteToolItem;
 import my.home.model.events.MConfAutoCompleteItemEvent;
 import my.home.model.events.MGetAutoCompleteItemEvent;
 import my.home.model.events.MSaveAutoCompleteLocalHistoryEvent;
@@ -47,7 +48,7 @@ import my.home.model.events.MSaveAutoCompleteLocalHistoryEvent;
  */
 public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSource {
 
-    public static final String TAG = "AutoCompleteItemDataSourceImpl";
+    public static final String TAG = "ACItemDataSource";
 
     public static final float DEFAULT_AUTOCOMPLETE_WEIGHT = 0.0f;
 
@@ -245,7 +246,12 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
 
         if (in_msg_or_time_ind_state) {
             String cmd = cmdString + mMessageSeq;
-            resultList.add(new AutoCompleteItem("message", 1.0f, mMessageSeq, cmd));
+            if (curState.equals("time")) {
+                addTimeToolItemToResultList(resultList);
+                addDateToolItemToResultList(resultList);
+            }
+            addFavorToolItemToResultList(resultList);
+            resultList.add(new AutoCompleteItem(curState, 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
             for (String val : mNodes.get(curState)) {
                 if (val.startsWith(leftString) && !val.equals(leftString)) {
@@ -261,6 +267,10 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                         }
                     }
+                } else if (nextState.equals("message") || nextState.equals("time")) {
+                    addTimeToolItemToResultList(resultList);
+                    addDateToolItemToResultList(resultList);
+                    addFavorToolItemToResultList(resultList);
                 } else {
                     if (nextState.equals("compare") || nextState.equals("logical"))
                         if (!in_if_or_while_state)
@@ -286,6 +296,18 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
         Collections.sort(resultList, mResultComparator);
         BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(resultList));
+    }
+
+    private void addFavorToolItemToResultList(List<AutoCompleteItem> resultList) {
+        resultList.add(new AutoCompleteToolItem("tool", "[收藏]", AutoCompleteToolItem.SPEC_TYPE_FAVOR));
+    }
+
+    private void addDateToolItemToResultList(List<AutoCompleteItem> resultList) {
+        resultList.add(new AutoCompleteToolItem("tool", "[日期]", AutoCompleteToolItem.SPEC_TYPE_DATE));
+    }
+
+    private void addTimeToolItemToResultList(List<AutoCompleteItem> resultList) {
+        resultList.add(new AutoCompleteToolItem("tool", "[时间]", AutoCompleteToolItem.SPEC_TYPE_TIME));
     }
 
     private void loadAutoCompleteLocalHistory(Context context) {

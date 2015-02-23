@@ -49,6 +49,9 @@
         <Preference
             android:title="@string/pref_load_auto_item"
             android:key="load_auto_item" />
+        <Preference
+            android:title="@string/pref_local_ip_item"
+            android:key="local_ip_item" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference

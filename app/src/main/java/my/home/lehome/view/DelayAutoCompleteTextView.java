@@ -74,5 +74,10 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
         if (!isPopupShowing())
             showDropDown();
     }
+
+    @Override
+    protected void replaceText(CharSequence text) {
+//        super.replaceText(text);
+    }
 }
 

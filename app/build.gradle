@@ -42,4 +42,6 @@ dependencies {
     compile files('libs/pushservice-4.2.0.63.jar')
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
+    compile 'com.github.markushi:circlebutton:1.1'
+    compile 'info.hoang8f:fbutton:1.0.5'
 }

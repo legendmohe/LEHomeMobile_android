@@ -39,7 +39,6 @@ import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.NavigationDrawerFragment;
 import my.home.lehome.fragment.ShortcutFragment;
 import my.home.lehome.helper.MessageHelper;
-import my.home.lehome.helper.NetworkHelper;
 import my.home.lehome.util.PushUtils;
 
 
@@ -229,10 +228,6 @@ public class MainActivity extends FragmentActivity
                 // onOptionsItemSelect() call and won't fall through to other item
                 // click functions. If your return false it may check the ID of
                 // the event in other item selection functions.
-                return true;
-            case R.id.local_ip_item:
-                String ipString = NetworkHelper.getIPAddress(true);
-                Toast.makeText(this, getResources().getString(R.string.local_ip_item) + ":" + ipString, Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_exit:
                 this.finish();

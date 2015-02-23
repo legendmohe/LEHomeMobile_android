@@ -57,7 +57,7 @@
     <string name="copy_to_input">复制到输入框</string>
     <string name="edittext_hint">输入命令</string>
     <string name="title_activity_settings">设置</string>
-    <string name="local_ip_item">本机ip</string>
+    <string name="pref_local_ip_item">显示本机ip</string>
     <string name="action_exit">退出</string>
     <string name="add_shortcut_item">添加</string>
     <string name="copy_shortcut_item">复制</string>

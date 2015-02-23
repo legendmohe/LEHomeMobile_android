@@ -31,6 +31,7 @@ import my.home.common.Constants;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
+import my.home.lehome.helper.NetworkHelper;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
     @Override
@@ -88,7 +89,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
                 getActivity().sendBroadcast(addIntent);
                 addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-                getActivity().getApplicationContext().sendBroadcast(addIntent);
+                getActivity().sendBroadcast(addIntent);
 
 //                        	ShortcutIconResource icon =
 //                        		    Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_launcher);
@@ -135,6 +136,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             @Override
             public boolean onPreferenceClick(Preference arg0) {
                 new LoadAutoCompleteConfAsyncTask(getActivity(), device_id).execute();
+                return true;
+            }
+        });
+        button = (Preference) findPreference("local_ip_item");
+        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                String ipString = NetworkHelper.getIPAddress(true);
+                Toast.makeText(getActivity(), getResources().getString(R.string.pref_local_ip_item) + ":" + ipString, Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
