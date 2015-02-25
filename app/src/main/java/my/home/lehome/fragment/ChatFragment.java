@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -52,13 +53,15 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
+import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog;
+
+import java.util.Calendar;
 import java.util.List;
 
 import my.home.common.Constants;
@@ -88,8 +91,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
         , ChatItemListView
-        , DateTimePickerFragmentListener {
+//        , DateTimePickerFragmentListener
+        , CalendarDatePickerDialog.OnDateSetListener
+        , RadialTimePickerDialog.OnTimeSetListener {
     public static final String TAG = ChatFragment.class.getName();
+    private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
+    private static final String FRAG_TAG_DATE_PICKER = "calendarDatePickerDialog";
 
     /*
      * common UI
@@ -269,6 +276,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 if (!mInSpeechMode) {
                     Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
                     switch_btn.setBackgroundResource(R.drawable.chatting_setmode_voice_btn);
+//                    switch_btn.setBackgroundResource(android.R.drawable.ic_menu_edit);
                     getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
                     mInSpeechMode = true;
@@ -287,6 +295,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 } else {
                     Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
                     switch_btn.setBackgroundResource(R.drawable.chatting_setmode_msg_btn);
+//                    switch_btn.setBackgroundResource(android.R.drawable.ic_btn_speak_now);
                     getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
                     mInSpeechMode = false;
@@ -535,6 +544,16 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
         MessageHelper.resetUnreadCount();
         mChatFragmentPresenter.resetDatas(getActivity());
+        RadialTimePickerDialog rtpd = (RadialTimePickerDialog) getFragmentManager().findFragmentByTag(
+                FRAG_TAG_TIME_PICKER);
+        if (rtpd != null) {
+            rtpd.setOnTimeSetListener(this);
+        }
+        CalendarDatePickerDialog cdpd = (CalendarDatePickerDialog) getFragmentManager()
+                .findFragmentByTag(FRAG_TAG_DATE_PICKER);
+        if (cdpd != null) {
+            cdpd.setOnDateSetListener(this);
+        }
     }
 
     @Override
@@ -700,18 +719,70 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         return getActivity();
     }
 
+    private void appendSendCmdEditText(String content) {
+        setSendCmdEditText(mSendCmdEdittext.getText() + content);
+    }
+
+    private void setSendCmdEditText(String content) {
+        mSendCmdEdittext.setText(content);
+        mSendCmdEdittext.requestFocus();
+        Editable editable = mSendCmdEdittext.getText();
+        Selection.setSelection(editable, editable.length());
+    }
+
     /*
      * Date Time picker callback
      */
 
+//    @Override
+//    public void onTimeSelected(TimePicker view, int hourOfDay, int minute) {
+//        appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
+//    }
+//
+//    @Override
+//    public void onDateSelected(DatePicker view, int year, int month, int day) {
+//        appendSendCmdEditText(Utils.DateToCmdString(year, month, day));
+//    }
+
     @Override
-    public void onTimeSelected(TimePicker view, int hourOfDay, int minute) {
-        appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
+    public void onDateSet(CalendarDatePickerDialog calendarDatePickerDialog, int year, int month, int day) {
+        appendSendCmdEditText(Utils.DateToCmdString(year, month, day));
     }
 
     @Override
-    public void onDateSelected(DatePicker view, int year, int month, int day) {
-        appendSendCmdEditText(Utils.DateToCmdString(year, month, day));
+    public void onTimeSet(RadialTimePickerDialog radialTimePickerDialog, int hourOfDay, int minute) {
+        appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
+    }
+
+    private void showTimeDialog() {
+//        TimePickerFragment timeFragment = new TimePickerFragment();
+//        timeFragment.setDateTimePickerFragmentListener(this);
+//        timeFragment.show(getFragmentManager(), "timePicker");
+        final Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+
+        RadialTimePickerDialog timePickerDialog = RadialTimePickerDialog
+                .newInstance(this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+        timePickerDialog.show(getFragmentManager(), FRAG_TAG_TIME_PICKER);
+    }
+
+    private void showDateDialog() {
+//        DatePickerFragment dateFragment = new DatePickerFragment();
+//        dateFragment.setDateTimePickerFragmentListener(this);
+//        dateFragment.show(getFragmentManager(), "datePicker");
+
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        // Create a new instance of DatePickerDialog and return it
+//        return new DatePickerDialog(getActivity(), this, year, month, day);
+
+        CalendarDatePickerDialog calendarDatePickerDialog = CalendarDatePickerDialog
+                .newInstance(this, year, month, day);
+        calendarDatePickerDialog.show(getFragmentManager(), FRAG_TAG_DATE_PICKER);
     }
 
     private void showShortcutDialog(List<Shortcut> items) {
@@ -745,28 +816,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         builder.show();
     }
 
-    private void appendSendCmdEditText(String content) {
-        setSendCmdEditText(mSendCmdEdittext.getText() + content);
-    }
-
-    private void setSendCmdEditText(String content) {
-        mSendCmdEdittext.setText(content);
-        mSendCmdEdittext.requestFocus();
-        Editable editable = mSendCmdEdittext.getText();
-        Selection.setSelection(editable, editable.length());
-    }
 
     private void performToolItem(AutoCompleteToolItem item) {
         switch (item.getSpecType()) {
             case AutoCompleteToolItem.SPEC_TYPE_DATE:
-                DatePickerFragment dateFragment = new DatePickerFragment();
-                dateFragment.setDateTimePickerFragmentListener(this);
-                dateFragment.show(getFragmentManager(), "datePicker");
+                showDateDialog();
                 break;
             case AutoCompleteToolItem.SPEC_TYPE_TIME:
-                TimePickerFragment timeFragment = new TimePickerFragment();
-                timeFragment.setDateTimePickerFragmentListener(this);
-                timeFragment.show(getFragmentManager(), "timePicker");
+                showTimeDialog();
                 break;
             case AutoCompleteToolItem.SPEC_TYPE_FAVOR:
                 List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());

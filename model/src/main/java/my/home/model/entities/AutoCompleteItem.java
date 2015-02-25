@@ -30,6 +30,17 @@ public class AutoCompleteItem {
         this.setCmd(cmd);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        AutoCompleteItem autoCompleteItem = (AutoCompleteItem) o;
+        return autoCompleteItem.content.equals(content) && autoCompleteItem.type.equals(type);
+    }
+
+    @Override
+    public int hashCode() {
+        return type.hashCode() ^ content.hashCode();
+    }
+
     public String getType() {
         return type;
     }

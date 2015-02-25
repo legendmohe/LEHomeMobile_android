@@ -31,9 +31,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import my.home.common.BusProvider;
 import my.home.model.entities.AutoCompleteCountHolder;
@@ -254,16 +256,16 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
 
         String cmdString = cmdBuffer.toString();
-        List<AutoCompleteItem> resultList = new ArrayList<>();
+        Set<AutoCompleteItem> resultSet = new HashSet<>();
 
         if (in_msg_or_time_ind_state) {
             String cmd = cmdString + mMessageSeq;
             if (curState.equals("time")) {
-                addTimeToolItemToResultList(resultList);
-                addDateToolItemToResultList(resultList);
+                addTimeToolItemToResult(resultSet);
+                addDateToolItemToResult(resultSet);
             }
-            addFavorToolItemToResultList(resultList);
-            resultList.add(new AutoCompleteItem(curState, 1.0f, mMessageSeq, cmd));
+            addFavorToolItemToResult(resultSet);
+            resultSet.add(new AutoCompleteItem(curState, 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
             String tempLeft = new StringBuilder(leftString).delete(0, lastString.length()).toString();
             if (tempLeft.length() != 0) {
@@ -273,7 +275,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             if (val.startsWith(tempLeft)) {
                                 String tempCmd = new StringBuilder(val).delete(0, tempLeft.length()).toString();
                                 String cmd = cmdString + tempCmd;
-                                resultList.add(new AutoCompleteItem(lastState, Float.MAX_VALUE, val, cmd));
+                                resultSet.add(new AutoCompleteItem(nextState, Float.MAX_VALUE, val, cmd));
                             }
                         }
                     }
@@ -282,23 +284,31 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         if (val.startsWith(tempLeft) && !val.equals(tempLeft)) {
                             String tempCmd = new StringBuilder(val).delete(0, lastString.length()).toString();
                             String cmd = cmdString + tempCmd;
-                            resultList.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
+                            resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
                         }
+                    }
+                }
+            } else if (leftString.equals(lastString)) {
+                for (String val : mNodes.get(curState)) {
+                    if (val.startsWith(leftString) && val.length() != leftString.length()) {
+                        String tempCmd = new StringBuilder(val).delete(0, lastState.length()).toString();
+                        String cmd = cmdString + tempCmd;
+                        resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
                     }
                 }
             }
 
             if (in_msg_or_time_state) {
-                addTimeToolItemToResultList(resultList);
-                addDateToolItemToResultList(resultList);
-                addFavorToolItemToResultList(resultList);
+                addTimeToolItemToResult(resultSet);
+                addDateToolItemToResult(resultSet);
+                addFavorToolItemToResult(resultSet);
             }
             for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
                     if (in_if_or_while_state) {
                         for (String val : mNodes.get(nextState)) {
                             String cmd = cmdString + val;
-                            resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                            resultSet.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                         }
                     }
                 } else {
@@ -306,13 +316,13 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         if (!in_if_or_while_state)
                             continue;
                     if (nextState.equals("message") || nextState.equals("time")) {
-                        addTimeToolItemToResultList(resultList);
-                        addDateToolItemToResultList(resultList);
-                        addFavorToolItemToResultList(resultList);
+                        addTimeToolItemToResult(resultSet);
+                        addDateToolItemToResult(resultSet);
+                        addFavorToolItemToResult(resultSet);
                     }
                     for (String val : mNodes.get(nextState)) {
                         String cmd = cmdString + val;
-                        resultList.add(
+                        resultSet.add(
                                 autoCompleteItemWithWeight(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd), lastString)
                         );
                     }
@@ -325,26 +335,27 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     for (String val : mNodes.get(nextState)) {
                         if (val.startsWith(tempInput)) {
                             String cmd = cmdString + val;
-                            resultList.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                            resultSet.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
                         }
                     }
                 }
             }
         }
+        List<AutoCompleteItem> resultList = new ArrayList<>(resultSet);
         Collections.sort(resultList, mResultComparator);
         BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(resultList));
     }
 
-    private void addFavorToolItemToResultList(List<AutoCompleteItem> resultList) {
-        resultList.add(new AutoCompleteToolItem("tool", "[收藏]", AutoCompleteToolItem.SPEC_TYPE_FAVOR));
+    private void addFavorToolItemToResult(Set<AutoCompleteItem> result) {
+        result.add(new AutoCompleteToolItem("tool", "[收藏]", AutoCompleteToolItem.SPEC_TYPE_FAVOR));
     }
 
-    private void addDateToolItemToResultList(List<AutoCompleteItem> resultList) {
-        resultList.add(new AutoCompleteToolItem("tool", "[日期]", AutoCompleteToolItem.SPEC_TYPE_DATE));
+    private void addDateToolItemToResult(Set<AutoCompleteItem> result) {
+        result.add(new AutoCompleteToolItem("tool", "[日期]", AutoCompleteToolItem.SPEC_TYPE_DATE));
     }
 
-    private void addTimeToolItemToResultList(List<AutoCompleteItem> resultList) {
-        resultList.add(new AutoCompleteToolItem("tool", "[时间]", AutoCompleteToolItem.SPEC_TYPE_TIME));
+    private void addTimeToolItemToResult(Set<AutoCompleteItem> result) {
+        result.add(new AutoCompleteToolItem("tool", "[时间]", AutoCompleteToolItem.SPEC_TYPE_TIME));
     }
 
     private void loadAutoCompleteLocalHistory(Context context) {

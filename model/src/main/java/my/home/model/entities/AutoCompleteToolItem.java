@@ -25,7 +25,7 @@ public class AutoCompleteToolItem extends AutoCompleteItem {
     public static final int SPEC_TYPE_FAVOR = 2;
 
     public AutoCompleteToolItem(String type, String content, int specType) {
-        super(type, Float.MAX_VALUE, content, "");
+        super(type, 10000.0f, content, "");
         this.specType = specType;
     }
 

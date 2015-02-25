@@ -107,7 +107,6 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="false"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/cmd_tool_button"
                 android:completionThreshold="1"
                 android:ems="10"
                 android:inputType="text"
