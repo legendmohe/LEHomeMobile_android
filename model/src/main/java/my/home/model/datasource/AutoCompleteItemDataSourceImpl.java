@@ -159,6 +159,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             mInitState = confJSONObject.getString("init_state");
             mNodes.put("message", new ArrayList<String>(Arrays.asList(mMessageSeq)));
             mNodes.put("time", new ArrayList<String>(Arrays.asList(mTimeSeq)));
+            mNodes.put("trigger", new ArrayList<String>());
+            mNodes.put("finish", new ArrayList<String>());
 
             mLoadSuccess = true;
             return true;

@@ -14,6 +14,8 @@
 
 package my.home.lehome.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -77,7 +79,9 @@ import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
+import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.SpeechDialog;
 import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
@@ -91,6 +95,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
         , ChatItemListView
+        , ChatSuggestionView
 //        , DateTimePickerFragmentListener
         , CalendarDatePickerDialog.OnDateSetListener
         , RadialTimePickerDialog.OnTimeSetListener {
@@ -104,6 +109,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     private ChatItemArrayAdapter mAdapter;
     //	private ProgressBar mProgressBar;
     private Button switchButton;
+    private Button mSuggestionButton;
     private Toast mToast;
     private OnGlobalLayoutListener mKeyboardListener;
     private ListView mCmdListview;
@@ -187,7 +193,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
 
         };
-        mChatFragmentPresenter = new ChatFragmentPresenter(this, this);
+        mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
         mChatFragmentPresenter.start();
     }
 
@@ -253,20 +259,16 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         });
 
 
-//        final Button toolButton = (Button) rootView.findViewById(R.id.cmd_tool_button);
-//        toolButton.setOnClickListener(new OnClickListener() {
+        mSuggestionButton = (Button) rootView.findViewById(R.id.cmd_suggestion_button);
+        mSuggestionButton.setOnClickListener(new OnClickListener() {
 
-//            @Override
-//            public void onClick(View v) {
-//                mSendCmdEdittext.setText("");
-//                PopupMenu popup = new PopupMenu(getActivity(), toolButton);
-//                popup.setOnMenuItemClickListener(ChatFragment.this);
-//                MenuInflater inflater = popup.getMenuInflater();
-//                inflater.inflate(R.menu.cmd_tool, popup.getMenu());
-//                popup.show();
-//            }
-//        });
-//        toolButton.setVisibility(View.GONE);
+            @Override
+            public void onClick(View v) {
+                AutoCompleteItem item = (AutoCompleteItem) v.getTag();
+                setSendCmdEditText(item.getCmd());
+            }
+        });
+        mSuggestionButton.setVisibility(View.GONE);
 
         switchButton = (Button) rootView.findViewById(R.id.switch_input_button);
         switchButton.setOnClickListener(new OnClickListener() {
@@ -829,6 +831,54 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());
                 showShortcutDialog(items);
                 break;
+        }
+    }
+
+    /*
+     *  onShowSuggestion(AutoCompleteItem item)
+     */
+
+    @Override
+    public void onShowSuggestion(AutoCompleteItem item) {
+        if (item == null || mSendCmdEdittext.getText() == null || mSendCmdEdittext.getText().length() == 0) {
+            if (mSuggestionButton.getVisibility() != View.GONE) {
+                AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(mSuggestionButton);
+                mSuggestionButton.setVisibility(View.VISIBLE);
+                animatorSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mSuggestionButton.setVisibility(View.GONE);
+                        mSuggestionButton.setText("");
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+                animatorSet.start();
+            } else {
+                mSuggestionButton.setText("");
+            }
+            mSuggestionButton.setTag(null);
+        } else {
+            if (mSuggestionButton.getVisibility() != View.VISIBLE) {
+                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSuggestionButton);
+                mSuggestionButton.setVisibility(View.VISIBLE);
+                animatorSet.start();
+            }
+            mSuggestionButton.setTag(item);
+            mSuggestionButton.setText(item.getContent());
         }
     }
 }

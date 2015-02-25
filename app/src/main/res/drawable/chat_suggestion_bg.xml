@@ -12,15 +12,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <color name="text_color">#333333</color>
-    <color name="chat_left_focus">#ffafafaf</color>
-    <color name="chat_left_pressed">#ffafafaf</color>
-    <color name="chat_left_normal">#ffbfbfbf</color>
-    <color name="chat_right_focus">#ffc5c5c5</color>
-    <color name="chat_right_pressed">#ffc5c5c5</color>
-    <color name="chat_right_normal">#ffe5e5e5</color>
-    <color name="chat_suggestion_focus">#fff0f0f0</color>
-    <color name="chat_suggestion_pressed">#ffc5c5c5</color>
-    <color name="chat_suggestion_normal">#fff0f0f0</color>
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:drawable="@drawable/chat_suggestion_pressed" />
+    <item android:state_pressed="true" android:drawable="@drawable/chat_suggestion_pressed" />
+    <!--<item android:state_selected="true" android:drawable="@color/chatto_select" />-->
+    <item android:drawable="@drawable/chat_suggestion_normal" />
+</selector>

@@ -25,11 +25,13 @@ import java.util.List;
 import my.home.common.BusProvider;
 import my.home.common.Constants;
 import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
+import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
 import my.home.domain.usecase.SaveAutoCompleteLocalHistoryUsecaseImpl;
 import my.home.lehome.asynctask.SendCommandAsyncTask;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
+import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
 import my.home.model.entities.ChatItem;
 
@@ -40,10 +42,14 @@ public class ChatFragmentPresenter extends MVPPresenter {
 
     private WeakReference<SaveLocalHistoryView> mSaveLocalHistoryView;
     private WeakReference<ChatItemListView> mChatItemListView;
+    private WeakReference<ChatSuggestionView> mChatSuggestionView;
 
-    public ChatFragmentPresenter(SaveLocalHistoryView saveLocalHistoryView, ChatItemListView chatItemListView) {
+    public ChatFragmentPresenter(SaveLocalHistoryView saveLocalHistoryView
+            , ChatItemListView chatItemListView
+            , ChatSuggestionView chatSuggestionView) {
         this.mSaveLocalHistoryView = new WeakReference<SaveLocalHistoryView>(saveLocalHistoryView);
         this.mChatItemListView = new WeakReference<ChatItemListView>(chatItemListView);
+        this.mChatSuggestionView = new WeakReference<ChatSuggestionView>(chatSuggestionView);
     }
 
     public void markAndSendCurrentInput(String input) {
@@ -84,5 +90,12 @@ public class ChatFragmentPresenter extends MVPPresenter {
             this.mSaveLocalHistoryView.get().onSaveLocalHistoryFinish(true);
         else
             this.mSaveLocalHistoryView.get().onSaveLocalHistoryFinish(false);
+    }
+
+    @Subscribe
+    public void onShowCmdSuggestionEvent(DShowCmdSuggestionEvent event) {
+        if (mChatSuggestionView.get() != null) {
+            mChatSuggestionView.get().onShowSuggestion(event.getItem());
+        }
     }
 }

@@ -16,17 +16,22 @@ package my.home.domain.usecase;
 
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import my.home.common.BusProvider;
 import my.home.domain.events.DLoadAutoCompleteConfEvent;
 import my.home.domain.events.DShowAutoCompleteItemEvent;
+import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.model.datasource.AutoCompleteItemDataSource;
 import my.home.model.datasource.AutoCompleteItemDataSourceImpl;
+import my.home.model.entities.AutoCompleteItem;
 import my.home.model.events.MConfAutoCompleteItemEvent;
 import my.home.model.events.MGetAutoCompleteItemEvent;
 
@@ -78,6 +83,15 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
     @Subscribe
     public void onGetAutoCompleteItems(MGetAutoCompleteItemEvent event) {
         BusProvider.getRestBusInstance().post(new DShowAutoCompleteItemEvent(event.getResultList()));
+
+        final AutoCompleteItem suggestionItem = filterSuggestionItem(event);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                BusProvider.getRestBusInstance().post(new DShowCmdSuggestionEvent(suggestionItem));
+            }
+        });
     }
 
     @Subscribe
@@ -113,5 +127,14 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
     public AutoCompleteItemUsecase setConfString(String mConfString) {
         this.mConfString = mConfString;
         return this;
+    }
+
+    private AutoCompleteItem filterSuggestionItem(MGetAutoCompleteItemEvent event) {
+        List<AutoCompleteItem> results = event.getResultList();
+        for (AutoCompleteItem item : results) {
+            if (item.getType() != "tool")
+                return item;
+        }
+        return null;
     }
 }
