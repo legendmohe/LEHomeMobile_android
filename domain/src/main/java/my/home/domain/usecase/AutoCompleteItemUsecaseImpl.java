@@ -16,8 +16,6 @@ package my.home.domain.usecase;
 
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
@@ -29,6 +27,7 @@ import my.home.common.BusProvider;
 import my.home.domain.events.DLoadAutoCompleteConfEvent;
 import my.home.domain.events.DShowAutoCompleteItemEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
+import my.home.domain.util.DomainUtil;
 import my.home.model.datasource.AutoCompleteItemDataSource;
 import my.home.model.datasource.AutoCompleteItemDataSourceImpl;
 import my.home.model.entities.AutoCompleteItem;
@@ -82,13 +81,13 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
 
     @Subscribe
     public void onGetAutoCompleteItems(MGetAutoCompleteItemEvent event) {
-        BusProvider.getRestBusInstance().post(new DShowAutoCompleteItemEvent(event.getResultList()));
 
         final AutoCompleteItem suggestionItem = filterSuggestionItem(event);
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
+        final MGetAutoCompleteItemEvent finalEvent = event;
+        DomainUtil.runOnMainThread(new Runnable() {
             @Override
             public void run() {
+                BusProvider.getRestBusInstance().post(new DShowAutoCompleteItemEvent(finalEvent.getResultList()));
                 BusProvider.getRestBusInstance().post(new DShowCmdSuggestionEvent(suggestionItem));
             }
         });
@@ -96,7 +95,13 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
 
     @Subscribe
     public void onConfAutoCompleteItems(MConfAutoCompleteItemEvent event) {
-        BusProvider.getRestBusInstance().post(new DLoadAutoCompleteConfEvent(event.getReturnCode()));
+        final MConfAutoCompleteItemEvent finalEvent = event;
+        DomainUtil.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                BusProvider.getRestBusInstance().post(new DLoadAutoCompleteConfEvent(finalEvent.getReturnCode()));
+            }
+        });
     }
 
     @Override

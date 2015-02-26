@@ -33,6 +33,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -376,31 +377,24 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
-//        mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            }
-//
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count,
-//                                          int after) {
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (s.length() > 0) {
-//                    if (toolButton.getVisibility() == View.INVISIBLE
-//                            || toolButton.getVisibility() == View.GONE) {
-//                        AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(toolButton);
-//                        toolButton.setVisibility(View.VISIBLE);
-//                        animatorSet.start();
-//                    }
-//                } else {
-//                    toolButton.setVisibility(View.GONE);
-//                }
-//            }
-//        });
+        mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    onShowSuggestion(null);
+                }
+            }
+        });
 
         mKeyboardListener = (new OnGlobalLayoutListener() {
             @Override

@@ -443,19 +443,21 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         break;
                     }
                 }
-                if (found)
+                if (found || inputBuffer.length() == 0)
                     break;
-                else if (curState.equals("message") || mLinks.get(curState).contains("message")) {
-                    found = true;
-                    curState = "message";
-                    inputBuffer.deleteCharAt(0);
-                    break;
-                } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
-                    found = true;
-                    curState = "time";
-                    inputBuffer.deleteCharAt(0);
-                    break;
-                }
+            }
+            if (inputBuffer.length() == 0)
+                break;
+            if (found)
+                continue;
+            if (curState.equals("message") || mLinks.get(curState).contains("message")) {
+                found = true;
+                curState = "message";
+                inputBuffer.deleteCharAt(0);
+            } else if (curState.equals("time") || mLinks.get(curState).contains("time")) {
+                found = true;
+                curState = "time";
+                inputBuffer.deleteCharAt(0);
             }
             if (!found) break;
         }
