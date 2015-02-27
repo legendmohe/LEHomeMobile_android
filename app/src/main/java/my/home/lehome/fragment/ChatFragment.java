@@ -57,7 +57,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -455,12 +454,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
-        mSendCmdEdittext.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                mSendCmdEdittext.setCanShowDropdown(false);
-            }
-        });
+//        mSendCmdEdittext.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
+//            @Override
+//            public void onDismiss() {
+//                mSendCmdEdittext.setCanShowDropdown(false);
+//            }
+//        });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -950,6 +949,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             } else {
                 mSuggestionButton.setText("");
             }
+            // disable autocomplete dropdown
             mSuggestionButton.setTag(null);
         } else if (!mSendCmdEdittext.isCanShowDropdown()) {
             if (mSuggestionButton.getVisibility() != View.VISIBLE) {
@@ -961,4 +961,11 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             mSuggestionButton.setText(item.getContent());
         }
     }
+
+//    @Override
+//    public void onGetAutoCompleteItems(List<AutoCompleteItem> item) {
+//        if (item == null || item.size() == 0) {
+//            mSendCmdEdittext.setCanShowDropdown(false);
+//        }
+//    }
 }

@@ -123,4 +123,11 @@ public class ChatFragmentPresenter extends MVPPresenter {
             mChatSuggestionView.get().onShowSuggestion(event.getItem());
         }
     }
+
+//    @Subscribe
+//    public void onGetAutoCompleteItems(DShowAutoCompleteItemEvent event) {
+//        if (mChatSuggestionView.get() != null) {
+//            mChatSuggestionView.get().onGetAutoCompleteItems(event.getResultList());
+//        }
+//    }
 }

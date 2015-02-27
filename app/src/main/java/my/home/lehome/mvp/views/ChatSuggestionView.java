@@ -21,4 +21,5 @@ import my.home.model.entities.AutoCompleteItem;
  */
 public interface ChatSuggestionView extends MVPView {
     public void onShowSuggestion(AutoCompleteItem item);
+//    public void onGetAutoCompleteItems(List<AutoCompleteItem> item);
 }
