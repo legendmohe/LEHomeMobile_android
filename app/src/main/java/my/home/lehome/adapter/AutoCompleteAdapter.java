@@ -151,6 +151,14 @@ public class AutoCompleteAdapter extends BaseAdapter implements Filterable {
         mLoadConfListener = new WeakReference<onLoadConfListener>(listener);
     }
 
+    public List<AutoCompleteItem> getResultList() {
+        return mResultList;
+    }
+
+    public void setResultList(List<AutoCompleteItem> mResultList) {
+        this.mResultList = mResultList;
+    }
+
     public interface onLoadConfListener {
         public void onLoadComplete(boolean loadSuccess);
     }

@@ -175,7 +175,11 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
             DBHelper.updateChatItem(this.mContext, mCurrentItem);
             mFragment.getAdapter().notifyDataSetChanged();
         } else {
-            mCurrentItem.setState(Constants.CHATITEM_STATE_ERROR);
+            if (rep_code == 415) {
+                mCurrentItem.setState(Constants.CHATITEM_STATE_SUCCESS);
+            } else {
+                mCurrentItem.setState(Constants.CHATITEM_STATE_ERROR);
+            }
             DBHelper.updateChatItem(this.mContext, mCurrentItem);
 
             ChatItem newItem = new ChatItem();

@@ -27,9 +27,9 @@ import java.util.ArrayList;
  */
 public class UIUtils {
 
-    public static AnimatorSet getShowViewScaleAnimatorSet(View target) {
+    public static AnimatorSet getShowViewScaleAnimatorSet(View target, long duration) {
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.setDuration(400);
+        animatorSet.setDuration(duration);
         animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
         ArrayList<Animator> animatorList = new ArrayList<Animator>();
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(target, "ScaleX", 0f, 1.2f, 1f);
@@ -40,9 +40,9 @@ public class UIUtils {
         return animatorSet;
     }
 
-    public static AnimatorSet getDismissViewScaleAnimatorSet(View target) {
+    public static AnimatorSet getDismissViewScaleAnimatorSet(View target, long duration) {
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.setDuration(400);
+        animatorSet.setDuration(duration);
         animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
         ArrayList<Animator> animatorList = new ArrayList<Animator>();
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(target, "ScaleX", 1f, 1.2f, 0f);

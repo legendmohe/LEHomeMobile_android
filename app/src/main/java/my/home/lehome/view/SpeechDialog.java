@@ -277,7 +277,7 @@ public class SpeechDialog extends Dialog {
                 break;
             case State.IDLE:
 //            mResult = null;
-                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSpeechImageButton);
+                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSpeechImageButton, 400);
                 mSpeechImageButton.setVisibility(View.VISIBLE);
                 animatorSet.start();
 

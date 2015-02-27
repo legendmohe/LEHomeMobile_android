@@ -293,7 +293,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             } else if (leftString.equals(lastString)) {
                 for (String val : mNodes.get(curState)) {
                     if (val.startsWith(leftString) && val.length() != leftString.length()) {
-                        String tempCmd = new StringBuilder(val).delete(0, lastState.length()).toString();
+                        String tempCmd = new StringBuilder(val).delete(0, lastString.length()).toString();
                         String cmd = cmdString + tempCmd;
                         resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
                     }

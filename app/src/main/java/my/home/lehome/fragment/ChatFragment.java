@@ -49,12 +49,15 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -84,6 +87,8 @@ import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
 import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.DelayAutoCompleteTextView;
+import my.home.lehome.view.OnSwipeTouchListener;
+import my.home.lehome.view.SimpleAnimationListener;
 import my.home.lehome.view.SpeechDialog;
 import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
 import my.home.model.entities.AutoCompleteItem;
@@ -266,7 +271,79 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void onClick(View v) {
                 AutoCompleteItem item = (AutoCompleteItem) v.getTag();
-                setSendCmdEditText(item.getCmd());
+                if (item instanceof AutoCompleteToolItem) {
+                    Log.d(TAG, "selected AutoCompleteToolItem: " + item.getContent());
+                    AutoCompleteToolItem toolItem = (AutoCompleteToolItem) item;
+                    performToolItem(toolItem);
+                } else {
+                    setSendCmdEditText(item.getCmd());
+                }
+            }
+        });
+//        mSuggestionButton.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                mSendCmdEdittext.setCanShowDropdown(true);
+//                mSendCmdEdittext.showDropDown();
+//                onShowSuggestion(null);
+//                return true;
+//            }
+//        });
+        mSuggestionButton.setOnTouchListener(new OnSwipeTouchListener(getActivity()) {
+
+//            private final Animation leftAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_left);
+//            private final Animation rightAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_right);
+
+            @Override
+            public void onSwipeTop() {
+//                Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();
+                Animation upAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_up);
+                upAnim.setAnimationListener(new SimpleAnimationListener() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mChatFragmentPresenter.showPreCmdSuggestion(
+                                mAutoCompleteAdapter.getResultList(),
+                                (AutoCompleteItem) mSuggestionButton.getTag()
+                        );
+                    }
+                });
+                mSuggestionButton.startAnimation(upAnim);
+            }
+
+            @Override
+            public void onSwipeLeft() {
+//                mSuggestionButton.startAnimation(leftAnim);
+                mSendCmdEdittext.setCanShowDropdown(true);
+                mSendCmdEdittext.showDropDown();
+                onShowSuggestion(null);
+            }
+
+            @Override
+            public void onSwipeBottom() {
+                Animation downAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_down);
+                downAnim.setAnimationListener(new SimpleAnimationListener() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mChatFragmentPresenter.showNextCmdSuggestion(
+                                mAutoCompleteAdapter.getResultList(),
+                                (AutoCompleteItem) mSuggestionButton.getTag()
+                        );
+                    }
+                });
+                mSuggestionButton.startAnimation(downAnim);
+//                Toast.makeText(getActivity(), "bottom", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClick() {
+                Animation clickAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_click);
+                clickAnim.setAnimationListener(new SimpleAnimationListener() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mSuggestionButton.performClick();
+                    }
+                });
+                mSuggestionButton.startAnimation(clickAnim);
             }
         });
         mSuggestionButton.setVisibility(View.GONE);
@@ -352,6 +429,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     if (!messageString.trim().equals("")) {
                         mChatFragmentPresenter.markAndSendCurrentInput(messageString);
                         mSendCmdEdittext.setText("");
+                        mSendCmdEdittext.setCanShowDropdown(false);
                     }
                     return true;
                 } else {
@@ -377,6 +455,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
+        mSendCmdEdittext.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                mSendCmdEdittext.setCanShowDropdown(false);
+            }
+        });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -392,9 +476,11 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             public void afterTextChanged(Editable s) {
                 if (s.length() == 0) {
                     onShowSuggestion(null);
+                    mSendCmdEdittext.setCanShowDropdown(false);
                 }
             }
         });
+        mSendCmdEdittext.setCanShowDropdown(false);
 
         mKeyboardListener = (new OnGlobalLayoutListener() {
             @Override
@@ -836,7 +922,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public void onShowSuggestion(AutoCompleteItem item) {
         if (item == null || mSendCmdEdittext.getText() == null || mSendCmdEdittext.getText().length() == 0) {
             if (mSuggestionButton.getVisibility() != View.GONE) {
-                AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(mSuggestionButton);
+                AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(mSuggestionButton, 200);
                 mSuggestionButton.setVisibility(View.VISIBLE);
                 animatorSet.addListener(new Animator.AnimatorListener() {
                     @Override
@@ -865,9 +951,9 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 mSuggestionButton.setText("");
             }
             mSuggestionButton.setTag(null);
-        } else {
+        } else if (!mSendCmdEdittext.isCanShowDropdown()) {
             if (mSuggestionButton.getVisibility() != View.VISIBLE) {
-                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSuggestionButton);
+                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSuggestionButton, 200);
                 mSuggestionButton.setVisibility(View.VISIBLE);
                 animatorSet.start();
             }

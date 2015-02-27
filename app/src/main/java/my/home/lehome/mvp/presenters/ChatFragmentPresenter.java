@@ -33,6 +33,7 @@ import my.home.lehome.helper.DBHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
 
 /**
@@ -71,6 +72,30 @@ public class ChatFragmentPresenter extends MVPPresenter {
         if (chatItems != null) {
             Collections.reverse(chatItems); // reverse descend items
             mChatItemListView.get().onResetDatas(chatItems);
+        }
+    }
+
+    public void showNextCmdSuggestion(List<AutoCompleteItem> results, AutoCompleteItem item) {
+        for (int i = 0; i < results.size() - 1; i++) {
+            if (results.get(i).equals(item)) {
+                item = results.get(i + 1);
+                break;
+            }
+        }
+        if (mChatSuggestionView.get() != null) {
+            mChatSuggestionView.get().onShowSuggestion(item);
+        }
+    }
+
+    public void showPreCmdSuggestion(List<AutoCompleteItem> results, AutoCompleteItem item) {
+        for (int i = 1; i < results.size(); i++) {
+            if (results.get(i).equals(item)) {
+                item = results.get(i - 1);
+                break;
+            }
+        }
+        if (mChatSuggestionView.get() != null) {
+            mChatSuggestionView.get().onShowSuggestion(item);
         }
     }
 

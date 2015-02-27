@@ -29,6 +29,8 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
     private static final int DEFAULT_AUTOCOMPLETE_DELAY = 300;
 
     private int mAutoCompleteDelay = DEFAULT_AUTOCOMPLETE_DELAY;
+    private boolean autoCompleteEnable = true;
+    private boolean canShowDropdown = true;
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -46,11 +48,15 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
     }
 
     public void performFiltering(CharSequence text) {
+        if (!autoCompleteEnable)
+            return;
         DelayAutoCompleteTextView.super.performFiltering(text, 0);
     }
 
     @Override
     protected void performFiltering(CharSequence text, int keyCode) {
+        if (!autoCompleteEnable)
+            return;
         mHandler.removeMessages(MESSAGE_TEXT_CHANGED);
         mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_TEXT_CHANGED, text), mAutoCompleteDelay);
     }
@@ -68,6 +74,14 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
 //        return true;
 //    }
 
+
+    @Override
+    public void showDropDown() {
+        if (!canShowDropdown)
+            return;
+        super.showDropDown();
+    }
+
     @Override
     public void onFilterComplete(int count) {
         super.onFilterComplete(count);
@@ -77,7 +91,24 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
 
     @Override
     protected void replaceText(CharSequence text) {
+        // must override onItemClickListener to set selected text
 //        super.replaceText(text);
+    }
+
+    public boolean isAutoCompleteEnable() {
+        return autoCompleteEnable;
+    }
+
+    public void setAutoCompleteEnable(boolean autoCompleteEnable) {
+        this.autoCompleteEnable = autoCompleteEnable;
+    }
+
+    public boolean isCanShowDropdown() {
+        return canShowDropdown;
+    }
+
+    public void setCanShowDropdown(boolean canShowDropdown) {
+        this.canShowDropdown = canShowDropdown;
     }
 }
 
