@@ -180,7 +180,9 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
 
         boolean in_msg_or_time_ind_state = false;
         boolean in_msg_or_time_state = false;
-        boolean in_if_or_while_state = false;
+        boolean in_if_state = false;
+        boolean in_if_then_state = false;
+        boolean in_while_state = false;
         String leftString = "";
         String lastString = "";
         String lastState = "";
@@ -204,30 +206,41 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 return;
             }
             for (String nextState : mLinks.get(curState)) {
-                if (!in_if_or_while_state) {
+                if (!in_if_state && !in_while_state) {
                     if (nextState.equals("then")
                             || nextState.equals("compare")
                             || nextState.equals("logical"))
+                        continue;
+                }
+                if (!in_if_then_state) {
+                    if (nextState.equals("else"))
                         continue;
                 }
                 for (String val : mNodes.get(nextState)) {
                     if (tempInput.startsWith(val)) {
                         lastString = val;
                         leftString = inputBuffer.toString();
-                        curState = nextState;
                         lastState = nextState;
                         inputBuffer.delete(0, val.length());
                         cmdBuffer.append(val);
                         found = true;
                         in_msg_or_time_state = false;
 
-                        if (curState.equals("message") || curState.equals("time")) {
+                        if (nextState.equals("message") || nextState.equals("time")) {
                             in_msg_or_time_ind_state = true;
-                        } else if (curState.equals("if") || curState.equals("while")) {
-                            in_if_or_while_state = true;
-                        } else if (curState.equals("then")) {
-                            in_if_or_while_state = false;
+                        } else if (nextState.equals("if")) {
+                            in_if_state = true;
+                        } else if (nextState.equals("while")) {
+                            in_while_state = true;
+                        } else if (nextState.equals("then")) {
+                            if (in_if_state)
+                                in_if_then_state = true;
+                            in_if_state = false;
+                            in_while_state = false;
+                        } else if (in_if_then_state && nextState.equals("else")) {
+                            in_if_then_state = false;
                         }
+                        curState = nextState;
                         break;
                     } else if (nextState.equals("message") && val.startsWith(tempInput)) {
                         lastState = nextState;
@@ -307,7 +320,14 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
             for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
-                    if (in_if_or_while_state) {
+                    if (in_if_state || in_while_state) {
+                        for (String val : mNodes.get(nextState)) {
+                            String cmd = cmdString + val;
+                            resultSet.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                        }
+                    }
+                } else if (nextState.equals("else")) {
+                    if (in_if_then_state) {
                         for (String val : mNodes.get(nextState)) {
                             String cmd = cmdString + val;
                             resultSet.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
@@ -315,7 +335,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     }
                 } else {
                     if (nextState.equals("compare") || nextState.equals("logical"))
-                        if (!in_if_or_while_state)
+                        if (!in_if_state && !in_while_state)
                             continue;
                     if (nextState.equals("message") || nextState.equals("time")) {
                         addTimeToolItemToResult(resultSet);
@@ -399,7 +419,9 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     public void markCurrentInput(String inputString) {
         Log.d(TAG, "mark: " + inputString);
         StringBuffer inputBuffer = new StringBuffer(inputString);
-        boolean in_if_or_while_state = false;
+        boolean in_if_state = false;
+        boolean in_if_then_state = false;
+        boolean in_while_state = false;
         boolean in_msg_or_time_ind_state = false;
         String lastString = null;
         String curState = mInitState;
@@ -418,10 +440,14 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 return;
             }
             for (String nextState : mLinks.get(curState)) {
-                if (!in_if_or_while_state) {
+                if (!in_if_state && !in_while_state) {
                     if (nextState.equals("then")
                             || nextState.equals("compare")
                             || nextState.equals("logical"))
+                        continue;
+                }
+                if (!in_if_then_state) {
+                    if (nextState.equals("else"))
                         continue;
                 }
                 for (String val : mNodes.get(nextState)) {
@@ -430,16 +456,23 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             incAutoCompleteItemWeight(lastString, val);
 
                         lastString = val;
-                        curState = nextState;
                         inputBuffer.delete(0, val.length());
                         found = true;
-                        if (curState.equals("message") || curState.equals("time")) {
+                        if (nextState.equals("message") || nextState.equals("time")) {
                             in_msg_or_time_ind_state = true;
-                        } else if (curState.equals("if") || curState.equals("while")) {
-                            in_if_or_while_state = true;
-                        } else if (curState.equals("then")) {
-                            in_if_or_while_state = false;
+                        } else if (nextState.equals("if")) {
+                            in_if_state = true;
+                        } else if (nextState.equals("while")) {
+                            in_while_state = true;
+                        } else if (nextState.equals("then")) {
+                            if (in_if_state)
+                                in_if_then_state = true;
+                            in_if_state = false;
+                            in_while_state = false;
+                        } else if (in_if_then_state && nextState.equals("else")) {
+                            in_if_then_state = false;
                         }
+                        curState = nextState;
                         break;
                     }
                 }
