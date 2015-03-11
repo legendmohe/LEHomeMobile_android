@@ -17,7 +17,6 @@ package my.home.lehome.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -69,8 +68,9 @@ import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog
 import java.util.Calendar;
 import java.util.List;
 
+import my.home.common.ComUtil;
 import my.home.common.Constants;
-import my.home.common.Utils;
+import my.home.common.UIUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.adapter.AutoCompleteAdapter;
@@ -84,7 +84,6 @@ import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
-import my.home.lehome.util.UIUtils;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
 import my.home.lehome.view.SimpleAnimationListener;
@@ -101,7 +100,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , SaveLocalHistoryView
         , ChatItemListView
         , ChatSuggestionView
-//        , DateTimePickerFragmentListener
         , CalendarDatePickerDialog.OnDateSetListener
         , RadialTimePickerDialog.OnTimeSetListener {
     public static final String TAG = ChatFragment.class.getName();
@@ -112,12 +110,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      * common UI
      */
     private ChatItemArrayAdapter mAdapter;
-    //	private ProgressBar mProgressBar;
     private Button switchButton;
     private Button mSuggestionButton;
     private Toast mToast;
     private OnGlobalLayoutListener mKeyboardListener;
     private ListView mCmdListview;
+    //    private WeakReference<ActionBarControlView> mActionBarControlViewRf;
     private DelayAutoCompleteTextView mSendCmdEdittext;
     private ChatFragmentPresenter mChatFragmentPresenter;
 
@@ -126,7 +124,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      */
     public static Handler mHandler;
     private int mNewMsgNum = 0;
-    private int mTopVisibleIndex;
     private boolean mNeedShowUnread = false;
     private boolean mScrollViewInButtom = false;
     private boolean mKeyboard_open = false;
@@ -200,6 +197,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         };
         mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
         mChatFragmentPresenter.start();
+
     }
 
     ;
@@ -224,12 +222,27 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
+        setupViews(rootView);
 
+        mSuggestionButton.setVisibility(View.GONE);
+        mSendCmdEdittext.setCanShowDropdown(false);
+        mToast = Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT);
+//        mActionBarControlViewRf = new WeakReference<ActionBarControlView>((MainActivity)getActivity());
+        // for retainning fragment
+        setRetainInstance(true);
+        // for user experience
+        scrollMyListViewToBottom();
+        return rootView;
+    }
+
+    @Override
+    public void setupViews(View rootView) {
         mCmdListview = (ListView) rootView.findViewById(R.id.chat_list);
         mCmdListview.setAdapter(mAdapter);
-
-
         mCmdListview.setOnScrollListener(new OnScrollListener() {
+            int lastFirstVisibleItem = 0;
+            int topVisibleIndex;
+
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (mKeyboard_open && scrollState == SCROLL_STATE_TOUCH_SCROLL) {
@@ -240,7 +253,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                             getActivity().getCurrentFocus().getWindowToken(),
                             InputMethodManager.HIDE_NOT_ALWAYS);
                 } else if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-                    if (mTopVisibleIndex == 0
+                    if (topVisibleIndex == 0
                             && mAdapter.getItem(0).getId() > Constants.CHATITEM_LOWEST_INDEX) {
                         new LoadMoreChatItemAsyncTask(ChatFragment.this).execute(Constants.CHATITEM_LOAD_LIMIT);
                     }
@@ -250,7 +263,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
-                mTopVisibleIndex = firstVisibleItem;
+                topVisibleIndex = firstVisibleItem;
                 if (firstVisibleItem + visibleItemCount == totalItemCount) {
                     Log.d(TAG, "reach buttom");
                     mScrollViewInButtom = true;
@@ -260,9 +273,19 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 } else {
                     mScrollViewInButtom = false;
                 }
+
+//                if (view.getId() == mCmdListview.getId()) {
+//                    final int currentFirstVisibleItem = mCmdListview.getFirstVisiblePosition();
+//                    if (currentFirstVisibleItem > lastFirstVisibleItem) {
+//                        mActionBarControlViewRf.get().hideActionBar();
+//                    } else if (currentFirstVisibleItem < lastFirstVisibleItem) {
+//                        mActionBarControlViewRf.get().showActionBar();
+//                    }
+//
+//                    lastFirstVisibleItem = currentFirstVisibleItem;
+//                }
             }
         });
-
 
         mSuggestionButton = (Button) rootView.findViewById(R.id.cmd_suggestion_button);
         mSuggestionButton.setOnClickListener(new OnClickListener() {
@@ -295,7 +318,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
             @Override
             public void onSwipeTop() {
-//                Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();
                 Animation upAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.shake_up);
                 upAnim.setAnimationListener(new SimpleAnimationListener() {
                     @Override
@@ -311,7 +333,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
             @Override
             public void onSwipeLeft() {
-//                mSuggestionButton.startAnimation(leftAnim);
                 mSendCmdEdittext.setCanShowDropdown(true);
                 mSendCmdEdittext.showDropDown();
                 onShowSuggestion(null);
@@ -330,7 +351,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     }
                 });
                 mSuggestionButton.startAnimation(downAnim);
-//                Toast.makeText(getActivity(), "bottom", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -345,7 +365,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 mSuggestionButton.startAnimation(clickAnim);
             }
         });
-        mSuggestionButton.setVisibility(View.GONE);
 
         switchButton = (Button) rootView.findViewById(R.id.switch_input_button);
         switchButton.setOnClickListener(new OnClickListener() {
@@ -383,7 +402,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         });
         mSpeechDialog = SpeechDialog.getInstance(getActivity());
         final Button speechButton = (Button) rootView.findViewById(R.id.speech_button);
-
         speechButton.setOnTouchListener(new OnTouchListener() {
 
             @Override
@@ -454,12 +472,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
-//        mSendCmdEdittext.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                mSendCmdEdittext.setCanShowDropdown(false);
-//            }
-//        });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -479,7 +491,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
             }
         });
-        mSendCmdEdittext.setCanShowDropdown(false);
 
         mKeyboardListener = (new OnGlobalLayoutListener() {
             @Override
@@ -501,11 +512,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
         });
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(mKeyboardListener);
-
-        mToast = Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT);
-
-        scrollMyListViewToBottom();
-        return rootView;
     }
 
     @Override
@@ -609,16 +615,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
@@ -685,7 +681,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         return mAdapter;
     }
 
-    /***
+    /**
      * ========================s2t===========================
      */
 
@@ -795,6 +791,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         mAdapter.setData(chatItems);
     }
 
+
     @Override
     public Context getContext() {
         return getActivity();
@@ -827,12 +824,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
     @Override
     public void onDateSet(CalendarDatePickerDialog calendarDatePickerDialog, int year, int month, int day) {
-        appendSendCmdEditText(Utils.DateToCmdString(year, month, day));
+        appendSendCmdEditText(ComUtil.DateToCmdString(year, month, day));
     }
 
     @Override
     public void onTimeSet(RadialTimePickerDialog radialTimePickerDialog, int hourOfDay, int minute) {
-        appendSendCmdEditText(Utils.TimeToCmdString(hourOfDay, minute));
+        appendSendCmdEditText(ComUtil.TimeToCmdString(hourOfDay, minute));
     }
 
     private void showTimeDialog() {
@@ -921,7 +918,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public void onShowSuggestion(AutoCompleteItem item) {
         if (item == null || mSendCmdEdittext.getText() == null || mSendCmdEdittext.getText().length() == 0) {
             if (mSuggestionButton.getVisibility() != View.GONE) {
-                AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(mSuggestionButton, 200);
+                AnimatorSet animatorSet = UIUtil.getDismissViewScaleAnimatorSet(mSuggestionButton, 200);
                 mSuggestionButton.setVisibility(View.VISIBLE);
                 animatorSet.addListener(new Animator.AnimatorListener() {
                     @Override
@@ -953,7 +950,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             mSuggestionButton.setTag(null);
         } else if (!mSendCmdEdittext.isCanShowDropdown()) {
             if (mSuggestionButton.getVisibility() != View.VISIBLE) {
-                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSuggestionButton, 200);
+                AnimatorSet animatorSet = UIUtil.getShowViewScaleAnimatorSet(mSuggestionButton, 200);
                 mSuggestionButton.setVisibility(View.VISIBLE);
                 animatorSet.start();
             }

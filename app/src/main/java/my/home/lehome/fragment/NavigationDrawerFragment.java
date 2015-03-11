@@ -17,7 +17,6 @@ package my.home.lehome.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -31,7 +30,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -165,6 +163,9 @@ public class NavigationDrawerFragment extends Fragment {
                 }
 
                 getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+                if (mCallbacks != null) {
+                    mCallbacks.onDrawerClosed(drawerView);
+                }
             }
 
             @Override
@@ -184,12 +185,9 @@ public class NavigationDrawerFragment extends Fragment {
                 }
 
                 getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
-                InputMethodManager inputManager =
-                        (InputMethodManager) getActivity().
-                                getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(
-                        getActivity().getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                if (mCallbacks != null) {
+                    mCallbacks.onDrawerOpened(drawerView);
+                }
             }
         };
 
@@ -295,5 +293,9 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+
+        public void onDrawerOpened(View drawerView);
+
+        public void onDrawerClosed(View drawerView);
     }
 }

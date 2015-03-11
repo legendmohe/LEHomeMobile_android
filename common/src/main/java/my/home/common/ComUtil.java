@@ -14,7 +14,7 @@
 
 package my.home.common;
 
-public class Utils {
+public class ComUtil {
     public static String readFileContent(String fileName) {
         return null;
     }

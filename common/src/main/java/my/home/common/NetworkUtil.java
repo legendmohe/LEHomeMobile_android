@@ -12,15 +12,19 @@
  * limitations under the License.
  */
 
-package my.home.lehome.mvp.views;
+package my.home.common;
 
-import android.view.View;
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
 /**
- * Created by legendmohe on 15/2/19.
+ * Created by legendmohe on 15/3/8.
  */
-public interface MVPView {
-    public void setupViews(View rootView);
-
-    public android.content.Context getContext();
+public class NetworkUtil {
+    public static String getSSID(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        return wifiInfo.getSSID();
+    }
 }

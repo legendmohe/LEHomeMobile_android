@@ -52,17 +52,21 @@
         <Preference
             android:title="@string/pref_local_ip_item"
             android:key="local_ip_item" />
+        <EditTextPreference
+            android:title="@string/pref_local_ssid"
+            android:defaultValue=""
+            android:key="pref_local_ssid" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference
             android:key="pref_auto_connect_sco"
             android:title="@string/pref_auto_connect_sco"
             android:defaultValue="true" />
-        <Preference
-            android:title="@string/pref_homescreen_shortcut"
-            android:key="homescreen_shortcut" />
-        <Preference
-            android:title="@string/pref_clean_cmd_history"
-            android:key="clean_cmd_history" />
+        <!--<Preference-->
+        <!--android:title="@string/pref_homescreen_shortcut"-->
+        <!--android:key="homescreen_shortcut" />-->
+        <!--<Preference-->
+        <!--android:title="@string/pref_clean_cmd_history"-->
+        <!--android:key="clean_cmd_history" />-->
     </PreferenceCategory>
 </PreferenceScreen>

@@ -12,13 +12,13 @@
   ~ limitations under the License.
   -->
 
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#c4000000"
-    android:choiceMode="singleChoice"
-    android:dividerHeight="1dp"
-    android:stackFromBottom="false"
-    tools:context="my.home.lehome.fragment.NavigationDrawerFragment" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="home.my.common">
 
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name">
+
+    </application>
+
+</manifest>

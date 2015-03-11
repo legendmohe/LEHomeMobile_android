@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.lehome.util;
+package my.home.common;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 /**
  * Created by legendmohe on 15/2/8.
  */
-public class UIUtils {
+public class UIUtil {
 
     public static AnimatorSet getShowViewScaleAnimatorSet(View target, long duration) {
         AnimatorSet animatorSet = new AnimatorSet();

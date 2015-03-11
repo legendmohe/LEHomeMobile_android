@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-package my.home.lehome.fragment;
+package home.my.common;
 
-import android.widget.DatePicker;
-import android.widget.TimePicker;
+import android.app.Application;
+import android.test.ApplicationTestCase;
 
 /**
- * Created by legendmohe on 15/2/22.
+ * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public interface DateTimePickerFragmentListener {
-    public void onTimeSelected(TimePicker view, int hourOfDay, int minute);
-
-    public void onDateSelected(DatePicker view, int year, int month, int day);
+public class ApplicationTest extends ApplicationTestCase<Application> {
+    public ApplicationTest() {
+        super(Application.class);
+    }
 }

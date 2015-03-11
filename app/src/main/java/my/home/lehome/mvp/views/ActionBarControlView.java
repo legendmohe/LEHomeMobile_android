@@ -14,13 +14,13 @@
 
 package my.home.lehome.mvp.views;
 
-import android.view.View;
-
 /**
- * Created by legendmohe on 15/2/19.
+ * Created by legendmohe on 15/3/2.
  */
-public interface MVPView {
-    public void setupViews(View rootView);
+public interface ActionBarControlView extends MVPView {
+    public void showActionBar();
 
-    public android.content.Context getContext();
+    public void hideActionBar();
+
+    public int getActionBarHeight();
 }

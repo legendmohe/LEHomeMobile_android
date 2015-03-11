@@ -12,15 +12,23 @@
  * limitations under the License.
  */
 
-package my.home.lehome.mvp.views;
+package my.home.lehome.receiver;
 
-import android.view.View;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 
 /**
- * Created by legendmohe on 15/2/19.
+ * Created by legendmohe on 15/3/11.
  */
-public interface MVPView {
-    public void setupViews(View rootView);
+public class LocalMessageReceiver extends BroadcastReceiver {
 
-    public android.content.Context getContext();
+    public final static String LOCAL_MSG_RECEIVER_ACTION = "my.home.lehome.receiver.LocalMessageReceiver";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (intent.getAction().equals(LOCAL_MSG_RECEIVER_ACTION)) {
+
+        }
+    }
 }

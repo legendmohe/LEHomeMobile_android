@@ -28,8 +28,6 @@ public class BusProvider {
     private BusProvider() {
     }
 
-    ;
-
     public static Bus getRestBusInstance() {
 
         return REST_BUS;

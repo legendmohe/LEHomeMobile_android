@@ -24,6 +24,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Push service 运行需要的权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -91,6 +92,17 @@
 		</receiver>
         -->
 
+        <receiver android:name=".receiver.NetworkStateReceiver">
+            <intent-filter android:priority="100">
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.LocalMessageReceiver">
+            <intent-filter android:priority="100">
+                <action android:name="my.home.lehome.receiver.LocalMessageReceiver" />
+            </intent-filter>
+        </receiver>
 
         <!-- push应用定义消息receiver声明 -->
         <receiver android:name=".receiver.PushMessageReceiver">
@@ -143,6 +155,10 @@
         </service>
         <!-- push结束 -->
 
+        <service
+            android:name=".service.LocalMessageService"
+            android:exported="true"
+            android:process=":local_message"></service>
 
         <!-- 在百度开发者中心查询应用的API Key -->
         <meta-data

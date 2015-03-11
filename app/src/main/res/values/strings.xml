@@ -98,5 +98,6 @@
     <string name="menu_tool_favor">收藏</string>
     <string name="menu_tool_favor_title">添加收藏</string>
     <string name="menu_tool_favor_empty">无收藏</string>
+    <string name="pref_local_ssid">本地wifi ssid</string>
 
 </resources>

@@ -40,8 +40,8 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import my.home.common.Constants;
+import my.home.common.UIUtil;
 import my.home.lehome.R;
-import my.home.lehome.util.UIUtils;
 
 public class SpeechDialog extends Dialog {
 
@@ -277,7 +277,7 @@ public class SpeechDialog extends Dialog {
                 break;
             case State.IDLE:
 //            mResult = null;
-                AnimatorSet animatorSet = UIUtils.getShowViewScaleAnimatorSet(mSpeechImageButton, 400);
+                AnimatorSet animatorSet = UIUtil.getShowViewScaleAnimatorSet(mSpeechImageButton, 400);
                 mSpeechImageButton.setVisibility(View.VISIBLE);
                 animatorSet.start();
 

@@ -16,9 +16,14 @@ package my.home.lehome.activity;
 
 
 import android.app.ActionBar;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -27,8 +32,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.baidu.android.pushservice.PushConstants;
@@ -39,60 +46,84 @@ import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.NavigationDrawerFragment;
 import my.home.lehome.fragment.ShortcutFragment;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.mvp.views.ActionBarControlView;
+import my.home.lehome.service.aidl.LocalMessageServiceAidlInterface;
 import my.home.lehome.util.PushUtils;
 
 
 public class MainActivity extends FragmentActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBarControlView {
 
     public static final String TAG = MainActivity.class.getName();
 
     public static boolean STOPPED = false;
     public static boolean VISIBLE = false;
+    private final String CHAT_FRAGMENT_TAG = "CHAT_FRAGMENT_TAG";
+    private final String SHORTCUT_FRAGMENT_TAG = "SHORTCUT_FRAGMENT_TAG";
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
     private int mCurrentSection;
     private boolean doubleBackToExitPressedOnce;
 
-    private ChatFragment chatFragment;
-    private ShortcutFragment shortcurFragment;
+    //    private ChatFragment mChatFragment;
+//    private ShortcutFragment mShortcurFragment;
+    private ActionBar mActionBar;
+    private int mActionBarHeight;
+
+    private LocalMessageServiceAidlInterface mLocalMsgService;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mLocalMsgService = LocalMessageServiceAidlInterface.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mLocalMsgService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (getIntent() != null && getIntent().getAction() == WakeupActivity.INTENT_VOICE_COMMAND) {
+            Window wind = this.getWindow();
+            wind.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+            wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }
+//        wind.requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
-        this.setupService();
+        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
+                new int[]{android.R.attr.actionBarSize});
+        mActionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+        mActionBar = getActionBar();
 
+        this.setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
-
-
         mTitle = getTitle();
-
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        Window wind = this.getWindow();
-        wind.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        this.setupService();
+        STOPPED = false;
+    }
+
+    @Override
+    public void setupViews(View rootView) {
 
     }
 
     private void setupService() {
-//    	DBHelper.initHelper(this);
-
         MessageHelper.loadPref(this);
-//    	MessageHelper.setPushTag(getApplicationContext(), MessageHelper.DEVICE_ID);
         PushManager.startWork(getApplicationContext(),
                 PushConstants.LOGIN_TYPE_API_KEY,
                 PushUtils.getMetaValue(MainActivity.this, "api_key"));
-
-        STOPPED = false;
     }
 
     @Override
@@ -142,19 +173,25 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         Fragment fragment = null;
+        FragmentManager fm = getSupportFragmentManager();
+        String fragment_tag = null;
         switch (position) {
             case 0:
+                ChatFragment chatFragment = (ChatFragment) fm.findFragmentByTag(CHAT_FRAGMENT_TAG);
                 if (chatFragment == null) {
                     chatFragment = new ChatFragment();
                 }
+                fragment_tag = CHAT_FRAGMENT_TAG;
                 fragment = chatFragment;
 //			fragment = new PagerFragment();
                 break;
             case 1:
-                if (shortcurFragment == null) {
-                    shortcurFragment = new ShortcutFragment();
+                ShortcutFragment shortcutFragment = (ShortcutFragment) fm.findFragmentByTag(SHORTCUT_FRAGMENT_TAG);
+                if (shortcutFragment == null) {
+                    shortcutFragment = new ShortcutFragment();
                 }
-                fragment = shortcurFragment;
+                fragment_tag = SHORTCUT_FRAGMENT_TAG;
+                fragment = shortcutFragment;
                 break;
 
             default:
@@ -163,8 +200,24 @@ public class MainActivity extends FragmentActivity
         this.onSectionAttached(position);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
+                .replace(R.id.container, fragment, fragment_tag)
                 .commit();
+    }
+
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        InputMethodManager inputManager =
+                (InputMethodManager) this.
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(
+                this.getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+//        showActionBar();
+    }
+
+    @Override
+    public void onDrawerClosed(View drawerView) {
+
     }
 
     public void onSectionAttached(int number) {
@@ -274,11 +327,36 @@ public class MainActivity extends FragmentActivity
     }
 
     public ChatFragment getChatFragment() {
-        return chatFragment;
+        FragmentManager fm = getSupportFragmentManager();
+        return (ChatFragment) fm.findFragmentByTag(CHAT_FRAGMENT_TAG);
     }
 
     public ShortcutFragment getShortcurFragment() {
-        return shortcurFragment;
+        FragmentManager fm = getSupportFragmentManager();
+        return (ShortcutFragment) fm.findFragmentByTag(SHORTCUT_FRAGMENT_TAG);
     }
 
+    @Override
+    public void showActionBar() {
+        if (!mActionBar.isShowing()) {
+            mActionBar.show();
+        }
+    }
+
+    @Override
+    public void hideActionBar() {
+        if (mActionBar.isShowing()) {
+            mActionBar.hide();
+        }
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
+    public int getActionBarHeight() {
+        return mActionBarHeight;
+    }
 }

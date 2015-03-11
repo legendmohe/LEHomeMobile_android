@@ -32,12 +32,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import my.home.lehome.R;
-import my.home.lehome.activity.MainActivity;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
-import my.home.lehome.asynctask.SendCommandAsyncTask;
 import my.home.lehome.helper.DBHelper;
 import my.home.model.entities.Shortcut;
 
@@ -54,6 +51,8 @@ public class ShortcutFragment extends ListFragment {
             adapter.setData(DBHelper.getAllShortcuts(this.getActivity()));
         }
         setListAdapter(adapter);
+        // for retainning fragment
+        setRetainInstance(true);
         return rootView;
     }
 
@@ -104,16 +103,16 @@ public class ShortcutFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView parent, View v,
                                 int position, long id) {
-        Shortcut shortcut = adapter.getItem(position);
-        shortcut.setInvoke_count(shortcut.getInvoke_count() + 1);
-        DBHelper.updateShortcut(this.getActivity(), shortcut);
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-        new SendCommandAsyncTask(mainActivity, shortcut.getContent()).execute();
-
-        Toast.makeText(getActivity(),
-                getResources().getString(R.string.com_exec) + ":" + shortcut.getContent(),
-                Toast.LENGTH_SHORT).show();
+//        Shortcut shortcut = adapter.getItem(position);
+//        shortcut.setInvoke_count(shortcut.getInvoke_count() + 1);
+//        DBHelper.updateShortcut(this.getActivity(), shortcut);
+//
+//        MainActivity mainActivity = (MainActivity) getActivity();
+//        new SendCommandAsyncTask(mainActivity, shortcut.getContent()).execute();
+//
+//        Toast.makeText(getActivity(),
+//                getResources().getString(R.string.com_exec) + ":" + shortcut.getContent(),
+//                Toast.LENGTH_SHORT).show();
     }
 
     @Override

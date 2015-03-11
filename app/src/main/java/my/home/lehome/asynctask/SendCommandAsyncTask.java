@@ -77,10 +77,8 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-//		this.mFragment.getSendProgressBar().setVisibility(View.VISIBLE);
         if (this.mCurrentItem != null) {
             mCurrentItem.setState(Constants.CHATITEM_STATE_PENDING);
-            DBHelper.updateChatItem(this.mContext, mCurrentItem);
             if (this.mFragment != null) {
                 mFragment.getAdapter().notifyDataSetChanged();
             }
@@ -193,7 +191,6 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
                 mFragment.getAdapter().add(newItem);
                 mFragment.getAdapter().notifyDataSetChanged();
                 ((MainActivity) mFragment.getAdapter().getContext()).getChatFragment().scrollMyListViewToBottom();
-                //    		this.mFragment.getSendProgressBar().setVisibility(View.INVISIBLE);
             }
         }
     }
