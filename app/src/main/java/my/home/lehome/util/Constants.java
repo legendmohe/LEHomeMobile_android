@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.common;
+package my.home.lehome.util;
 
 public class Constants {
 
@@ -26,4 +26,9 @@ public class Constants {
 
     public static final String BAIDUVOICE_API_KEY = "7P5ZCG6WTAGWr5TuURBgndRH";
     public static final String BAIDUVOICE_SECRET_KEY = "gggk30ubCSFGM5uXYfwGll4vILlnQ0em";
+
+    public static final String PREF_SSID_KEY = "pref_local_ssid";
+    public static final String PREF_MSG_MAXSEQ_KEY = "pref_meg_max_seq";
+
+    public static final int SETTINGS_ACTIVITY_RESULT_CODE = 100;
 }

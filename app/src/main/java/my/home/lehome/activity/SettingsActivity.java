@@ -20,6 +20,8 @@ import android.os.Bundle;
 import my.home.lehome.fragment.SettingsFragment;
 
 public class SettingsActivity extends Activity {
+    public static final String TAG = "SettingsActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

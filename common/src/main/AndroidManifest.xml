@@ -15,6 +15,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="home.my.common">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:label="@string/app_name">

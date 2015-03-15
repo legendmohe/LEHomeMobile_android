@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import my.home.common.BusProvider;
-import my.home.common.Constants;
 import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
@@ -33,6 +32,7 @@ import my.home.lehome.helper.DBHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.util.Constants;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
 
@@ -53,13 +53,13 @@ public class ChatFragmentPresenter extends MVPPresenter {
         this.mChatSuggestionView = new WeakReference<ChatSuggestionView>(chatSuggestionView);
     }
 
-    public void markAndSendCurrentInput(String input) {
-        new SendCommandAsyncTask(mSaveLocalHistoryView.get().getContext(), input).execute();
+    public void markAndSendCurrentInput(String input, boolean local) {
+        new SendCommandAsyncTask(mChatItemListView.get().getContext(), input, local).execute();
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), input).execute();
     }
 
-    public void markAndSendCurrentChatItem(ChatItem chatItem) {
-        new SendCommandAsyncTask(mSaveLocalHistoryView.get().getContext(), chatItem).execute();
+    public void markAndSendCurrentChatItem(ChatItem chatItem, boolean local) {
+        new SendCommandAsyncTask(mChatItemListView.get().getContext(), chatItem, local).execute();
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), chatItem.getContent()).execute();
     }
 

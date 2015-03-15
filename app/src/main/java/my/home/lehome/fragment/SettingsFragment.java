@@ -142,9 +142,30 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return true;
             }
         });
+
         //init local ssid preference
         EditTextPreference ssidEditTextPreference = (EditTextPreference) findPreference("pref_local_ssid");
         ssidEditTextPreference.setSummary(sharedPreferences.getString("pref_local_ssid", ""));
+        //init local server preference
+        EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_server_address");
+        addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_server_address", ""));
+        //init local subscribe preference
+        EditTextPreference subscribeEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_subscribe_address");
+        subscribeEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
+        //init state
+        CheckBoxPreference lMsgCheckBoxPreference = (CheckBoxPreference) findPreference("pref_enable_local_msg");
+        boolean enable_local_msg = sharedPreferences.getBoolean("pref_enable_local_msg", false);
+        if (enable_local_msg) {
+            lMsgCheckBoxPreference.setChecked(true);
+            ssidEditTextPreference.setEnabled(true);
+            subscribeEditTextPreference.setEnabled(true);
+            addressEditTextPreference.setEnabled(true);
+        } else {
+            lMsgCheckBoxPreference.setChecked(false);
+            ssidEditTextPreference.setEnabled(false);
+            subscribeEditTextPreference.setEnabled(true);
+            addressEditTextPreference.setEnabled(false);
+        }
     }
 
     @Override
@@ -176,9 +197,25 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 findPreference("pref_message_begin").setEnabled(false);
                 findPreference("pref_message_end").setEnabled(false);
             }
+        } else if (key.equals("pref_enable_local_msg")) {
+            if (sharedPreferences.getBoolean("pref_enable_local_msg", false)) {
+                findPreference("pref_local_msg_server_address").setEnabled(true);
+                findPreference("pref_local_ssid").setEnabled(true);
+                findPreference("pref_local_msg_subscribe_address").setEnabled(true);
+            } else {
+                findPreference("pref_local_msg_server_address").setEnabled(false);
+                findPreference("pref_local_ssid").setEnabled(false);
+                findPreference("pref_local_msg_subscribe_address").setEnabled(false);
+            }
         } else if (key.equals("pref_local_ssid")) {
             EditTextPreference ssidEditTextPreference = (EditTextPreference) findPreference("pref_local_ssid");
             ssidEditTextPreference.setSummary(sharedPreferences.getString("pref_local_ssid", ""));
+        } else if (key.equals("pref_local_msg_server_address")) {
+            EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_server_address");
+            addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_server_address", ""));
+        } else if (key.equals("pref_local_msg_subscribe_address")) {
+            EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_subscribe_address");
+            addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
         }
     }
 }

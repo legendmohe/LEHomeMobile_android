@@ -16,19 +16,17 @@ package my.home.lehome.activity;
 
 
 import android.app.ActionBar;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,23 +36,23 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
-
 import my.home.lehome.R;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.NavigationDrawerFragment;
 import my.home.lehome.fragment.ShortcutFragment;
-import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.mvp.presenters.MainActivityPresenter;
 import my.home.lehome.mvp.views.ActionBarControlView;
-import my.home.lehome.service.aidl.LocalMessageServiceAidlInterface;
-import my.home.lehome.util.PushUtils;
+import my.home.lehome.mvp.views.MainActivityView;
+import my.home.lehome.util.Constants;
 
 
 public class MainActivity extends FragmentActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBarControlView {
+        implements
+        NavigationDrawerFragment.NavigationDrawerCallbacks,
+        ActionBarControlView,
+        MainActivityView {
 
-    public static final String TAG = MainActivity.class.getName();
+    public static final String TAG = "MainActivity";
 
     public static boolean STOPPED = false;
     public static boolean VISIBLE = false;
@@ -63,26 +61,13 @@ public class MainActivity extends FragmentActivity
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
-    private int mCurrentSection;
-    private boolean doubleBackToExitPressedOnce;
-
-    //    private ChatFragment mChatFragment;
-//    private ShortcutFragment mShortcurFragment;
     private ActionBar mActionBar;
     private int mActionBarHeight;
 
-    private LocalMessageServiceAidlInterface mLocalMsgService;
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mLocalMsgService = LocalMessageServiceAidlInterface.Stub.asInterface(service);
-        }
+    private int mCurrentSection;
+    private boolean doubleBackToExitPressedOnce;
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mLocalMsgService = null;
-        }
-    };
+    private MainActivityPresenter mMainActivityPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +78,14 @@ public class MainActivity extends FragmentActivity
             wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
             wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
-//        wind.requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        this.setupViews(null);
+        mMainActivityPresenter = new MainActivityPresenter(this);
+        mMainActivityPresenter.start();
+        STOPPED = false;
+    }
 
+    @Override
+    public void setupViews(View rootView) {
         final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
                 new int[]{android.R.attr.actionBarSize});
         mActionBarHeight = (int) styledAttributes.getDimension(0, 0);
@@ -109,29 +100,14 @@ public class MainActivity extends FragmentActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
-        this.setupService();
-        STOPPED = false;
     }
 
-    @Override
-    public void setupViews(View rootView) {
-
-    }
-
-    private void setupService() {
-        MessageHelper.loadPref(this);
-        PushManager.startWork(getApplicationContext(),
-                PushConstants.LOGIN_TYPE_API_KEY,
-                PushUtils.getMetaValue(MainActivity.this, "api_key"));
-    }
 
     @Override
     protected void onDestroy() {
+        mMainActivityPresenter.stop();
         super.onDestroy();
     }
-
-    ;
 
     @Override
     protected void onResume() {
@@ -163,6 +139,18 @@ public class MainActivity extends FragmentActivity
     }
 
     @Override
+    protected void onStart() {
+        mMainActivityPresenter.onActivityStart();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mMainActivityPresenter.onActivityStop();
+        super.onStop();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         // TODO Auto-generated method stub
         super.onNewIntent(intent);
@@ -183,7 +171,6 @@ public class MainActivity extends FragmentActivity
                 }
                 fragment_tag = CHAT_FRAGMENT_TAG;
                 fragment = chatFragment;
-//			fragment = new PagerFragment();
                 break;
             case 1:
                 ShortcutFragment shortcutFragment = (ShortcutFragment) fm.findFragmentByTag(SHORTCUT_FRAGMENT_TAG);
@@ -276,7 +263,7 @@ public class MainActivity extends FragmentActivity
             case R.id.action_settings:
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, SettingsActivity.class);
-                startActivityForResult(intent, 0);
+                startActivityForResult(intent, Constants.SETTINGS_ACTIVITY_RESULT_CODE);
                 // The if returned true the click event will be consumed by the
                 // onOptionsItemSelect() call and won't fall through to other item
                 // click functions. If your return false it may check the ID of
@@ -284,7 +271,8 @@ public class MainActivity extends FragmentActivity
                 return true;
             case R.id.action_exit:
                 this.finish();
-                PushManager.stopWork(getApplicationContext());
+                if (!mMainActivityPresenter.onAppExit())
+                    Toast.makeText(this, getResources().getString(R.string.error_stop_local_msg_service), Toast.LENGTH_SHORT).show();
                 STOPPED = true;
                 return true;
             default:
@@ -297,14 +285,10 @@ public class MainActivity extends FragmentActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String old_device_id = MessageHelper.DEVICE_ID;
-        MessageHelper.loadPref(this);
-        if (!old_device_id.equals(MessageHelper.DEVICE_ID)) {
-            MessageHelper.delPushTag(getApplicationContext(), old_device_id);
-            MessageHelper.setPushTag(getApplicationContext(), MessageHelper.DEVICE_ID);
+        if (requestCode == Constants.SETTINGS_ACTIVITY_RESULT_CODE) {
+            if (!mMainActivityPresenter.onSettingsActivityResult(resultCode, data))
+                Toast.makeText(this, getResources().getString(R.string.error_local_msg_service), Toast.LENGTH_SHORT).show();
         }
-//    	MessageHelper.sendServerMsgToList(getResources().getString(R.string.pref_sub_address) + ":" + ConnectionService.SUBSCRIBE_ADDRESS);
-//    	MessageHelper.sendServerMsgToList(getResources().getString(R.string.pref_pub_address) + ":" + ConnectionService.PUBLISH_ADDRESS);
     }
 
     @Override
@@ -359,4 +343,35 @@ public class MainActivity extends FragmentActivity
     public int getActionBarHeight() {
         return mActionBarHeight;
     }
+
+    // --------------------------- Local Message ----------------------------
+
+
+    @Override
+    public void setActionBarTitle(String title) {
+        if (TextUtils.isEmpty(title))
+            return;
+        if (this.getActionBar() != null)
+            this.getActionBar().setTitle(title);
+    }
+
+    public boolean shouldUseLocalMsg() {
+        return mMainActivityPresenter.shouldUseLocalMsg();
+    }
+
+//    /**
+//     * Handler of incoming messages from service.
+//     */
+//    class IncomingHandler extends Handler {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case LocalMessageService.MSG_SERVER_RECEIVE_MSG:
+//                    Log.d(TAG, "Received from service: " + msg.obj);
+//                    break;
+//                default:
+//                    super.handleMessage(msg);
+//            }
+//        }
+//    }
 }

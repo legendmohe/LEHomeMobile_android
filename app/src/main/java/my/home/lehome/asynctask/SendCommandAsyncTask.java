@@ -21,24 +21,33 @@ import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import my.home.common.Constants;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
 //import org.zeromq.ZMQ;
@@ -51,23 +60,28 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
     private ChatFragment mFragment;
     private Context mContext;
     private ChatItem mCurrentItem;
+    private boolean mLocalMsg = false;
 
-    public SendCommandAsyncTask(Context context, String cmdString) {
+    public SendCommandAsyncTask(Context context, String cmdString, boolean local) {
         if (context instanceof MainActivity) {
             this.mFragment = ((MainActivity) context).getChatFragment();
+            this.mLocalMsg = local;
         } else {
             this.mFragment = null;
+            this.mLocalMsg = false;
         }
         this.mCurrentItem = null;
         this.mContext = context;
         this.mCmdString = cmdString;
     }
 
-    public SendCommandAsyncTask(Context context, ChatItem chatItem) {
+    public SendCommandAsyncTask(Context context, ChatItem chatItem, boolean local) {
         if (context instanceof MainActivity) {
             this.mFragment = ((MainActivity) context).getChatFragment();
+            this.mLocalMsg = local;
         } else {
             this.mFragment = null;
+            this.mLocalMsg = false;
         }
         this.mContext = context;
         this.mCmdString = chatItem.getContent();
@@ -102,27 +116,104 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
 
     @Override
     protected String doInBackground(Void... cmd) {
-        Log.d(TAG, "sending: " + mCmdString);
-
-        if (TextUtils.isEmpty(MessageHelper.DEVICE_ID)) {
-            return this.mContext.getResources().getString(R.string.msg_no_deviceid);
+        Log.d(TAG, "sending: " + mCmdString + " use local: " + mLocalMsg);
+        if (mLocalMsg) {
+            String message = MessageHelper.getFormatLocalMessage(mCmdString);
+            String serverURL = MessageHelper.getLocalServerURL();
+            if (serverURL == null)
+                return getErrorJsonString(
+                        400,
+                        this.mContext.getResources().getString(R.string.msg_local_saddress_not_set)
+                );
+            return sendToLocalServer(serverURL, message);
+        } else {
+            if (TextUtils.isEmpty(MessageHelper.DEVICE_ID)) {
+                return getErrorJsonString(
+                        400,
+                        this.mContext.getResources().getString(R.string.msg_no_deviceid)
+                );
+            }
+            String message = MessageHelper.getFormatMessage(mCmdString);
+            String serverURL = MessageHelper.getServerURL(message);
+            if (serverURL == null)
+                return getErrorJsonString(
+                        400,
+                        this.mContext.getResources().getString(R.string.msg_saddress_not_set)
+                );
+            return sendToServer(serverURL);
         }
+    }
 
-        String message = MessageHelper.getFormatMessage(mCmdString);
-        String targetURL = MessageHelper.getServerURL(message);
-
+    private String sendToServer(String cmdURL) {
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = null;
         JSONObject repObject = new JSONObject();
         try {
-            response = httpclient.execute(new HttpGet(targetURL));
+            response = httpclient.execute(new HttpGet(cmdURL));
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 response.getEntity().writeTo(out);
                 out.close();
                 responseString = out.toString();
+            } else {
+                //Closes the connection.
+                response.getEntity().getContent().close();
+                try {
+                    repObject.put("code", 400);
+                    repObject.put("desc", mContext.getString(R.string.chat_error_conn));
+                } catch (JSONException je) {
+                }
+                responseString = repObject.toString();
+            }
+        } catch (ClientProtocolException e) {
+            try {
+                repObject.put("code", 400);
+                repObject.put("desc", mContext.getString(R.string.chat_error_protocol_error));
+            } catch (JSONException je) {
+            }
+            responseString = repObject.toString();
+        } catch (IOException e) {
+            try {
+                repObject.put("code", 400);
+                repObject.put("desc", mContext.getString(R.string.chat_error_http_error));
+            } catch (JSONException je) {
+            }
+            responseString = repObject.toString();
+        }
+        return responseString;
+    }
+
+    private String sendToLocalServer(String serverAddress, String cmd) {
+        HttpParams httpParameters = new BasicHttpParams();
+        int timeoutConnection = 3000;
+        HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+        int timeoutSocket = 5000;
+        HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+
+        HttpClient httpclient = new DefaultHttpClient(httpParameters);
+        HttpResponse response;
+        String responseString = null;
+        JSONObject repObject = new JSONObject();
+        try {
+            List<NameValuePair> pairList = new ArrayList<>();
+            pairList.add(new BasicNameValuePair("cmd", cmd));
+            HttpPost httpPost = new HttpPost(serverAddress);
+            httpPost.setEntity(new UrlEncodedFormEntity(pairList, "utf-8"));
+
+            response = httpclient.execute(httpPost);
+            StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                response.getEntity().writeTo(out);
+                out.close();
+                try {
+                    repObject.put("code", 200);
+                    repObject.put("desc", out.toString());
+                } catch (JSONException je) {
+                }
+                responseString = repObject.toString();
             } else {
                 //Closes the connection.
                 response.getEntity().getContent().close();
@@ -195,4 +286,7 @@ public class SendCommandAsyncTask extends AsyncTask<Void, String, String> {
         }
     }
 
+    private String getErrorJsonString(int code, String error) {
+        return "{\"code\":" + code + ",\"desc\":\"" + error + "\"}";
+    }
 }

@@ -12,16 +12,11 @@
  * limitations under the License.
  */
 
-package my.home.lehome.application;
+package my.home.lehome.mvp.views;
 
-import com.baidu.frontia.FrontiaApplication;
-
-public class LEHomeApplication extends FrontiaApplication {
-    private final static String TAG = "LEHomeApplication";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
+/**
+ * Created by legendmohe on 15/3/15.
+ */
+public interface MainActivityView extends MVPView {
+    public void setActionBarTitle(String title);
 }

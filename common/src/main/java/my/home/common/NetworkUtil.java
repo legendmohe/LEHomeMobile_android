@@ -15,6 +15,8 @@
 package my.home.common;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -22,9 +24,21 @@ import android.net.wifi.WifiManager;
  * Created by legendmohe on 15/3/8.
  */
 public class NetworkUtil {
-    public static String getSSID(Context context) {
+    public static String getFormatSSID(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        return wifiInfo.getSSID();
+        String SSID = wifiInfo.getSSID();
+        if (SSID == null)
+            return "";
+        else if (SSID.startsWith("\""))
+            return SSID.substring(1, SSID.length() - 1);
+        else
+            return SSID;
+    }
+
+    public static NetworkInfo getWifiNetworkInfo(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return mWifi;
     }
 }

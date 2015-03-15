@@ -99,5 +99,18 @@
     <string name="menu_tool_favor_title">添加收藏</string>
     <string name="menu_tool_favor_empty">无收藏</string>
     <string name="pref_local_ssid">本地wifi ssid</string>
+    <string name="error_stop_local_msg_service">本地消息服务退出失败</string>
+    <string name="error_bind_local_msg_service">绑定本地消息服务失败</string>
+    <string name="error_unbind_local_msg_service">解除本地消息绑定失败</string>
+    <string name="pref_enable_local_msg">自动切换本地消息服务</string>
+    <string name="pref_local_msg_server_address">本地消息服务器地址</string>
+    <string name="msg_local_saddress_not_set">本地消息服务器地址未设置</string>
+    <string name="msg_saddress_not_set">服务器地址未设置</string>
+    <string name="msg_local_binding">切换至本地消息服务器</string>
+    <string name="error_local_msg_service">本地消息服务器通讯失败</string>
+    <string name="pref_local_msg_subscribe_address">本地消息订阅地址</string>
+    <string name="title_local_msg_mode">本地模式</string>
+    <string name="error_empty_local_server_adress">没有设置本地消息服务器地址</string>
+    <string name="error_connect_local_server">连接本地消息服务器失败</string>
 
 </resources>

@@ -52,10 +52,22 @@
         <Preference
             android:title="@string/pref_local_ip_item"
             android:key="local_ip_item" />
+        <CheckBoxPreference
+            android:key="pref_enable_local_msg"
+            android:title="@string/pref_enable_local_msg"
+            android:defaultValue="false" />
         <EditTextPreference
             android:title="@string/pref_local_ssid"
             android:defaultValue=""
             android:key="pref_local_ssid" />
+        <EditTextPreference
+            android:title="@string/pref_local_msg_server_address"
+            android:defaultValue=""
+            android:key="pref_local_msg_server_address" />
+        <EditTextPreference
+            android:title="@string/pref_local_msg_subscribe_address"
+            android:defaultValue=""
+            android:key="pref_local_msg_subscribe_address" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference

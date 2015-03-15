@@ -12,16 +12,27 @@
  * limitations under the License.
  */
 
-package my.home.lehome.application;
+package my.home.lehome.mvp.presenters;
 
-import com.baidu.frontia.FrontiaApplication;
-
-public class LEHomeApplication extends FrontiaApplication {
-    private final static String TAG = "LEHomeApplication";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
+/**
+ * Created by legendmohe on 15/3/15.
+ */
+public abstract class MVPActivityPresenter extends MVPPresenter {
+    public void onActivityStart() {
     }
 
+    public void onActivityStop() {
+    }
+
+    public void onActivityResume() {
+    }
+
+    public void onActivityPause() {
+    }
+
+    public void onActivityCreate() {
+    }
+
+    public void onActivityDestory() {
+    }
 }

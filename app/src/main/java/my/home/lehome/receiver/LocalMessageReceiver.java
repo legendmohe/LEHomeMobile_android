@@ -17,6 +17,17 @@ package my.home.lehome.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import my.home.common.PrefUtil;
+import my.home.lehome.R;
+import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.util.Constants;
 
 /**
  * Created by legendmohe on 15/3/11.
@@ -24,11 +35,54 @@ import android.content.Intent;
 public class LocalMessageReceiver extends BroadcastReceiver {
 
     public final static String LOCAL_MSG_RECEIVER_ACTION = "my.home.lehome.receiver.LocalMessageReceiver";
+    public final static String LOCAL_MSG_REP_KEY = "Local:Rep";
+    private static final String TAG = "LocalMessageReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(LOCAL_MSG_RECEIVER_ACTION)) {
+            String lm = intent.getStringExtra(LOCAL_MSG_REP_KEY);
+            Log.d(TAG, "receive local msg: " + lm);
+            if (lm != null) {
+                JSONTokener jsonParser = new JSONTokener(lm);
+                String type = "";
+                String msg = "";
+                String err_msg = "";
+                int seq = -1;
+                try {
+                    JSONObject cmdObject = (JSONObject) jsonParser.nextValue();
+                    type = cmdObject.getString("type");
+                    msg = cmdObject.getString("msg");
+                    seq = cmdObject.getInt("seq");
+                    int maxSeq = cmdObject.getInt("maxseq");
+                    int preMaxSeq = PrefUtil.getIntValue(context, Constants.PREF_MSG_MAXSEQ_KEY);
+                    if (preMaxSeq >= maxSeq) {
+                        return;
+                    }
+                    PrefUtil.setIntValue(context, Constants.PREF_MSG_MAXSEQ_KEY, maxSeq);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    err_msg = context.getString(R.string.msg_push_msg_format_error);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    err_msg = context.getString(R.string.msg_push_msg_format_error);
+                }
 
+                if (!TextUtils.isEmpty(err_msg)) {
+                    MessageHelper.sendToast(err_msg);
+                    return;
+                }
+
+                if (type.equals("normal")) {
+                    MessageHelper.inNormalState = true;
+                } else if (type.equals("toast")) {
+                    MessageHelper.sendToast(msg);
+                    return;
+                } else {
+                    MessageHelper.inNormalState = false;
+                }
+                MessageHelper.sendServerMsgToList(seq, msg, context);
+            }
         }
     }
 }

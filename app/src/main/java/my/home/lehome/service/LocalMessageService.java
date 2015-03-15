@@ -14,52 +14,108 @@
 
 package my.home.lehome.service;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
-import my.home.lehome.service.aidl.LocalMessageServiceAidlInterface;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
+
+import my.home.lehome.R;
+import my.home.lehome.receiver.LocalMessageReceiver;
+import my.home.lehome.receiver.ScreenStateReceiver;
 
 /**
  * Created by legendmohe on 15/3/9.
  */
 public class LocalMessageService extends Service {
-    private static final String TAG = "LocalMassageService";
+    private static final String TAG = "LocalMessageService";
+
+    public static final int MSG_SET_SUBSCRIBE_ADDRESS = 0;
+    //    public static final int MSG_REGISTER_CLIENT = 1;
+//    public static final int MSG_UNREGISTER_CLIENT = 2;
+    public static final int MSG_STOP_SERVICE = 3;
+//    public static final int MSG_SEND_CMD = 4;
+
+    public static final int MSG_SERVER_RECEIVE_MSG = 0;
 
     private String mServiceAddress = "";
+    private ScreenStateReceiver mScreenStateReceiver;
+    NotificationManager mNM;
+    //    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+    private Thread mSubThread;
+    private SubRunnable mSubRunnable;
 
-    private LocalMessageServiceAidlInterface.Stub mBinder = new LocalMessageServiceAidlInterface.Stub() {
+    /**
+     * Handler of incoming messages from clients.
+     */
+    class IncomingHandler extends Handler {
         @Override
-        public boolean sendLocalMessage(String cmd) {
-            if (LocalMessageService.this != null)
-                return LocalMessageService.this.sendLocalMessage(cmd);
-            return false;
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+//                case MSG_REGISTER_CLIENT:
+//                    mClients.add(msg.replyTo);
+//                    break;
+//                case MSG_UNREGISTER_CLIENT:
+//                    mClients.remove(msg.replyTo);
+//                    break;
+                case MSG_SET_SUBSCRIBE_ADDRESS:
+                    if (msg.obj != null) {
+                        String address = (String) msg.obj;
+                        setServerAddress(address);
+                    }
+                    break;
+                case MSG_STOP_SERVICE:
+                    stopLocalMsgService();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
         }
+    }
 
-        @Override
-        public void connectServer(String address) {
-            if (LocalMessageService.this != null)
-                LocalMessageService.this.connectServer(address);
-        }
-
-        @Override
-        public void disconnectServer() {
-            if (LocalMessageService.this != null)
-                LocalMessageService.this.disconnectServer();
-        }
-    };
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        Toast.makeText(getApplicationContext(), getString(R.string.msg_local_binding), Toast.LENGTH_SHORT).show();
+        return mMessenger.getBinder();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "in onCreate");
+//        Log.d(TAG, "in onCreate");
+
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (mScreenStateReceiver == null) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            mScreenStateReceiver = new ScreenStateReceiver();
+            registerReceiver(mScreenStateReceiver, filter);
+        }
+
+        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mServiceAddress = mySharedPreferences.getString("pref_local_msg_subscribe_address", null);
+        initSubscriber(mServiceAddress);
     }
 
     @Override
@@ -76,8 +132,23 @@ public class LocalMessageService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        if (mSubThread != null) {
+            mSubRunnable.setGoingStop(true);
+            if (!mSubThread.isInterrupted()) {
+                mSubThread.interrupt();
+                try {
+                    mSubThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (mScreenStateReceiver != null) {
+            unregisterReceiver(mScreenStateReceiver);
+            mScreenStateReceiver = null;
+        }
         Log.d(TAG, "in onDestroy");
+        super.onDestroy();
     }
 
     @Override
@@ -85,26 +156,121 @@ public class LocalMessageService extends Service {
         return START_STICKY;
     }
 
-    private void initServer() {
-        if (TextUtils.isEmpty(mServiceAddress))
-            return;
-
-        Log.d(TAG, "init server: " + mServiceAddress);
-    }
-
-    private void connectServer(String address) {
-        mServiceAddress = address;
+    private void setServerAddress(String address) {
         Log.d(TAG, "connect server: " + address);
-
+        if (mServiceAddress != null && !mServiceAddress.equals(address)) {
+            mServiceAddress = address;
+            initSubscriber(mServiceAddress);
+        }
     }
 
-    private void disconnectServer() {
+    private void stopLocalMsgService() {
         Log.d(TAG, "disconnect server: " + mServiceAddress);
-
+        stopSelf();
     }
 
-    private boolean sendLocalMessage(String cmd) {
-        Log.d(TAG, "init server: " + mServiceAddress);
+    private void initSubscriber(String serverAddress) {
+        Log.d(TAG, "init server: " + serverAddress);
+
+        if (TextUtils.isEmpty(serverAddress) && !serverAddress.startsWith("tcp://")) {
+            return;
+        }
+        if (mSubThread != null) {
+            mSubRunnable.setGoingStop(true);
+            if (!mSubThread.isInterrupted()) {
+                mSubThread.interrupt();
+                try {
+                    mSubThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        mSubRunnable = new SubRunnable(serverAddress);
+        mSubThread = new Thread(mSubRunnable);
+        mSubThread.start();
+    }
+
+    private void sendSubResponse(String repString) {
+//        for (int i = mClients.size() - 1; i >= 0; i--) {
+//            try {
+//                Message msg = Message.obtain();
+//                msg.what = MSG_SERVER_RECEIVE_MSG;
+//                msg.obj = repString;
+//                mClients.get(i).send(msg);
+//            } catch (RemoteException e) {
+//                mClients.remove(i);
+//            }
+//        }
+        if (TextUtils.isEmpty(repString))
+            return;
+        Intent repIntent = new Intent();
+        repIntent.setAction(LocalMessageReceiver.LOCAL_MSG_RECEIVER_ACTION);
+        repIntent.putExtra(LocalMessageReceiver.LOCAL_MSG_REP_KEY, repString);
+        sendBroadcast(repIntent);
+    }
+
+    private boolean shouldSendReponse(String repString) {
+        JSONTokener jsonParser = new JSONTokener(repString);
+        try {
+            JSONObject repJO = (JSONObject) jsonParser.nextValue();
+            String type = repJO.getString("type");
+            if (!type.equals("heartbeat"))
+                return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return false;
     }
+
+    private class SubRunnable implements Runnable {
+
+        private ZMQ.Socket subscriber;
+        private ZMQ.Context zmqContext;
+        private boolean isGoingStop = false;
+        private String serverAddress = null;
+
+        public SubRunnable(String serverAddress) {
+            this.serverAddress = serverAddress;
+        }
+
+        public void setGoingStop(boolean goingStop) {
+            this.isGoingStop = goingStop;
+        }
+
+        @Override
+        public void run() {
+            zmqContext = ZMQ.context(1);
+            subscriber = zmqContext.socket(ZMQ.SUB);
+            ZMQ.Poller poller = new ZMQ.Poller(1);
+            poller.register(subscriber, ZMQ.Poller.POLLIN);
+
+            try {
+                subscriber.connect(serverAddress);
+                subscriber.subscribe("".getBytes());
+                while (!Thread.currentThread().isInterrupted() && !isGoingStop) {
+                    poller.poll(1000 * 3);
+                    if (poller.pollin(0) && !isGoingStop) {
+                        String repString = subscriber.recvStr(ZMQ.DONTWAIT);
+                        Log.d(TAG, "received response: " + repString);
+                        if (shouldSendReponse(repString))
+                            sendSubResponse(repString);
+                    }
+                }
+                if (!Thread.currentThread().isInterrupted()) {
+                    subscriber.close();
+                    zmqContext.term();
+                }
+            } catch (ZMQException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.error_connect_local_server),
+                        Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    ;
 }

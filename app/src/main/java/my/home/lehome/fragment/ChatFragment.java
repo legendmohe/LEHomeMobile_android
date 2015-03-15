@@ -69,7 +69,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import my.home.common.ComUtil;
-import my.home.common.Constants;
 import my.home.common.UIUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
@@ -84,6 +83,7 @@ import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.util.Constants;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
 import my.home.lehome.view.SimpleAnimationListener;
@@ -444,7 +444,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     // Perform action on key press
                     String messageString = mSendCmdEdittext.getText().toString();
                     if (!messageString.trim().equals("")) {
-                        mChatFragmentPresenter.markAndSendCurrentInput(messageString);
+                        mChatFragmentPresenter.markAndSendCurrentInput(messageString, shouldUseLocalMsg());
                         mSendCmdEdittext.setText("");
                         mSendCmdEdittext.setCanShowDropdown(false);
                     }
@@ -560,7 +560,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 }
                 return true;
             case R.id.resend_item:
-                mChatFragmentPresenter.markAndSendCurrentInput(selectedString);
+                mChatFragmentPresenter.markAndSendCurrentInput(selectedString, shouldUseLocalMsg());
                 return true;
             case R.id.copy_item:
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -723,7 +723,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             boolean need_confirm = mySharedPreferences.getBoolean("pref_speech_cmd_need_confirm", true);
             if (!need_confirm) {
-                mChatFragmentPresenter.markAndSendCurrentInput(msgString);
+                mChatFragmentPresenter.markAndSendCurrentInput(msgString, shouldUseLocalMsg());
                 inRecogintion = false;
             } else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -745,7 +745,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 alert.setPositiveButton(getResources().getString(R.string.com_comfirm)
                         , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        mChatFragmentPresenter.markAndSendCurrentInput(msgString);
+                        mChatFragmentPresenter.markAndSendCurrentInput(msgString, shouldUseLocalMsg());
                         inRecogintion = false;
                     }
                 });
@@ -772,7 +772,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     @Override
     public void onResendButtonClicked(int pos) {
         ChatItem item = this.getAdapter().getItem(pos);
-        mChatFragmentPresenter.markAndSendCurrentChatItem(item);
+        mChatFragmentPresenter.markAndSendCurrentChatItem(item, shouldUseLocalMsg());
     }
 
     @Override
@@ -965,4 +965,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 //            mSendCmdEdittext.setCanShowDropdown(false);
 //        }
 //    }
+
+    private boolean shouldUseLocalMsg() {
+        return ((MainActivity) getActivity()).shouldUseLocalMsg();
+    }
 }

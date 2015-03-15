@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 
 import com.baidu.android.pushservice.PushManager;
 
@@ -42,11 +43,14 @@ public class MessageHelper {
     private static final int maxNotiLen = 140;
     private static int unreadMsgCount = 0;
     public static String SERVER_ADDRESS = "";
+    public static String LOCAL_SERVER_ADDRESS = "";
+    public static String LOCAL_SERVER_SUBSCRIBE_ADDRESS;
     public static String MESSAGE_BEGIN = "";
     public static String MESSAGE_END = "";
     public static String DEVICE_ID = "";
     public static boolean inNormalState = true;
     public static boolean needCorrect = true;
+    public static boolean localMsgServiceEnable = false;
 
     public final static int NOTIFICATION_ID = 1;
 
@@ -64,6 +68,8 @@ public class MessageHelper {
         SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         DEVICE_ID = mySharedPreferences.getString("pref_bind_device", "");
         SERVER_ADDRESS = mySharedPreferences.getString("pref_server_address", "http://lehome.sinaapp.com");
+        LOCAL_SERVER_ADDRESS = mySharedPreferences.getString("pref_local_msg_server_address", "http://192.168.1.111:8000");
+        LOCAL_SERVER_SUBSCRIBE_ADDRESS = mySharedPreferences.getString("pref_local_msg_subscribe_address", "tcp://192.168.1.111:9000");
         boolean auto_complete_cmd = mySharedPreferences.getBoolean("pref_auto_add_begin_and_end", false);
         if (auto_complete_cmd) {
             MESSAGE_BEGIN = mySharedPreferences.getString("pref_message_begin", "");
@@ -79,6 +85,7 @@ public class MessageHelper {
             MESSAGE_END = "";
         }
         needCorrect = mySharedPreferences.getBoolean("pref_cmd_need_correct", true);
+        localMsgServiceEnable = mySharedPreferences.getBoolean("pref_enable_local_msg", false);
     }
 
     public static String getFormatMessage(String content) {
@@ -92,7 +99,17 @@ public class MessageHelper {
         return content;
     }
 
+    public static String getFormatLocalMessage(String content) {
+        if (!inNormalState) {
+            return content;
+        }
+        content = MESSAGE_BEGIN + content + MESSAGE_END;
+        return content;
+    }
+
     public static String getServerURL(String content) {
+        if (TextUtils.isEmpty(SERVER_ADDRESS))
+            return null;
         try {
             content = URLEncoder.encode(content, "utf-8");
         } catch (UnsupportedEncodingException e) {
@@ -100,6 +117,20 @@ public class MessageHelper {
             e.printStackTrace();
         }
         return SERVER_ADDRESS + "/cmd/put/" + content + "?id=" + DEVICE_ID;
+    }
+
+    public static String getLocalServerURL() {
+        if (TextUtils.isEmpty(LOCAL_SERVER_ADDRESS))
+            return null;
+        return LOCAL_SERVER_ADDRESS + "/home/cmd";
+    }
+
+    public static String getLocalServerSubscribeURL() {
+        return LOCAL_SERVER_SUBSCRIBE_ADDRESS;
+    }
+
+    public static boolean isLocalMsgServiceEnable() {
+        return localMsgServiceEnable;
     }
 
     public static void resetUnreadCount() {

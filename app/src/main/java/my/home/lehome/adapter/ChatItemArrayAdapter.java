@@ -27,8 +27,8 @@ import com.skyfishjy.library.RippleBackground;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import my.home.common.Constants;
 import my.home.lehome.R;
+import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {

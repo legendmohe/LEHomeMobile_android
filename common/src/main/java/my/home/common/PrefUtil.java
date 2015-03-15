@@ -34,6 +34,18 @@ public class PrefUtil {
         prefEditor.commit();
     }
 
+    public static int getIntValue(Context context, String key) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt(key, -1);
+    }
+
+    public static void setIntValue(Context context, String key, int val) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+        prefEditor.putInt(key, val);
+        prefEditor.commit();
+    }
+
     public static boolean getbooleanValue(Context context, String key) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(key, false);

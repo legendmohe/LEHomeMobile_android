@@ -92,14 +92,16 @@
 		</receiver>
         -->
 
-        <receiver android:name=".receiver.NetworkStateReceiver">
-            <intent-filter android:priority="100">
+        <receiver
+            android:name=".receiver.NetworkStateReceiver"
+            android:process=":local_message">
+            <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 
         <receiver android:name=".receiver.LocalMessageReceiver">
-            <intent-filter android:priority="100">
+            <intent-filter>
                 <action android:name="my.home.lehome.receiver.LocalMessageReceiver" />
             </intent-filter>
         </receiver>
@@ -153,12 +155,18 @@
                 <action android:name="com.baidu.android.pushservice.action.PUSH_SERVICE" />
             </intent-filter>
         </service>
+        <service
+            android:name="com.baidu.android.pushservice.CommandService"
+            android:exported="true" />
         <!-- push结束 -->
 
         <service
             android:name=".service.LocalMessageService"
-            android:exported="true"
-            android:process=":local_message"></service>
+            android:process=":local_message">
+            <intent-filter>
+                <action android:name="my.home.lehome.service.LocalMessageService" />
+            </intent-filter>
+        </service>
 
         <!-- 在百度开发者中心查询应用的API Key -->
         <meta-data

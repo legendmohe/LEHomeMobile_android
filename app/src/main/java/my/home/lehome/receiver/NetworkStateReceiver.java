@@ -21,17 +21,23 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
+
 import my.home.common.NetworkUtil;
 import my.home.common.PrefUtil;
+import my.home.lehome.helper.LocalMsgHelper;
+import my.home.lehome.util.Constants;
+import my.home.lehome.util.PushUtils;
 
 /**
  * Created by legendmohe on 15/3/8.
  */
 public class NetworkStateReceiver extends BroadcastReceiver {
 
-    static final String TAG = "NetworkStateReceiver";
-    // same value in SettingsFragment
-    static final String PREF_SSID_KEY = "pref_local_ssid";
+    public static final String TAG = "NetworkStateReceiver";
+    public static final String VALUE_INTENT_STOP_LOCAL_SERVER = "my.home.lehome.receiver.NetworkStateReceiver:stop";
+    public static final String VALUE_INTENT_START_LOCAL_SERVER = "my.home.lehome.receiver.NetworkStateReceiver:start";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -39,13 +45,39 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         if (info != null) {
             Log.d(TAG, "NetworkInfo: " + info);
             if (info.isConnected()) {
-                String ssid = NetworkUtil.getSSID(context);
-                String prefSSID = PrefUtil.getStringValue(context, PREF_SSID_KEY);
+                String ssid = NetworkUtil.getFormatSSID(context);
+                String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY);
                 if (ssid.equals(prefSSID)) {
+                    Log.d(TAG, "start " + "LocalMessageService");
+                    if (LocalMsgHelper.startLocalMsgService(context)) {
+                        stopBaiduPush(context);
+                        Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
+                        context.sendBroadcast(startIntent);
+                    }
+                } else {
+                    Log.d(TAG, "stop " + "LocalMessageService");
+                    LocalMsgHelper.stopLocalMsgService(context);
+                    Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
+                    context.sendBroadcast(stopIntent);
+                    startBaiduPush(context);
                 }
+            } else if (!info.isConnectedOrConnecting()) {
+                Log.d(TAG, "stop " + "LocalMessageService");
+                LocalMsgHelper.stopLocalMsgService(context);
+                startBaiduPush(context);
+                Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
+                context.sendBroadcast(stopIntent);
             }
         }
     }
 
+    private void stopBaiduPush(Context context) {
+        PushManager.stopWork(context);
+    }
 
+    private void startBaiduPush(Context context) {
+        PushManager.startWork(context,
+                PushConstants.LOGIN_TYPE_API_KEY,
+                PushUtils.getMetaValue(context, "api_key"));
+    }
 }

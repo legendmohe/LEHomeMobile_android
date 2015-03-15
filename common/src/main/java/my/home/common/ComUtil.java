@@ -14,6 +14,13 @@
 
 package my.home.common;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.hardware.display.DisplayManager;
+import android.os.Build;
+import android.os.PowerManager;
+import android.view.Display;
+
 public class ComUtil {
     public static String readFileContent(String fileName) {
         return null;
@@ -37,5 +44,32 @@ public class ComUtil {
         stringBuilder.append(minute);
         stringBuilder.append("分");
         return stringBuilder.toString();
+    }
+
+    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isScreenOn(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            DisplayManager dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+            boolean screenOn = false;
+            for (Display display : dm.getDisplays()) {
+                if (display.getState() != Display.STATE_OFF) {
+                    screenOn = true;
+                }
+            }
+            return screenOn;
+        } else {
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            //noinspection deprecation
+            return pm.isScreenOn();
+        }
     }
 }
