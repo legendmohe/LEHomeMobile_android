@@ -23,13 +23,14 @@ LEHome 是一套完整的开源智能家居方案。LEHome拥有以下特性：
 主要界面有：
 
 1. 主界面，采用对话形式向服务端发送命令。  
-    ![主界面]()
+    ![主界面](http://i1334.photobucket.com/albums/w649/legendmohe/_zpsvtgkblrr.png)
 2. 收藏界面，主要是为了更方便地输入一些自定义的命令（message）。  
-    ![收藏]()
+    ![收藏](http://i1334.photobucket.com/albums/w649/legendmohe/_zpsinvhnfjz.png)
 3. 设置界面。  
-    ![设置]()
+    ![设置1](http://i1334.photobucket.com/albums/w649/legendmohe/1_zpsyyf5qpbz.png)
+    ![设置2](http://i1334.photobucket.com/albums/w649/legendmohe/2_zps3btsbgcy.png)
 4. 语音输入界面。  
-    ![语音输入]()
+    ![语音输入](http://i1334.photobucket.com/albums/w649/legendmohe/_zpsusnzwfoc.png)
 
 ## 功能
 
@@ -49,8 +50,8 @@ LEHome 是一套完整的开源智能家居方案。LEHome拥有以下特性：
     当输入字符>1个时，输入框左侧弹出智能提示（或补全）按钮，此时上划按钮看上一个提示，下划看下一个提示，左划弹出所有提示的列表。  
     智能提示的类型有：补全当前命令、下一个合法的命令、日期、时间和收藏的命令语句。  
     注意，使用此功能需要在设置菜单中下载补全数据。  
-    ![智能补全]()  
-    ![智能补全列表]()
+    ![智能补全](http://i1334.photobucket.com/albums/w649/legendmohe/_zpsrbyvx2oo.png)  
+    ![智能补全列表](http://i1334.photobucket.com/albums/w649/legendmohe/_zpsw8bqzsgt.png)
   2. 本地、远程服务自动切换  
     启用了此功能后，当手机处于跟服务器同一局域网时，会自动切换至本地模式。本地模式是指命令的发送和接受无需通过云端转发，直接在局域网内进行。
   3. 自动连接蓝牙麦克风  
