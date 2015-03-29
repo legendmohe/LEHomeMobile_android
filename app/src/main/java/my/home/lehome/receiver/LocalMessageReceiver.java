@@ -24,10 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.MessageHelper;
-import my.home.lehome.util.Constants;
 
 /**
  * Created by legendmohe on 15/3/11.
@@ -54,12 +52,8 @@ public class LocalMessageReceiver extends BroadcastReceiver {
                     type = cmdObject.getString("type");
                     msg = cmdObject.getString("msg");
                     seq = cmdObject.getInt("seq");
-                    int maxSeq = cmdObject.getInt("maxseq");
-                    int preMaxSeq = PrefUtil.getIntValue(context, Constants.PREF_MSG_MAXSEQ_KEY);
-                    if (preMaxSeq >= maxSeq) {
+                    if (MessageHelper.enqueueMsgSeq(context, seq))
                         return;
-                    }
-                    PrefUtil.setIntValue(context, Constants.PREF_MSG_MAXSEQ_KEY, maxSeq);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     err_msg = context.getString(R.string.msg_push_msg_format_error);

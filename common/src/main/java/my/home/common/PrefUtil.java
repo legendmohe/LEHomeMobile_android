@@ -24,14 +24,14 @@ import android.preference.PreferenceManager;
 public class PrefUtil {
     public static String getStringValue(Context context, String key) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(key, "");
+        return sharedPreferences.getString(key, null);
     }
 
     public static void setStringValue(Context context, String key, String val) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putString(key, val);
-        prefEditor.commit();
+        prefEditor.apply();
     }
 
     public static int getIntValue(Context context, String key) {
@@ -43,7 +43,7 @@ public class PrefUtil {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putInt(key, val);
-        prefEditor.commit();
+        prefEditor.apply();
     }
 
     public static boolean getbooleanValue(Context context, String key) {
@@ -55,6 +55,6 @@ public class PrefUtil {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putBoolean(key, val);
-        prefEditor.commit();
+        prefEditor.apply();
     }
 }

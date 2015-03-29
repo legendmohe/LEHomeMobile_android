@@ -59,6 +59,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void start() {
         BusProvider.getRestBusInstance().register(this);
         setupService();
+        MessageHelper.removeNotification(mMainActivityView.get().getContext());
     }
 
     @Override

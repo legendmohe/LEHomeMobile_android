@@ -30,11 +30,15 @@ import com.baidu.android.pushservice.PushManager;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
+import my.home.common.KeyValueStorage;
+import my.home.common.PrefKeyValueStorgeImpl;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
+import my.home.lehome.util.Constants;
 import my.home.lehome.util.PushUtils;
 import my.home.model.entities.ChatItem;
 
@@ -53,6 +57,7 @@ public class MessageHelper {
     public static boolean localMsgServiceEnable = false;
 
     public final static int NOTIFICATION_ID = 1;
+    public final static String NOTIFICATION_INTENT_ACTION = "my.home.lehome.helper.MessagerHelper:noti_intent";
 
     public static void setPushTag(Context context, String tagText) {
         List<String> tags = PushUtils.getTagsList(tagText);
@@ -196,6 +201,7 @@ public class MessageHelper {
                 .setTicker(ticker)
                 .setDefaults(Notification.DEFAULT_ALL);
         Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.setAction(NOTIFICATION_INTENT_ACTION);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
         builder.setContentIntent(contentIntent);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -203,8 +209,32 @@ public class MessageHelper {
     }
 
     // Remove notification
-    private void removeNotification(Context context) {
+    public static void removeNotification(Context context) {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(NOTIFICATION_ID);
+    }
+
+    private final static String MSG_SEQ_STORAGE_KEY = "MSG_SEQ_STORAGE_KEY";
+
+    public static boolean enqueueMsgSeq(Context context, int seq) {
+        if (KeyValueStorage.getInstance().getStorageImpl() == null) {
+            KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(context));
+        }
+        LinkedList<Integer> limitedQueue = null;
+        if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
+            limitedQueue = (LinkedList<Integer>) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, LinkedList.class);
+            if (limitedQueue != null && limitedQueue.contains(seq))
+                return true;
+        }
+        if (limitedQueue == null) {
+            limitedQueue = new LinkedList<>();
+        }
+        boolean added = limitedQueue.add(seq);
+        while (added && limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
+            limitedQueue.remove();
+        }
+        KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue);
+        KeyValueStorage.getInstance().sync();
+        return false;
     }
 }
