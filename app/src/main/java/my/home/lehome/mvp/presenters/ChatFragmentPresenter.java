@@ -15,6 +15,8 @@
 package my.home.lehome.mvp.presenters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Messenger;
 
 import com.squareup.otto.Subscribe;
 
@@ -27,11 +29,13 @@ import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
 import my.home.domain.usecase.SaveAutoCompleteLocalHistoryUsecaseImpl;
-import my.home.lehome.asynctask.SendCommandAsyncTask;
+import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
+import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
@@ -54,12 +58,45 @@ public class ChatFragmentPresenter extends MVPPresenter {
     }
 
     public void markAndSendCurrentInput(String input, boolean local) {
-        new SendCommandAsyncTask(mChatItemListView.get().getContext(), input, local).execute();
+        if (mChatItemListView.get() == null)
+            return;
+//        new SendCommandAsyncTask(mChatItemListView.get().getContext(), input, local).execute();
+        Context context = mChatItemListView.get().getContext();
+        String message;
+        if (local)
+            message = MessageHelper.getFormatLocalMessage(input);
+        else
+            message = MessageHelper.getFormatMessage(input);
+        String serverURL = MessageHelper.getLocalServerURL();
+        Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
+        serviceIntent.putExtra("local", local);
+        serviceIntent.putExtra("cmdString", message);
+        serviceIntent.putExtra("serverUrl", serverURL);
+        serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
+        serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));
+        mChatItemListView.get().getContext().startService(serviceIntent);
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), input).execute();
     }
 
     public void markAndSendCurrentChatItem(ChatItem chatItem, boolean local) {
-        new SendCommandAsyncTask(mChatItemListView.get().getContext(), chatItem, local).execute();
+        if (mChatItemListView.get() == null)
+            return;
+//        new SendCommandAsyncTask(mChatItemListView.get().getContext(), chatItem, local).execute();
+        Context context = mChatItemListView.get().getContext();
+        String message;
+        if (local)
+            message = MessageHelper.getFormatLocalMessage(chatItem.getContent());
+        else
+            message = MessageHelper.getFormatMessage(chatItem.getContent());
+        String serverURL = MessageHelper.getLocalServerURL();
+        Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
+        serviceIntent.putExtra("local", local);
+        serviceIntent.putExtra("update", chatItem);
+        serviceIntent.putExtra("cmdString", message);
+        serviceIntent.putExtra("serverUrl", serverURL);
+        serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
+        serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));
+        mChatItemListView.get().getContext().startService(serviceIntent);
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), chatItem.getContent()).execute();
     }
 

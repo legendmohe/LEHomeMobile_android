@@ -168,6 +168,11 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".service.SendMsgIntentService"
+            android:exported="false"
+            android:process=":send_msg"></service>
+
         <!-- 在百度开发者中心查询应用的API Key -->
         <meta-data
             android:name="api_key"

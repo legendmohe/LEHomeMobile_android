@@ -56,6 +56,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -64,7 +65,9 @@ import android.widget.Toast;
 
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog;
+import com.google.gson.Gson;
 
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.List;
 
@@ -83,6 +86,7 @@ import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.Constants;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
@@ -122,7 +126,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     /*
      * common variables
      */
-    public static Handler mHandler;
+    public static Handler PublicHandler;
+    public static Handler SendMsgHandler;
     private int mNewMsgNum = 0;
     private boolean mNeedShowUnread = false;
     private boolean mScrollViewInButtom = false;
@@ -149,6 +154,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public static final int MSG_TYPE_CHATITEM = 1;
     public static final int MSG_TYPE_TOAST = 2;
     public static final int MSG_TYPE_VOICE_CMD = 3;
+    public static final int MSG_TYPE_SEND_MSG = 4;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -159,48 +165,156 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_onright);
             mAdapter.setResendButtonClickListener(this);
         }
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == MSG_TYPE_CHATITEM) {
-                    ChatItem newItem = (ChatItem) msg.obj;
-                    if (newItem != null) {
-                        Log.d(TAG, "onSubscribalbeReceiveMsg : " + newItem.getContent());
-                        mAdapter.add(newItem);
-                        mAdapter.notifyDataSetChanged();
-                        if (!mScrollViewInButtom) {
-                            mNeedShowUnread = true;
-                            mNewMsgNum++;
-                            ChatFragment.this.showTip(mNewMsgNum + " new message");
-                        } else {
-                            mNewMsgNum = 0;
-                            ChatFragment.this.scrollMyListViewToBottom();
-                        }
-                    }
-                } else if (msg.what == MSG_TYPE_TOAST) {
-                    if (getActivity() != null) {
-                        Context context = getActivity().getApplicationContext();
-                        if (context != null) {
-                            Toast.makeText(
-                                    context
-                                    , (String) msg.obj
-                                    , Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    }
-                } else if (msg.what == MSG_TYPE_VOICE_CMD) {
-                    startRecognize(getActivity());
-                }
-            }
-
-        };
+        SendMsgHandler = new IntentServiceHandler(this);
+        PublicHandler = new MyHandler(this);
         mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
         mChatFragmentPresenter.start();
 
     }
 
-    ;
+    public boolean isScrollViewInButtom() {
+        return mScrollViewInButtom;
+    }
+
+    public void setScrollViewInButtom(boolean mScrollViewInButtom) {
+        this.mScrollViewInButtom = mScrollViewInButtom;
+    }
+
+    public int getNewMsgNum() {
+        return mNewMsgNum;
+    }
+
+    public void setNewMsgNum(int mNewMsgNum) {
+        this.mNewMsgNum = mNewMsgNum;
+    }
+
+    public boolean isNeedShowUnread() {
+        return mNeedShowUnread;
+    }
+
+    public void setNeedShowUnread(boolean mNeedShowUnread) {
+        this.mNeedShowUnread = mNeedShowUnread;
+    }
+
+    private static class IntentServiceHandler extends Handler {
+        private final WeakReference<ChatFragment> mFragment;
+
+        public IntentServiceHandler(ChatFragment fragment) {
+            mFragment = new WeakReference<>(fragment);
+        }
+
+        private void updateArrayAdapter(ArrayAdapter<ChatItem> adapter, long update_id, int state) {
+            for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                Log.d(TAG, adapter.getItem(i).getId() + "s" + update_id);
+                if (adapter.getItem(i).getId() == update_id) {
+                    adapter.getItem(i).setState(state);
+                    adapter.notifyDataSetChanged();
+                    return;
+                }
+            }
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ChatFragment fragment = mFragment.get();
+            if (fragment != null) {
+                Bundle bundle = msg.getData();
+                bundle.setClassLoader(ChatItem.class.getClassLoader());
+                String jsonString;
+                ChatItem item;
+                switch (msg.what) {
+                    case SendMsgIntentService.MSG_BEGIN_SENDING:
+                        jsonString = bundle.getString("item");
+                        item = new Gson().fromJson(jsonString, ChatItem.class);
+                        if (bundle.getBoolean("update", false)) {
+                            updateArrayAdapter(
+                                    fragment.getAdapter(),
+                                    bundle.getLong("update_id"),
+                                    bundle.getInt("update_state")
+                            );
+                        } else {
+                            fragment.getAdapter().add(item);
+                            fragment.getAdapter().notifyDataSetChanged();
+                            fragment.scrollMyListViewToBottom();
+                        }
+                        break;
+                    case SendMsgIntentService.MSG_END_SENDING:
+                        int rep_code = bundle.getInt("rep_code", -1);
+                        jsonString = bundle.getString("item");
+                        item = new Gson().fromJson(jsonString, ChatItem.class);
+                        if (rep_code == 200) {
+                            updateArrayAdapter(
+                                    fragment.getAdapter(),
+                                    bundle.getLong("update_id"),
+                                    bundle.getInt("update_state")
+                            );
+                        } else {
+                            fragment.getAdapter().add(item);
+                            updateArrayAdapter(
+                                    fragment.getAdapter(),
+                                    bundle.getLong("update_id"),
+                                    bundle.getInt("update_state")
+                            );
+                            fragment.scrollMyListViewToBottom();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    private static class MyHandler extends Handler {
+        private final WeakReference<ChatFragment> mFragment;
+
+        public MyHandler(ChatFragment fragment) {
+            mFragment = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ChatFragment fragment = mFragment.get();
+            if (fragment != null) {
+                switch (msg.what) {
+                    case MSG_TYPE_CHATITEM:
+                        ChatItem newItem = (ChatItem) msg.obj;
+                        if (newItem != null) {
+                            Log.d(TAG, "onSubscribalbeReceiveMsg : " + newItem.getContent());
+                            fragment.getAdapter().add(newItem);
+                            fragment.getAdapter().notifyDataSetChanged();
+                            if (!fragment.isScrollViewInButtom()) {
+                                int newNum = fragment.getNewMsgNum();
+                                fragment.setNewMsgNum(++newNum);
+                                fragment.showTip(newNum + " new message");
+                                fragment.setNeedShowUnread(true);
+                            } else {
+                                fragment.setNewMsgNum(0);
+                                fragment.scrollMyListViewToBottom();
+                            }
+                        }
+                        break;
+                    case MSG_TYPE_TOAST:
+                        if (fragment.getActivity() != null) {
+                            Context context = fragment.getActivity().getApplicationContext();
+                            if (context != null) {
+                                Toast.makeText(
+                                        context
+                                        , (String) msg.obj
+                                        , Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }
+                        break;
+                    case MSG_TYPE_VOICE_CMD:
+                        fragment.startRecognize(fragment.getActivity());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
 
     @Override
     public void onDestroy() {
@@ -210,8 +324,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     }
 
     public static boolean sendMessage(Message msg) {
-        if (ChatFragment.mHandler != null) {
-            ChatFragment.mHandler.sendMessage(msg);
+        if (ChatFragment.PublicHandler != null) {
+            ChatFragment.PublicHandler.sendMessage(msg);
             return true;
         }
         return false;
@@ -263,8 +377,13 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
+                if (visibleItemCount == 0)
+                    return;
                 topVisibleIndex = firstVisibleItem;
-                if (firstVisibleItem + visibleItemCount == totalItemCount) {
+                int vH = view.getHeight();
+                int bottomPos = view.getChildAt(visibleItemCount - 1).getBottom();
+
+                if (firstVisibleItem + visibleItemCount == totalItemCount && vH >= bottomPos) {
                     Log.d(TAG, "reach buttom");
                     mScrollViewInButtom = true;
                     if (mNeedShowUnread) {
@@ -273,17 +392,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 } else {
                     mScrollViewInButtom = false;
                 }
-
-//                if (view.getId() == mCmdListview.getId()) {
-//                    final int currentFirstVisibleItem = mCmdListview.getFirstVisiblePosition();
-//                    if (currentFirstVisibleItem > lastFirstVisibleItem) {
-//                        mActionBarControlViewRf.get().hideActionBar();
-//                    } else if (currentFirstVisibleItem < lastFirstVisibleItem) {
-//                        mActionBarControlViewRf.get().showActionBar();
-//                    }
-//
-//                    lastFirstVisibleItem = currentFirstVisibleItem;
-//                }
             }
         });
 
