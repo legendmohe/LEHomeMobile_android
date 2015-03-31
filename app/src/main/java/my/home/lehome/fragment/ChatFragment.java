@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -390,8 +391,42 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                         mNeedShowUnread = false;
                     }
                 } else {
-                    mScrollViewInButtom = false;
+                    if (mScrollViewInButtom == true)
+                        mScrollViewInButtom = false;
                 }
+            }
+        });
+        mCmdListview.setOnTouchListener(new OnTouchListener() {
+
+            private final GestureDetector gestureDetector = new GestureDetector(
+                    getContext(), new GestureDetector.SimpleOnGestureListener() {
+
+                private final float _SHOW_KEYBOARD_Y = 10.0f;
+
+                @Override
+                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                    if (distanceY > _SHOW_KEYBOARD_Y) {
+                        mSendCmdEdittext.requestFocus();
+                        mSendCmdEdittext.postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                InputMethodManager keyboard = (InputMethodManager)
+                                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                keyboard.showSoftInput(mSendCmdEdittext, 0);
+                            }
+                        }, 200);
+                    }
+                    return false;
+                }
+            });
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mScrollViewInButtom) {
+                    return gestureDetector.onTouchEvent(event);
+                }
+                return false;
             }
         });
 
@@ -677,10 +712,20 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 return true;
             case R.id.copy_to_input:
                 if (!TextUtils.isEmpty(selectedString)) {
-                    mSendCmdEdittext.append(selectedString);
                     if (mInSpeechMode) {
                         switchButton.performClick();
                     }
+                    mSendCmdEdittext.append(selectedString);
+                    mSendCmdEdittext.requestFocus();
+                    mSendCmdEdittext.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            InputMethodManager keyboard = (InputMethodManager)
+                                    getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            keyboard.showSoftInput(mSendCmdEdittext, 0);
+                        }
+                    }, 200);
                 }
                 return true;
             default:
