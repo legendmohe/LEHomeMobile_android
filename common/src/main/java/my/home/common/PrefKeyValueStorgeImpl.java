@@ -21,30 +21,31 @@ import android.preference.PreferenceManager;
 /**
  * Created by legendmohe on 15/3/29.
  */
-public class PrefKeyValueStorgeImpl implements KeyValueStorage.IKeyStringStorge {
+public class PrefKeyValueStorgeImpl extends CacheKeyValueStorageImpl {
 
     private final SharedPreferences.Editor mEditor;
     private final SharedPreferences mPref;
 
     public PrefKeyValueStorgeImpl(Context context) {
+        super();
         mPref = PreferenceManager.getDefaultSharedPreferences(context);
         mEditor = mPref.edit();
     }
 
     @Override
-    public boolean hasKey(String key) {
+    public boolean storageHasKey(String key) {
         if (mPref.getString(key, null) == null)
             return false;
         return true;
     }
 
     @Override
-    public void putString(String key, String value) {
+    public void storagePutString(String key, String value) {
         mEditor.putString(key, value);
     }
 
     @Override
-    public String getString(String key) {
+    public String storageGetString(String key) {
         return mPref.getString(key, null);
     }
 

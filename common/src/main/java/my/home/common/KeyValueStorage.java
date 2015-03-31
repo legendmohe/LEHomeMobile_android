@@ -37,6 +37,9 @@ public class KeyValueStorage {
     private static Object mLock = new Object();
     private IKeyStringStorge mStorageImpl;
 
+    private KeyValueStorage() {
+    }
+
     public static KeyValueStorage getInstance() {
         if (mInstance == null) {
             synchronized (mLock) {

@@ -824,8 +824,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void run() {
                 // Select the last row so it will scroll into view...
-                mCmdListview.setSelection(mAdapter.getCount() - 1);
-//                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
+//                mCmdListview.setSelection(mAdapter.getCount() - 1);
+                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
             }
         });
     }

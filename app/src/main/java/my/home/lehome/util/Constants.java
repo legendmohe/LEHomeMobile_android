@@ -32,5 +32,5 @@ public class Constants {
 
     public static final int SETTINGS_ACTIVITY_RESULT_CODE = 100;
 
-    public static final int MESSAGE_SEQ_QUEUE_LIMIT = 100;
+    public static final int MESSAGE_SEQ_QUEUE_LIMIT = 45;
 }
