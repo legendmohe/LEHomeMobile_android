@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Messenger;
 
+import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 
 import java.lang.ref.WeakReference;
@@ -63,14 +64,18 @@ public class ChatFragmentPresenter extends MVPPresenter {
 //        new SendCommandAsyncTask(mChatItemListView.get().getContext(), input, local).execute();
         Context context = mChatItemListView.get().getContext();
         String message;
-        if (local)
+        String serverURL;
+        if (local) {
             message = MessageHelper.getFormatLocalMessage(input);
-        else
+            serverURL = MessageHelper.getLocalServerURL();
+        } else {
             message = MessageHelper.getFormatMessage(input);
-        String serverURL = MessageHelper.getLocalServerURL();
+            serverURL = MessageHelper.getServerURL(message);
+        }
         Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
         serviceIntent.putExtra("local", local);
         serviceIntent.putExtra("cmdString", message);
+        serviceIntent.putExtra("cmd", input);
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
         serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));
@@ -84,15 +89,19 @@ public class ChatFragmentPresenter extends MVPPresenter {
 //        new SendCommandAsyncTask(mChatItemListView.get().getContext(), chatItem, local).execute();
         Context context = mChatItemListView.get().getContext();
         String message;
-        if (local)
+        String serverURL;
+        if (local) {
             message = MessageHelper.getFormatLocalMessage(chatItem.getContent());
-        else
+            serverURL = MessageHelper.getLocalServerURL();
+        } else {
             message = MessageHelper.getFormatMessage(chatItem.getContent());
-        String serverURL = MessageHelper.getLocalServerURL();
+            serverURL = MessageHelper.getServerURL(message);
+        }
         Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
         serviceIntent.putExtra("local", local);
-        serviceIntent.putExtra("update", chatItem);
+        serviceIntent.putExtra("update", new Gson().toJson(chatItem));
         serviceIntent.putExtra("cmdString", message);
+        serviceIntent.putExtra("cmd", chatItem.getContent());
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
         serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));

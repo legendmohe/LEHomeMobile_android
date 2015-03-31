@@ -126,7 +126,7 @@ public class ChatItem implements Parcelable {
         dest.writeLong(date.getTime());
     }
 
-    public static final Parcelable.Creator<ChatItem> CREATOR = new Creator<ChatItem>() {
+    public static final Parcelable.Creator<ChatItem> CREATOR = new Parcelable.Creator<ChatItem>() {
 
         @Override
         public ChatItem[] newArray(int size) {
@@ -139,7 +139,7 @@ public class ChatItem implements Parcelable {
         }
     };
 
-    public ChatItem(Parcel in) {
+    private ChatItem(Parcel in) {
         ChatItem info = new ChatItem();
         info.setId(in.readLong());
         info.setContent(in.readString());
@@ -147,5 +147,15 @@ public class ChatItem implements Parcelable {
         info.setState(in.readInt());
         info.setSeq(in.readInt());
         info.setDate(new java.util.Date(in.readLong()));
+    }
+
+    @Override
+    public String toString() {
+        return "info: " + id + "\n"
+                + "content: " + content + "\n"
+                + "isMe: " + isMe + "\n"
+                + "state: " + state + "\n"
+                + "seq: " + seq + "\n"
+                + "date: " + date + "\n";
     }
 }

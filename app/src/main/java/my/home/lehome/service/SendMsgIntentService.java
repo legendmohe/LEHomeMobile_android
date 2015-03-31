@@ -65,11 +65,10 @@ public class SendMsgIntentService extends IntentService {
     public final static String TAG = "SendMsgIntentService";
     public final static String SEND_MSG_INTENT_SERVICE_ACTION = "my.home.lehome.receiver.SendMsgServiceReceiver";
 
-    private static final Gson gson = new Gson();
-
     private boolean mLocalMsg = false;
     private ChatItem mCurrentItem;
-    private String mCmdString;
+    private String mFmtCmd;
+    private String mOriCmd;
     private String mServerURL;
     private String mDeviceID;
     private Messenger mCurMessager;
@@ -83,12 +82,12 @@ public class SendMsgIntentService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        BeforeSending(intent);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        BeforeSending(intent);
         String resultString = dispatchSendingTask(intent);
         AfterSending(intent, resultString);
     }
@@ -102,16 +101,25 @@ public class SendMsgIntentService extends IntentService {
         repMsg.what = MSG_BEGIN_SENDING;
 
         boolean useLocal = intent.getBooleanExtra("local", false);
-        ChatItem updateItem = intent.getParcelableExtra("update");
-        mCmdString = intent.getStringExtra("cmdString");
+        String updateString = intent.getStringExtra("update");
+        mFmtCmd = intent.getStringExtra("cmdString");
+        mOriCmd = intent.getStringExtra("cmd");
         mServerURL = intent.getStringExtra("serverUrl");
         mDeviceID = intent.getStringExtra("deviceID");
 
-        if (updateItem != null) {
-            mCurrentItem = updateItem;
+        Log.d(TAG, "recv cmd: \nuseLocal: " + useLocal + "\n"
+                        + "updateString: " + updateString + "\n"
+                        + "mFmtCmd: " + mFmtCmd + "\n"
+                        + "mOriCmd: " + mOriCmd + "\n"
+                        + "mServerURL: " + mServerURL + "\n"
+                        + "mDeviceID: " + mDeviceID
+        );
+
+        if (updateString != null) {
+            mCurrentItem = new Gson().fromJson(updateString, ChatItem.class);
         } else {
             mCurrentItem = new ChatItem();
-            mCurrentItem.setContent(mCmdString);
+            mCurrentItem.setContent(mOriCmd);
             mCurrentItem.setIsMe(true);
             mCurrentItem.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
             mCurrentItem.setDate(new Date());
@@ -123,7 +131,7 @@ public class SendMsgIntentService extends IntentService {
         if (mCurMessager != null) {
             Bundle bundle = new Bundle();
             bundle.putBoolean("update", intent.hasExtra("update"));
-            bundle.putString("item", gson.toJson(mCurrentItem));
+            bundle.putString("item", new Gson().toJson(mCurrentItem));
             bundle.putLong("update_id", mCurrentItem.getId());
             bundle.putInt("update_state", mCurrentItem.getState());
             repMsg.setData(bundle);
@@ -143,7 +151,7 @@ public class SendMsgIntentService extends IntentService {
                         400,
                         getApplicationContext().getResources().getString(R.string.msg_local_saddress_not_set)
                 );
-            return sendToLocalServer(mServerURL, mCmdString);
+            return sendToLocalServer(mServerURL, mFmtCmd);
         } else {
             if (TextUtils.isEmpty(mDeviceID)) {
                 return getErrorJsonString(
@@ -310,7 +318,7 @@ public class SendMsgIntentService extends IntentService {
 
         if (mCurMessager != null) {
             Bundle bundle = new Bundle();
-            bundle.putString("item", gson.toJson(mCurrentItem));
+            bundle.putString("item", new Gson().toJson(mCurrentItem));
             bundle.putInt("rep_code", rep_code);
             bundle.putLong("update_id", update_id);
             bundle.putInt("update_state", update_state);
