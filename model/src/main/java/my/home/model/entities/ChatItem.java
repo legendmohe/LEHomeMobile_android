@@ -140,13 +140,12 @@ public class ChatItem implements Parcelable {
     };
 
     private ChatItem(Parcel in) {
-        ChatItem info = new ChatItem();
-        info.setId(in.readLong());
-        info.setContent(in.readString());
-        info.setIsMe(in.readInt() == 1);
-        info.setState(in.readInt());
-        info.setSeq(in.readInt());
-        info.setDate(new java.util.Date(in.readLong()));
+        setId(in.readLong());
+        setContent(in.readString());
+        setIsMe(in.readInt() == 1);
+        setState(in.readInt());
+        setSeq(in.readInt());
+        setDate(new java.util.Date(in.readLong()));
     }
 
     @Override
