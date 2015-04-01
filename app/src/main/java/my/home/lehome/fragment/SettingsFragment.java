@@ -202,10 +202,23 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 findPreference("pref_local_msg_server_address").setEnabled(true);
                 findPreference("pref_local_ssid").setEnabled(true);
                 findPreference("pref_local_msg_subscribe_address").setEnabled(true);
+
+//                ComponentName receiver = new ComponentName(getActivity(), BootCompleteReceiver.class);
+//                PackageManager pm = getActivity().getPackageManager();
+//
+//                pm.setComponentEnabledSetting(receiver,
+//                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+//                        PackageManager.DONT_KILL_APP);
             } else {
                 findPreference("pref_local_msg_server_address").setEnabled(false);
                 findPreference("pref_local_ssid").setEnabled(false);
                 findPreference("pref_local_msg_subscribe_address").setEnabled(false);
+//                ComponentName receiver = new ComponentName(getActivity(), BootCompleteReceiver.class);
+//                PackageManager pm = getActivity().getPackageManager();
+//
+//                pm.setComponentEnabledSetting(receiver,
+//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+//                        PackageManager.DONT_KILL_APP);
             }
         } else if (key.equals("pref_local_ssid")) {
             EditTextPreference ssidEditTextPreference = (EditTextPreference) findPreference("pref_local_ssid");

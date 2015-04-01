@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -58,6 +59,7 @@ public class LocalMessageService extends Service {
     //    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
     private Thread mSubThread;
     private SubRunnable mSubRunnable;
+    private PowerManager.WakeLock mWakeLock;
 
     /**
      * Handler of incoming messages from clients.
@@ -116,6 +118,12 @@ public class LocalMessageService extends Service {
         SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mServiceAddress = mySharedPreferences.getString("pref_local_msg_subscribe_address", null);
         initSubscriber(mServiceAddress);
+
+        if (mWakeLock == null) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+            mWakeLock.acquire();
+        }
     }
 
     @Override
@@ -149,6 +157,11 @@ public class LocalMessageService extends Service {
         }
         Log.d(TAG, "in onDestroy");
         super.onDestroy();
+
+        if (mWakeLock != null) {
+            mWakeLock.release();
+            mWakeLock = null;
+        }
     }
 
     @Override

@@ -107,6 +107,13 @@
             </intent-filter>
         </receiver>
 
+        <!--<receiver android:name=".receiver.BootCompleteReceiver"-->
+        <!--android:enabled="false">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.BOOT_COMPLETED"></action>-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
+
         <!-- push应用定义消息receiver声明 -->
         <receiver android:name=".receiver.PushMessageReceiver">
             <intent-filter>

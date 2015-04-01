@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -63,6 +64,8 @@ public class SendMsgIntentService extends IntentService {
     public final static String TAG = "SendMsgIntentService";
     public final static String SEND_MSG_INTENT_SERVICE_ACTION = "my.home.lehome.receiver.SendMsgServiceReceiver";
 
+    private PowerManager.WakeLock mWakeLock;
+
 //    private boolean mLocalMsg = false;
 //    private ChatItem mCurrentItem;
 //    private String mFmtCmd;
@@ -79,6 +82,25 @@ public class SendMsgIntentService extends IntentService {
     }
 
     @Override
+    public void onCreate() {
+        if (mWakeLock == null) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+            mWakeLock.acquire();
+        }
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mWakeLock != null) {
+            mWakeLock.release();
+            mWakeLock = null;
+        }
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         BeforeSending(intent);
         return super.onStartCommand(intent, flags, startId);
@@ -90,17 +112,17 @@ public class SendMsgIntentService extends IntentService {
         String servelURL = intent.getStringExtra("serverUrl");
         String deviceID = intent.getStringExtra("deviceID");
         boolean useLocal = intent.getBooleanExtra("local", false);
-        
+
         String resultString = dispatchSendingTask(servelURL, deviceID, cmd, useLocal);
         AfterSending(intent, resultString);
     }
 
     private void BeforeSending(Intent intent) {
-    	Messenger messenger;
+        Messenger messenger;
         if (intent.hasExtra("messenger"))
-        	messenger = (Messenger) intent.getExtras().get("messenger");
+            messenger = (Messenger) intent.getExtras().get("messenger");
         else
-        	messenger = null;
+            messenger = null;
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
@@ -112,16 +134,16 @@ public class SendMsgIntentService extends IntentService {
 //                        + "mServerURL: " + mServerURL + "\n"
 //                        + "mDeviceID: " + mDeviceID
 //        );
-        
+
         ChatItem item;
         if (updateItem != null) {
             item = updateItem;
         } else {
-        	item = new ChatItem();
-        	item.setContent(intent.getStringExtra("cmd"));
-        	item.setIsMe(true);
-        	item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
-        	item.setDate(new Date());
+            item = new ChatItem();
+            item.setContent(intent.getStringExtra("cmd"));
+            item.setIsMe(true);
+            item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
+            item.setDate(new Date());
             DBHelper.addChatItem(getApplicationContext(), item);
         }
         item.setState(Constants.CHATITEM_STATE_PENDING);
@@ -133,7 +155,7 @@ public class SendMsgIntentService extends IntentService {
             bundle.putParcelable("item", item);
             repMsg.setData(bundle);
             try {
-            	messenger.send(repMsg);
+                messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -285,23 +307,23 @@ public class SendMsgIntentService extends IntentService {
         Log.d(TAG, "send cmd finish: " + rep_code + " " + desc);
         Messenger messenger;
         if (intent.hasExtra("messenger"))
-        	messenger = (Messenger) intent.getExtras().get("messenger");
+            messenger = (Messenger) intent.getExtras().get("messenger");
         else
-        	messenger = null;
-        
+            messenger = null;
+
         Message repMsg = Message.obtain();
         repMsg.what = MSG_END_SENDING;
 
         ChatItem item = intent.getParcelableExtra("pass_item");
         ChatItem newItem = null;
         if (rep_code == 200) {
-        	item.setState(Constants.CHATITEM_STATE_SUCCESS);
+            item.setState(Constants.CHATITEM_STATE_SUCCESS);
             DBHelper.updateChatItem(context, item);
         } else {
             if (rep_code == 415) {
-            	item.setState(Constants.CHATITEM_STATE_SUCCESS);
+                item.setState(Constants.CHATITEM_STATE_SUCCESS);
             } else {
-            	item.setState(Constants.CHATITEM_STATE_ERROR);
+                item.setState(Constants.CHATITEM_STATE_ERROR);
             }
             DBHelper.updateChatItem(context, item);
 
@@ -322,7 +344,7 @@ public class SendMsgIntentService extends IntentService {
             bundle.putInt("rep_code", rep_code);
             repMsg.setData(bundle);
             try {
-            	messenger.send(repMsg);
+                messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
