@@ -66,7 +66,6 @@ import android.widget.Toast;
 
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog;
-import com.google.gson.Gson;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
@@ -204,15 +203,15 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             mFragment = new WeakReference<>(fragment);
         }
 
-        private void updateArrayAdapter(ArrayAdapter<ChatItem> adapter, long update_id, int state) {
+        private void updateArrayAdapter(ArrayAdapter<ChatItem> adapter, ChatItem item) {
             for (int i = adapter.getCount() - 1; i >= 0; i--) {
-                Log.d(TAG, adapter.getItem(i).getId() + "s" + update_id);
-                if (adapter.getItem(i).getId() == update_id) {
-                    adapter.getItem(i).setState(state);
-                    adapter.notifyDataSetChanged();
-                    return;
+//                Log.d(TAG, adapter.getItem(i).getId() + "s" + item.getId());
+                if (adapter.getItem(i).getId().equals(item.getId())) {
+                    adapter.getItem(i).setState(item.getState());
+                    break;
                 }
             }
+            adapter.notifyDataSetChanged();
         }
 
         @Override
@@ -221,18 +220,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             if (fragment != null) {
                 Bundle bundle = msg.getData();
                 bundle.setClassLoader(ChatItem.class.getClassLoader());
-                String jsonString;
                 ChatItem item;
                 switch (msg.what) {
                     case SendMsgIntentService.MSG_BEGIN_SENDING:
-                        jsonString = bundle.getString("item");
-                        item = new Gson().fromJson(jsonString, ChatItem.class);
+                        item = bundle.getParcelable("item");
                         if (bundle.getBoolean("update", false)) {
-                            updateArrayAdapter(
-                                    fragment.getAdapter(),
-                                    bundle.getLong("update_id"),
-                                    bundle.getInt("update_state")
-                            );
+                            updateArrayAdapter(fragment.getAdapter(), item);
                         } else {
                             fragment.getAdapter().add(item);
                             fragment.getAdapter().notifyDataSetChanged();
@@ -241,21 +234,13 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                         break;
                     case SendMsgIntentService.MSG_END_SENDING:
                         int rep_code = bundle.getInt("rep_code", -1);
-                        jsonString = bundle.getString("item");
-                        item = new Gson().fromJson(jsonString, ChatItem.class);
+                        item = bundle.getParcelable("item");
                         if (rep_code == 200) {
-                            updateArrayAdapter(
-                                    fragment.getAdapter(),
-                                    bundle.getLong("update_id"),
-                                    bundle.getInt("update_state")
-                            );
+                            updateArrayAdapter(fragment.getAdapter(), item);
                         } else {
-                            fragment.getAdapter().add(item);
-                            updateArrayAdapter(
-                                    fragment.getAdapter(),
-                                    bundle.getLong("update_id"),
-                                    bundle.getInt("update_state")
-                            );
+                            ChatItem newItem = bundle.getParcelable("new_item");
+                            fragment.getAdapter().add(newItem);
+                            updateArrayAdapter(fragment.getAdapter(), item);
                             fragment.scrollMyListViewToBottom();
                         }
                         break;
@@ -401,7 +386,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             private final GestureDetector gestureDetector = new GestureDetector(
                     getContext(), new GestureDetector.SimpleOnGestureListener() {
 
-                private final float _SHOW_KEYBOARD_Y = 10.0f;
+                private final float _SHOW_KEYBOARD_Y = 30.0f;
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {

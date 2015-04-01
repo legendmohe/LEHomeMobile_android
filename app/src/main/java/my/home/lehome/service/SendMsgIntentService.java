@@ -24,8 +24,6 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -106,7 +104,7 @@ public class SendMsgIntentService extends IntentService {
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
-        String updateString = intent.getStringExtra("update");
+        ChatItem updateItem = intent.getParcelableExtra("update");
 //        Log.d(TAG, "recv cmd: \nuseLocal: " + useLocal + "\n"
 //                        + "updateString: " + updateString + "\n"
 //                        + "mFmtCmd: " + mFmtCmd + "\n"
@@ -116,8 +114,8 @@ public class SendMsgIntentService extends IntentService {
 //        );
         
         ChatItem item;
-        if (updateString != null) {
-        	item = new Gson().fromJson(updateString, ChatItem.class);
+        if (updateItem != null) {
+            item = updateItem;
         } else {
         	item = new ChatItem();
         	item.setContent(intent.getStringExtra("cmd"));
@@ -126,13 +124,13 @@ public class SendMsgIntentService extends IntentService {
         	item.setDate(new Date());
             DBHelper.addChatItem(getApplicationContext(), item);
         }
+        item.setState(Constants.CHATITEM_STATE_PENDING);
 
+        Log.d(TAG, "enqueue item: \n" + item);
         if (messenger != null) {
             Bundle bundle = new Bundle();
             bundle.putBoolean("update", intent.hasExtra("update"));
-            bundle.putString("item", new Gson().toJson(item));
-            bundle.putLong("update_id", item.getId());
-            bundle.putInt("update_state", Constants.CHATITEM_STATE_PENDING);
+            bundle.putParcelable("item", item);
             repMsg.setData(bundle);
             try {
             	messenger.send(repMsg);
@@ -140,7 +138,7 @@ public class SendMsgIntentService extends IntentService {
                 e.printStackTrace();
             }
         }
-        
+
         intent.putExtra("pass_item", item);
     }
 
@@ -293,14 +291,11 @@ public class SendMsgIntentService extends IntentService {
         
         Message repMsg = Message.obtain();
         repMsg.what = MSG_END_SENDING;
-        long update_id = -1;
-        int update_state = -1;
 
         ChatItem item = intent.getParcelableExtra("pass_item");
+        ChatItem newItem = null;
         if (rep_code == 200) {
         	item.setState(Constants.CHATITEM_STATE_SUCCESS);
-            update_id = item.getId();
-            update_state = item.getState();
             DBHelper.updateChatItem(context, item);
         } else {
             if (rep_code == 415) {
@@ -308,25 +303,23 @@ public class SendMsgIntentService extends IntentService {
             } else {
             	item.setState(Constants.CHATITEM_STATE_ERROR);
             }
-            update_id = item.getId();
-            update_state = item.getState();
             DBHelper.updateChatItem(context, item);
 
-            ChatItem newItem = new ChatItem();
+            newItem = new ChatItem();
             newItem.setContent(desc);
             newItem.setIsMe(false);
             newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
             newItem.setDate(new Date());
             DBHelper.addChatItem(context, newItem);
-            item = newItem;
         }
 
+        Log.d(TAG, "dequeue item: \n" + item);
         if (messenger != null) {
             Bundle bundle = new Bundle();
-            bundle.putString("item", new Gson().toJson(item));
+            bundle.putParcelable("item", item);
+            if (newItem != null)
+                bundle.putParcelable("new_item", newItem);
             bundle.putInt("rep_code", rep_code);
-            bundle.putLong("update_id", update_id);
-            bundle.putInt("update_state", update_state);
             repMsg.setData(bundle);
             try {
             	messenger.send(repMsg);
