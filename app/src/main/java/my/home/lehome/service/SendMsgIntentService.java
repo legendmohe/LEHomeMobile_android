@@ -65,13 +65,13 @@ public class SendMsgIntentService extends IntentService {
     public final static String TAG = "SendMsgIntentService";
     public final static String SEND_MSG_INTENT_SERVICE_ACTION = "my.home.lehome.receiver.SendMsgServiceReceiver";
 
-    private boolean mLocalMsg = false;
-    private ChatItem mCurrentItem;
-    private String mFmtCmd;
-    private String mOriCmd;
-    private String mServerURL;
-    private String mDeviceID;
-    private Messenger mCurMessager;
+//    private boolean mLocalMsg = false;
+//    private ChatItem mCurrentItem;
+//    private String mFmtCmd;
+//    private String mOriCmd;
+//    private String mServerURL;
+//    private String mDeviceID;
+//    private Messenger mCurMessager;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -88,83 +88,84 @@ public class SendMsgIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String resultString = dispatchSendingTask(intent);
+        String cmd = intent.getStringExtra("cmdString");
+        String servelURL = intent.getStringExtra("serverUrl");
+        String deviceID = intent.getStringExtra("deviceID");
+        boolean useLocal = intent.getBooleanExtra("local", false);
+        
+        String resultString = dispatchSendingTask(servelURL, deviceID, cmd, useLocal);
         AfterSending(intent, resultString);
     }
 
     private void BeforeSending(Intent intent) {
+    	Messenger messenger;
         if (intent.hasExtra("messenger"))
-            mCurMessager = (Messenger) intent.getExtras().get("messenger");
+        	messenger = (Messenger) intent.getExtras().get("messenger");
         else
-            mCurMessager = null;
+        	messenger = null;
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
-        boolean useLocal = intent.getBooleanExtra("local", false);
         String updateString = intent.getStringExtra("update");
-        mFmtCmd = intent.getStringExtra("cmdString");
-        mOriCmd = intent.getStringExtra("cmd");
-        mServerURL = intent.getStringExtra("serverUrl");
-        mDeviceID = intent.getStringExtra("deviceID");
-
-        Log.d(TAG, "recv cmd: \nuseLocal: " + useLocal + "\n"
-                        + "updateString: " + updateString + "\n"
-                        + "mFmtCmd: " + mFmtCmd + "\n"
-                        + "mOriCmd: " + mOriCmd + "\n"
-                        + "mServerURL: " + mServerURL + "\n"
-                        + "mDeviceID: " + mDeviceID
-        );
-
+//        Log.d(TAG, "recv cmd: \nuseLocal: " + useLocal + "\n"
+//                        + "updateString: " + updateString + "\n"
+//                        + "mFmtCmd: " + mFmtCmd + "\n"
+//                        + "mOriCmd: " + mOriCmd + "\n"
+//                        + "mServerURL: " + mServerURL + "\n"
+//                        + "mDeviceID: " + mDeviceID
+//        );
+        
+        ChatItem item;
         if (updateString != null) {
-            mCurrentItem = new Gson().fromJson(updateString, ChatItem.class);
+        	item = new Gson().fromJson(updateString, ChatItem.class);
         } else {
-            mCurrentItem = new ChatItem();
-            mCurrentItem.setContent(mOriCmd);
-            mCurrentItem.setIsMe(true);
-            mCurrentItem.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
-            mCurrentItem.setDate(new Date());
-            DBHelper.addChatItem(getApplicationContext(), mCurrentItem);
+        	item = new ChatItem();
+        	item.setContent(intent.getStringExtra("cmd"));
+        	item.setIsMe(true);
+        	item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
+        	item.setDate(new Date());
+            DBHelper.addChatItem(getApplicationContext(), item);
         }
-        mCurrentItem.setState(Constants.CHATITEM_STATE_PENDING); // set PENDING temporary
 
-        mLocalMsg = useLocal;
-        if (mCurMessager != null) {
+        if (messenger != null) {
             Bundle bundle = new Bundle();
             bundle.putBoolean("update", intent.hasExtra("update"));
-            bundle.putString("item", new Gson().toJson(mCurrentItem));
-            bundle.putLong("update_id", mCurrentItem.getId());
-            bundle.putInt("update_state", mCurrentItem.getState());
+            bundle.putString("item", new Gson().toJson(item));
+            bundle.putLong("update_id", item.getId());
+            bundle.putInt("update_state", Constants.CHATITEM_STATE_PENDING);
             repMsg.setData(bundle);
             try {
-                mCurMessager.send(repMsg);
+            	messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
+        
+        intent.putExtra("pass_item", item);
     }
 
-    private String dispatchSendingTask(Intent intent) {
-        Log.d(TAG, "sending: " + mCurrentItem.getContent() + " use local: " + mLocalMsg);
-        if (mLocalMsg) {
-            if (TextUtils.isEmpty(mServerURL))
+    private String dispatchSendingTask(String servelURL, String deviceID, String cmd, boolean local) {
+//        Log.d(TAG, "sending: " + mCurrentItem.getContent() + " use local: " + mLocalMsg);
+        if (local) {
+            if (TextUtils.isEmpty(servelURL))
                 return getErrorJsonString(
                         400,
                         getApplicationContext().getResources().getString(R.string.msg_local_saddress_not_set)
                 );
-            return sendToLocalServer(mServerURL, mFmtCmd);
+            return sendToLocalServer(servelURL, cmd);
         } else {
-            if (TextUtils.isEmpty(mDeviceID)) {
+            if (TextUtils.isEmpty(deviceID)) {
                 return getErrorJsonString(
                         400,
                         getApplicationContext().getResources().getString(R.string.msg_no_deviceid)
                 );
             }
-            if (TextUtils.isEmpty(mServerURL))
+            if (TextUtils.isEmpty(servelURL))
                 return getErrorJsonString(
                         400,
                         getApplicationContext().getResources().getString(R.string.msg_saddress_not_set)
                 );
-            return sendToServer(mServerURL);
+            return sendToServer(servelURL);
         }
     }
 
@@ -284,28 +285,32 @@ public class SendMsgIntentService extends IntentService {
         }
 
         Log.d(TAG, "send cmd finish: " + rep_code + " " + desc);
-        if (mCurMessager != null) {
-            mCurMessager = (Messenger) intent.getExtras().get("messenger");
-        }
+        Messenger messenger;
+        if (intent.hasExtra("messenger"))
+        	messenger = (Messenger) intent.getExtras().get("messenger");
+        else
+        	messenger = null;
+        
         Message repMsg = Message.obtain();
         repMsg.what = MSG_END_SENDING;
         long update_id = -1;
         int update_state = -1;
 
+        ChatItem item = intent.getParcelableExtra("pass_item");
         if (rep_code == 200) {
-            mCurrentItem.setState(Constants.CHATITEM_STATE_SUCCESS);
-            update_id = mCurrentItem.getId();
-            update_state = mCurrentItem.getState();
-            DBHelper.updateChatItem(context, mCurrentItem);
+        	item.setState(Constants.CHATITEM_STATE_SUCCESS);
+            update_id = item.getId();
+            update_state = item.getState();
+            DBHelper.updateChatItem(context, item);
         } else {
             if (rep_code == 415) {
-                mCurrentItem.setState(Constants.CHATITEM_STATE_SUCCESS);
+            	item.setState(Constants.CHATITEM_STATE_SUCCESS);
             } else {
-                mCurrentItem.setState(Constants.CHATITEM_STATE_ERROR);
+            	item.setState(Constants.CHATITEM_STATE_ERROR);
             }
-            update_id = mCurrentItem.getId();
-            update_state = mCurrentItem.getState();
-            DBHelper.updateChatItem(context, mCurrentItem);
+            update_id = item.getId();
+            update_state = item.getState();
+            DBHelper.updateChatItem(context, item);
 
             ChatItem newItem = new ChatItem();
             newItem.setContent(desc);
@@ -313,23 +318,22 @@ public class SendMsgIntentService extends IntentService {
             newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
             newItem.setDate(new Date());
             DBHelper.addChatItem(context, newItem);
-            mCurrentItem = newItem;
+            item = newItem;
         }
 
-        if (mCurMessager != null) {
+        if (messenger != null) {
             Bundle bundle = new Bundle();
-            bundle.putString("item", new Gson().toJson(mCurrentItem));
+            bundle.putString("item", new Gson().toJson(item));
             bundle.putInt("rep_code", rep_code);
             bundle.putLong("update_id", update_id);
             bundle.putInt("update_state", update_state);
             repMsg.setData(bundle);
             try {
-                mCurMessager.send(repMsg);
+            	messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
-        mCurMessager = null;
     }
 
     private String getErrorJsonString(int code, String error) {
