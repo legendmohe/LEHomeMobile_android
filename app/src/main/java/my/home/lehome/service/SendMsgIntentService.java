@@ -126,19 +126,8 @@ public class SendMsgIntentService extends IntentService {
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
-        ChatItem updateItem = intent.getParcelableExtra("update");
-//        Log.d(TAG, "recv cmd: \nuseLocal: " + useLocal + "\n"
-//                        + "updateString: " + updateString + "\n"
-//                        + "mFmtCmd: " + mFmtCmd + "\n"
-//                        + "mOriCmd: " + mOriCmd + "\n"
-//                        + "mServerURL: " + mServerURL + "\n"
-//                        + "mDeviceID: " + mDeviceID
-//        );
-
-        ChatItem item;
-        if (updateItem != null) {
-            item = updateItem;
-        } else {
+        ChatItem item = intent.getParcelableExtra("update");
+        if (item == null) {
             item = new ChatItem();
             item.setContent(intent.getStringExtra("cmd"));
             item.setIsMe(true);

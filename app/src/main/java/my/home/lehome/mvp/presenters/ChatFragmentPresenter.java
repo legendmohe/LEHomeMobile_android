@@ -18,7 +18,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Messenger;
 
-import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 
 import java.lang.ref.WeakReference;
@@ -99,7 +98,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
         }
         Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
         serviceIntent.putExtra("local", local);
-        serviceIntent.putExtra("update", new Gson().toJson(chatItem));
+        serviceIntent.putExtra("update", chatItem);
         serviceIntent.putExtra("cmdString", message);
         serviceIntent.putExtra("cmd", chatItem.getContent());
         serviceIntent.putExtra("serverUrl", serverURL);

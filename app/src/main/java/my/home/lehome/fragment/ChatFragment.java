@@ -154,7 +154,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     public static final int MSG_TYPE_CHATITEM = 1;
     public static final int MSG_TYPE_TOAST = 2;
     public static final int MSG_TYPE_VOICE_CMD = 3;
-    public static final int MSG_TYPE_SEND_MSG = 4;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -340,7 +339,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         mCmdListview = (ListView) rootView.findViewById(R.id.chat_list);
         mCmdListview.setAdapter(mAdapter);
         mCmdListview.setOnScrollListener(new OnScrollListener() {
-            int lastFirstVisibleItem = 0;
             int topVisibleIndex;
 
             @Override
@@ -386,7 +384,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             private final GestureDetector gestureDetector = new GestureDetector(
                     getContext(), new GestureDetector.SimpleOnGestureListener() {
 
-                private final float _SHOW_KEYBOARD_Y = 30.0f;
+                private final float _SHOW_KEYBOARD_Y = 40.0f;
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
@@ -927,6 +925,16 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     @Override
     public void onResetDatas(List<ChatItem> chatItems) {
         mAdapter.setData(chatItems);
+    }
+
+    @Override
+    public void onChatItemRequest(ChatItem reqItem) {
+
+    }
+
+    @Override
+    public void onChatItemResponse(long reqID, int reqState, ChatItem repItem) {
+
     }
 
 
