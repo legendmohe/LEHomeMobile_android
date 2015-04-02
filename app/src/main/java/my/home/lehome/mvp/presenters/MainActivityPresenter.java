@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -164,9 +165,11 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             MessageHelper.setPushTag(context, MessageHelper.DEVICE_ID);
         }
         if (mBinded) {
-            Message msg = Message.obtain();
-            msg.what = LocalMessageService.MSG_SET_SUBSCRIBE_ADDRESS;
-            msg.obj = MessageHelper.getLocalServerSubscribeURL();
+            Message msg = Message.obtain(null, LocalMessageService.MSG_SET_SUBSCRIBE_ADDRESS);
+            Bundle bundle = new Bundle();
+            bundle.putString("server_address", MessageHelper.getLocalServerSubscribeURL());
+            msg.setData(bundle);
+//            msg.obj = MessageHelper.getLocalServerSubscribeURL();
             try {
                 mLocalMsgService.send(msg);
             } catch (RemoteException e) {
@@ -192,10 +195,10 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     @Override
-    public void onActivityStart() {
+    public void onActivityCreate() {
         Context context = mMainActivityView.get().getContext();
         // bind service if needed.
-        if (LocalMsgHelper.canUseLocalMessageService(context)) {
+        if (LocalMsgHelper.canUseLocalMessageService(context) && MessageHelper.isLocalMsgServiceEnable()) {
             Intent i = new Intent("my.home.lehome.service.LocalMessageService");
             context.bindService(i, mConnection, context.BIND_AUTO_CREATE);
         }
@@ -206,7 +209,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     @Override
-    public void onActivityStop() {
+    public void onActivityDestory() {
         Context context = mMainActivityView.get().getContext();
         // Unbind from the service
         if (mBinded) {

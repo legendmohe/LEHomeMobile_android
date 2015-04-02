@@ -14,10 +14,10 @@
 
 package my.home.common;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,12 +37,12 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
         @Override
         public boolean handleMessage(Message msg) {
         	synchronized (mSyncLock) {
-	        	for (String keyString : mSyncCache.keySet()) {
+                Log.d(TAG, "sync cache: " + mSyncCache.size());
+                for (String keyString : mSyncCache.keySet()) {
 	        		storagePutString(keyString, mSyncCache.get(keyString));
 				}
 	        	mSyncCache.clear();
         	}
-//            Log.d(TAG, "run msg: " + bundle.toString());
             return false;
         }
     }
@@ -82,8 +82,9 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
 
     @Override
     public String getString(String key) {
-        if (mCache.containsKey(key))
+        if (mCache.containsKey(key)) {
             return mCache.get(key);
+        }
         String value = storageGetString(key);
         if (value != null)
             mCache.put(key, value);

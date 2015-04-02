@@ -163,7 +163,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         } else {
             lMsgCheckBoxPreference.setChecked(false);
             ssidEditTextPreference.setEnabled(false);
-            subscribeEditTextPreference.setEnabled(true);
+            subscribeEditTextPreference.setEnabled(false);
             addressEditTextPreference.setEnabled(false);
         }
     }

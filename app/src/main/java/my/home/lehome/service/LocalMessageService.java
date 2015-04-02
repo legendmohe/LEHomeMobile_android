@@ -19,6 +19,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -67,6 +68,7 @@ public class LocalMessageService extends Service {
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
+            Bundle bundle = null;
             switch (msg.what) {
 //                case MSG_REGISTER_CLIENT:
 //                    mClients.add(msg.replyTo);
@@ -75,9 +77,9 @@ public class LocalMessageService extends Service {
 //                    mClients.remove(msg.replyTo);
 //                    break;
                 case MSG_SET_SUBSCRIBE_ADDRESS:
-                    if (msg.obj != null) {
-                        String address = (String) msg.obj;
-                        setServerAddress(address);
+                    bundle = msg.getData();
+                    if (bundle != null) {
+                        setServerAddress(bundle.getString("server_address"));
                     }
                     break;
                 case MSG_STOP_SERVICE:

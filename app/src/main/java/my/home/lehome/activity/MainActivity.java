@@ -28,6 +28,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,9 +80,11 @@ public class MainActivity extends FragmentActivity
             wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
         this.setupViews(null);
+        STOPPED = false;
+
         mMainActivityPresenter = new MainActivityPresenter(this);
         mMainActivityPresenter.start();
-        STOPPED = false;
+        mMainActivityPresenter.onActivityCreate();
     }
 
     @Override
@@ -106,6 +109,7 @@ public class MainActivity extends FragmentActivity
     @Override
     protected void onDestroy() {
         mMainActivityPresenter.stop();
+        mMainActivityPresenter.onActivityDestory();
         super.onDestroy();
     }
 
@@ -308,6 +312,19 @@ public class MainActivity extends FragmentActivity
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+    }
+
+    @Override
+    public boolean onKeyDown(int keycode, KeyEvent e) {
+        switch (keycode) {
+            case KeyEvent.KEYCODE_MENU:
+                if (mCurrentSection == 0 && !mNavigationDrawerFragment.isDrawerOpen()) {
+                    getChatFragment().switchInputMode();
+                }
+                return true;
+        }
+
+        return super.onKeyDown(keycode, e);
     }
 
     public ChatFragment getChatFragment() {

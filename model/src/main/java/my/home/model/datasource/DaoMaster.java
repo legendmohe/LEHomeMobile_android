@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.model.entities;
+package my.home.model.datasource;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

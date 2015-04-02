@@ -43,6 +43,7 @@ import my.home.lehome.util.PushUtils;
 import my.home.model.entities.ChatItem;
 
 public class MessageHelper {
+    public final static String TAG = "MessageHelper";
 
     private static final int maxNotiLen = 140;
     private static int unreadMsgCount = 0;
@@ -225,6 +226,7 @@ public class MessageHelper {
             LinkedList<Integer> limitedQueue = null;
             if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
                 limitedQueue = (LinkedList<Integer>) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, LinkedList.class);
+//                Log.d(TAG, "limitedQueue" + limitedQueue);
                 if (limitedQueue != null && limitedQueue.contains(seq))
                     return true;
             }

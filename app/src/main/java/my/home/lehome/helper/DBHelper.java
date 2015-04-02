@@ -21,13 +21,13 @@ import java.util.List;
 
 import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.QueryBuilder;
+import my.home.model.datasource.ChatItemDao;
+import my.home.model.datasource.DaoMaster;
+import my.home.model.datasource.DaoMaster.OpenHelper;
+import my.home.model.datasource.DaoSession;
+import my.home.model.datasource.ShortcutDao;
 import my.home.model.entities.ChatItem;
-import my.home.model.entities.ChatItemDao;
-import my.home.model.entities.DaoMaster;
-import my.home.model.entities.DaoMaster.OpenHelper;
-import my.home.model.entities.DaoSession;
 import my.home.model.entities.Shortcut;
-import my.home.model.entities.ShortcutDao;
 
 public class DBHelper {
     private static final String TAG = DBHelper.class.getName();

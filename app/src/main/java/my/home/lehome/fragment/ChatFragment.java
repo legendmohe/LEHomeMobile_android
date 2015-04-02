@@ -86,7 +86,6 @@ import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
-import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.Constants;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
@@ -114,7 +113,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      * common UI
      */
     private ChatItemArrayAdapter mAdapter;
-    private Button switchButton;
+    private Button mSwitchButton;
     private Button mSuggestionButton;
     private Toast mToast;
     private OnGlobalLayoutListener mKeyboardListener;
@@ -127,7 +126,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      * common variables
      */
     public static Handler PublicHandler;
-    public static Handler SendMsgHandler;
     private int mNewMsgNum = 0;
     private boolean mNeedShowUnread = false;
     private boolean mScrollViewInButtom = false;
@@ -164,7 +162,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_onright);
             mAdapter.setResendButtonClickListener(this);
         }
-        SendMsgHandler = new IntentServiceHandler(this);
         PublicHandler = new MyHandler(this);
         mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
         mChatFragmentPresenter.start();
@@ -193,61 +190,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
     public void setNeedShowUnread(boolean mNeedShowUnread) {
         this.mNeedShowUnread = mNeedShowUnread;
-    }
-
-    private static class IntentServiceHandler extends Handler {
-        private final WeakReference<ChatFragment> mFragment;
-
-        public IntentServiceHandler(ChatFragment fragment) {
-            mFragment = new WeakReference<>(fragment);
-        }
-
-        private void updateArrayAdapter(ArrayAdapter<ChatItem> adapter, ChatItem item) {
-            for (int i = adapter.getCount() - 1; i >= 0; i--) {
-//                Log.d(TAG, adapter.getItem(i).getId() + "s" + item.getId());
-                if (adapter.getItem(i).getId().equals(item.getId())) {
-                    adapter.getItem(i).setState(item.getState());
-                    break;
-                }
-            }
-            adapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            ChatFragment fragment = mFragment.get();
-            if (fragment != null) {
-                Bundle bundle = msg.getData();
-                bundle.setClassLoader(ChatItem.class.getClassLoader());
-                ChatItem item;
-                switch (msg.what) {
-                    case SendMsgIntentService.MSG_BEGIN_SENDING:
-                        item = bundle.getParcelable("item");
-                        if (bundle.getBoolean("update", false)) {
-                            updateArrayAdapter(fragment.getAdapter(), item);
-                        } else {
-                            fragment.getAdapter().add(item);
-                            fragment.getAdapter().notifyDataSetChanged();
-                            fragment.scrollMyListViewToBottom();
-                        }
-                        break;
-                    case SendMsgIntentService.MSG_END_SENDING:
-                        int rep_code = bundle.getInt("rep_code", -1);
-                        item = bundle.getParcelable("item");
-                        if (rep_code == 200) {
-                            updateArrayAdapter(fragment.getAdapter(), item);
-                        } else {
-                            ChatItem newItem = bundle.getParcelable("new_item");
-                            fragment.getAdapter().add(newItem);
-                            updateArrayAdapter(fragment.getAdapter(), item);
-                            fragment.scrollMyListViewToBottom();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
     }
 
     private static class MyHandler extends Handler {
@@ -492,40 +434,6 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
         });
 
-        switchButton = (Button) rootView.findViewById(R.id.switch_input_button);
-        switchButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (!mInSpeechMode) {
-                    Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
-                    switch_btn.setBackgroundResource(R.drawable.chatting_setmode_voice_btn);
-//                    switch_btn.setBackgroundResource(android.R.drawable.ic_menu_edit);
-                    getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
-                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
-                    mInSpeechMode = true;
-//                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
-//                    toolButton.setVisibility(View.GONE);
-//                    animatorSet.start();
-
-                    if (mKeyboard_open) {
-                        InputMethodManager inputManager =
-                                (InputMethodManager) getActivity().
-                                        getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.hideSoftInputFromWindow(
-                                getActivity().getCurrentFocus().getWindowToken(),
-                                InputMethodManager.HIDE_NOT_ALWAYS);
-                    }
-                } else {
-                    Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
-                    switch_btn.setBackgroundResource(R.drawable.chatting_setmode_msg_btn);
-//                    switch_btn.setBackgroundResource(android.R.drawable.ic_btn_speak_now);
-                    getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
-                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
-                    mInSpeechMode = false;
-                }
-            }
-        });
         mSpeechDialog = SpeechDialog.getInstance(getActivity());
         final Button speechButton = (Button) rootView.findViewById(R.id.speech_button);
         speechButton.setOnTouchListener(new OnTouchListener() {
@@ -638,6 +546,52 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             }
         });
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(mKeyboardListener);
+
+        mSwitchButton = (Button) rootView.findViewById(R.id.switch_input_button);
+        mSwitchButton.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (!mInSpeechMode) {
+                    Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
+                    switch_btn.setBackgroundResource(R.drawable.chatting_setmode_voice_btn);
+//                    switch_btn.setBackgroundResource(android.R.drawable.ic_menu_edit);
+                    getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
+                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
+                    mInSpeechMode = true;
+//                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
+//                    toolButton.setVisibility(View.GONE);
+//                    animatorSet.start();
+
+                    if (mKeyboard_open) {
+                        InputMethodManager inputManager =
+                                (InputMethodManager) getActivity().
+                                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputManager.hideSoftInputFromWindow(
+                                getActivity().getCurrentFocus().getWindowToken(),
+                                InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                } else {
+                    Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
+                    switch_btn.setBackgroundResource(R.drawable.chatting_setmode_msg_btn);
+//                    switch_btn.setBackgroundResource(android.R.drawable.ic_btn_speak_now);
+                    getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
+                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
+
+                    mSendCmdEdittext.requestFocus();
+                    mSendCmdEdittext.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            InputMethodManager keyboard = (InputMethodManager)
+                                    getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            keyboard.showSoftInput(mSendCmdEdittext, 0);
+                        }
+                    }, 200);
+                    mInSpeechMode = false;
+                }
+            }
+        });
     }
 
     @Override
@@ -696,7 +650,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             case R.id.copy_to_input:
                 if (!TextUtils.isEmpty(selectedString)) {
                     if (mInSpeechMode) {
-                        switchButton.performClick();
+                        mSwitchButton.performClick();
                     }
                     mSendCmdEdittext.append(selectedString);
                     mSendCmdEdittext.requestFocus();
@@ -714,6 +668,10 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    public void switchInputMode() {
+        mSwitchButton.performClick();
     }
 
     @Override
@@ -803,14 +761,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     }
 
     public void scrollMyListViewToBottom() {
-        mCmdListview.post(new Runnable() {
+        mCmdListview.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // Select the last row so it will scroll into view...
 //                mCmdListview.setSelection(mAdapter.getCount() - 1);
                 mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
             }
-        });
+        }, 100);
     }
 
     public ChatItemArrayAdapter getAdapter() {
@@ -872,7 +830,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     public void onClick(DialogInterface dialog, int whichButton) {
                         mSendCmdEdittext.append(msgString);
                         if (mInSpeechMode) {
-                            switchButton.performClick();
+                            mSwitchButton.performClick();
                         }
                         inRecogintion = false;
                     }
@@ -922,19 +880,41 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         }
     }
 
+    private void updateRequestChatItemState(ArrayAdapter<ChatItem> adapter, Long id, int state) {
+        for (int i = adapter.getCount() - 1; i >= 0; i--) {
+            if (adapter.getItem(i).getId().equals(id)) {
+                adapter.getItem(i).setState(state);
+                break;
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onResetDatas(List<ChatItem> chatItems) {
         mAdapter.setData(chatItems);
     }
 
     @Override
-    public void onChatItemRequest(ChatItem reqItem) {
-
+    public void onChatItemRequest(ChatItem reqItem, boolean isUpdate) {
+        if (isUpdate) {
+            updateRequestChatItemState(getAdapter(), reqItem.getId(), reqItem.getState());
+        } else {
+            getAdapter().add(reqItem);
+            getAdapter().notifyDataSetChanged();
+            scrollMyListViewToBottom();
+        }
     }
 
     @Override
-    public void onChatItemResponse(long reqID, int reqState, ChatItem repItem) {
-
+    public void onChatItemResponse(int repCode, long reqID, int reqState, ChatItem repItem) {
+        if (repCode == 200) {
+            updateRequestChatItemState(getAdapter(), reqID, reqState);
+        } else {
+            getAdapter().add(repItem);
+            updateRequestChatItemState(getAdapter(), reqID, reqState);
+            scrollMyListViewToBottom();
+        }
     }
 
 

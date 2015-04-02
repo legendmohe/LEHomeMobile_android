@@ -16,6 +16,9 @@ package my.home.lehome.mvp.presenters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Messenger;
 
 import com.squareup.otto.Subscribe;
@@ -29,7 +32,6 @@ import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
 import my.home.domain.usecase.SaveAutoCompleteLocalHistoryUsecaseImpl;
-import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
@@ -49,12 +51,57 @@ public class ChatFragmentPresenter extends MVPPresenter {
     private WeakReference<ChatItemListView> mChatItemListView;
     private WeakReference<ChatSuggestionView> mChatSuggestionView;
 
+    public static Handler SendMsgHandler;
+
+    private static class IntentServiceHandler extends Handler {
+        private final WeakReference<ChatItemListView> mChatItemListView;
+
+        public IntentServiceHandler(ChatItemListView listView) {
+            mChatItemListView = new WeakReference<>(listView);
+        }
+
+
+        @Override
+        public void handleMessage(Message msg) {
+            ChatItemListView listView = mChatItemListView.get();
+            if (listView != null) {
+                Bundle bundle = msg.getData();
+                bundle.setClassLoader(ChatItem.class.getClassLoader());
+                ChatItem item;
+                switch (msg.what) {
+                    case SendMsgIntentService.MSG_BEGIN_SENDING:
+                        item = bundle.getParcelable("item");
+                        if (bundle.getBoolean("update", false)) {
+                            listView.onChatItemRequest(item, true);
+                        } else {
+                            listView.onChatItemRequest(item, false);
+                        }
+                        break;
+                    case SendMsgIntentService.MSG_END_SENDING:
+                        int rep_code = bundle.getInt("rep_code", -1);
+                        item = bundle.getParcelable("item");
+                        if (rep_code == 200) {
+                            listView.onChatItemResponse(rep_code, item.getId(), item.getState(), null);
+                        } else {
+                            ChatItem newItem = bundle.getParcelable("new_item");
+                            listView.onChatItemResponse(rep_code, item.getId(), item.getState(), newItem);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     public ChatFragmentPresenter(SaveLocalHistoryView saveLocalHistoryView
             , ChatItemListView chatItemListView
             , ChatSuggestionView chatSuggestionView) {
         this.mSaveLocalHistoryView = new WeakReference<SaveLocalHistoryView>(saveLocalHistoryView);
         this.mChatItemListView = new WeakReference<ChatItemListView>(chatItemListView);
         this.mChatSuggestionView = new WeakReference<ChatSuggestionView>(chatSuggestionView);
+
+        SendMsgHandler = new IntentServiceHandler(chatItemListView);
     }
 
     public void markAndSendCurrentInput(String input, boolean local) {
@@ -77,7 +124,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
         serviceIntent.putExtra("cmd", input);
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
-        serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));
+        serviceIntent.putExtra("messenger", new Messenger(ChatFragmentPresenter.SendMsgHandler));
         mChatItemListView.get().getContext().startService(serviceIntent);
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), input).execute();
     }
@@ -103,9 +150,12 @@ public class ChatFragmentPresenter extends MVPPresenter {
         serviceIntent.putExtra("cmd", chatItem.getContent());
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.DEVICE_ID);
-        serviceIntent.putExtra("messenger", new Messenger(ChatFragment.SendMsgHandler));
+        serviceIntent.putExtra("messenger", new Messenger(ChatFragmentPresenter.SendMsgHandler));
         mChatItemListView.get().getContext().startService(serviceIntent);
         new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), chatItem.getContent()).execute();
+
+//        if (mChatItemListView.get() != null)
+//            mChatItemListView.get().onChatItemRequest(item, true);
     }
 
     public void saveSaveLocalHistory() {
