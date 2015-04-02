@@ -36,14 +36,20 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
 
         @Override
         public boolean handleMessage(Message msg) {
-            Bundle bundle = msg.getData();
+        	synchronized (mSyncLock) {
+	        	for (String keyString : mSyncCache.keySet()) {
+	        		storagePutString(keyString, mSyncCache.get(keyString));
+				}
+	        	mSyncCache.clear();
+        	}
 //            Log.d(TAG, "run msg: " + bundle.toString());
-            storagePutString(bundle.getString("key"), bundle.getString("value"));
             return false;
         }
     }
 
     final ConcurrentHashMap<String, String> mCache = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<String, String> mSyncCache = new ConcurrentHashMap<>();
+    private final Object mSyncLock = new Object();
     private Handler mHandler;
 
     public CacheKeyValueStorageImpl() {
@@ -64,14 +70,11 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     public void putString(String key, String value) {
         mCache.put(key, value);
 
-        Bundle bundle = new Bundle();
-        bundle.putString("key", key);
-        bundle.putString("value", value);
-        Message msg = new Message();
+        Message msg = Message.obtain();
         msg.what = MSG_STORAGE_WHAT;
-        msg.setData(bundle);
 
-        synchronized (mHandler) {
+        synchronized (mSyncLock) {
+        	mSyncCache.put(key, value);
             mHandler.removeMessages(MSG_STORAGE_WHAT);
             mHandler.sendMessageDelayed(msg, 300);
         }
@@ -86,10 +89,18 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
             mCache.put(key, value);
         return value;
     }
+    
+    @Override
+    public void removeString(String key) {
+    	mCache.remove(key);
+    	storageRemoveString(key);
+    }
 
     public abstract boolean storageHasKey(String key);
 
     public abstract void storagePutString(String key, String value);
 
     public abstract String storageGetString(String key);
+    
+    public abstract void storageRemoveString(String key);
 }
