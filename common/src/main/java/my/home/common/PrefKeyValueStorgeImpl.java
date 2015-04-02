@@ -48,6 +48,11 @@ public class PrefKeyValueStorgeImpl extends CacheKeyValueStorageImpl {
     public String storageGetString(String key) {
         return mPref.getString(key, null);
     }
+    
+    @Override
+    public void storageRemoveString(String key) {
+    	mEditor.remove(key);
+    }
 
     @Override
     public void sync() {
