@@ -215,26 +215,28 @@ public class MessageHelper {
     }
 
     private final static String MSG_SEQ_STORAGE_KEY = "MSG_SEQ_STORAGE_KEY";
+    private final static Object MSG_SEQ_STORAGE_LOCK_OBJECT = new Object();
 
     public static boolean enqueueMsgSeq(Context context, int seq) {
-        if (KeyValueStorage.getInstance().getStorageImpl() == null) {
-            KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(context));
-        }
-        LinkedList<Integer> limitedQueue = null;
-        if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
-            limitedQueue = (LinkedList<Integer>) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, LinkedList.class);
-            if (limitedQueue != null && limitedQueue.contains(seq))
-                return true;
-        }
-        if (limitedQueue == null) {
-            limitedQueue = new LinkedList<>();
-        }
-        boolean added = limitedQueue.add(seq);
-        while (added && limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
-            limitedQueue.remove();
-        }
-        KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue);
-        KeyValueStorage.getInstance().sync();
+    	synchronized (MSG_SEQ_STORAGE_LOCK_OBJECT) {
+    		if (KeyValueStorage.getInstance().getStorageImpl() == null) {
+                KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(context));
+            }
+            LinkedList<Integer> limitedQueue = null;
+            if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
+                limitedQueue = (LinkedList<Integer>) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, LinkedList.class);
+                if (limitedQueue != null && limitedQueue.contains(seq))
+                    return true;
+            }
+            if (limitedQueue == null) {
+                limitedQueue = new LinkedList<>();
+            }
+            boolean added = limitedQueue.add(seq);
+            while (added && limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
+                limitedQueue.remove();
+            }
+            KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue);
+		}
         return false;
     }
 }
