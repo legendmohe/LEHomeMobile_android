@@ -218,8 +218,8 @@ public class MessageHelper {
     private final static Object MSG_SEQ_STORAGE_LOCK_OBJECT = new Object();
 
     public static boolean enqueueMsgSeq(Context context, int seq) {
-    	synchronized (MSG_SEQ_STORAGE_LOCK_OBJECT) {
-    		if (KeyValueStorage.getInstance().getStorageImpl() == null) {
+        synchronized (MSG_SEQ_STORAGE_LOCK_OBJECT) {
+            if (KeyValueStorage.getInstance().getStorageImpl() == null) {
                 KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(context));
             }
             LinkedList<Integer> limitedQueue = null;
@@ -236,7 +236,7 @@ public class MessageHelper {
                 limitedQueue.remove();
             }
             KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue);
-		}
+        }
         return false;
     }
 }
