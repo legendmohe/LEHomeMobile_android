@@ -29,6 +29,8 @@ public class KeyValueStorage {
         public void putString(String key, String value);
 
         public String getString(String key);
+        
+        public void removeString(String key);
 
         public void sync();
     }
@@ -94,6 +96,12 @@ public class KeyValueStorage {
             return mStorageImpl.getString(key);
         }
         return null;
+    }
+    
+    public void removeString(String key) {
+        if (mStorageImpl != null) {
+            mStorageImpl.removeString(key);
+        }
     }
 
     public void sync() {
