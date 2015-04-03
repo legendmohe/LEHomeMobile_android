@@ -344,7 +344,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     for (String val : mNodes.get(nextState)) {
                         String cmd = cmdString + val;
                         resultSet.add(
-                                autoCompleteItemWithWeight(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd), lastString)
+                                setItemWeight(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd), lastString)
                         );
                     }
                 }
@@ -386,7 +386,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
     }
 
-    private AutoCompleteItem autoCompleteItemWithWeight(AutoCompleteItem toItem, String from) {
+    private AutoCompleteItem setItemWeight(AutoCompleteItem toItem, String from) {
         String key = from + toItem.getContent();
         AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
         if (countHolder == null) {
@@ -400,7 +400,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         return toItem;
     }
 
-    private void incAutoCompleteItemWeight(String from, String to) {
+    private void incItemWeight(String from, String to) {
         String key = from + to;
         AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
         if (countHolder == null) {
@@ -451,8 +451,9 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 }
                 for (String val : mNodes.get(nextState)) {
                     if (tempInput.startsWith(val)) {
-                        if (lastString != null)
-                            incAutoCompleteItemWeight(lastString, val);
+                        if (lastString != null) {
+                            incItemWeight(lastString, val);
+                        }
 
                         lastString = val;
                         inputBuffer.delete(0, val.length());
