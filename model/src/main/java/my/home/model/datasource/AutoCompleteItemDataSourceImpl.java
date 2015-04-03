@@ -54,7 +54,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
 
     public static final float DEFAULT_AUTOCOMPLETE_WEIGHT = 0.0f;
 
-    public static AutoCompleteItemDataSourceImpl INSTANCE;
+    private static AutoCompleteItemDataSourceImpl INSTANCE;
 
     private Map<String, List<String>> mNodes;
     private Map<String, List<String>> mLinks;
@@ -76,13 +76,12 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         };
     }
 
+    private static class SingletonHolder {  
+        private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();  
+    }  
 
     public static AutoCompleteItemDataSourceImpl getInstance() {
-
-        if (INSTANCE == null)
-            INSTANCE = new AutoCompleteItemDataSourceImpl();
-
-        return INSTANCE;
+        return SingletonHolder.INSTANCE;
     }
 
     private AutoCompleteItemDataSourceImpl() {
