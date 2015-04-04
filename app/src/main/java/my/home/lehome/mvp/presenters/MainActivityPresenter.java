@@ -60,12 +60,17 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void start() {
         BusProvider.getRestBusInstance().register(this);
         setupService();
-        MessageHelper.removeNotification(mMainActivityView.get().getContext());
     }
 
     @Override
     public void stop() {
         BusProvider.getRestBusInstance().unregister(this);
+    }
+
+    @Override
+    public void onActivityResume() {
+        super.onActivityResume();
+        MessageHelper.removeNotification(mMainActivityView.get().getContext());
     }
 
     private void setupService() {

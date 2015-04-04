@@ -60,6 +60,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -118,6 +119,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     private Toast mToast;
     private OnGlobalLayoutListener mKeyboardListener;
     private ListView mCmdListview;
+    private RelativeLayout mSendCmdLayout;
     //    private WeakReference<ActionBarControlView> mActionBarControlViewRf;
     private DelayAutoCompleteTextView mSendCmdEdittext;
     private ChatFragmentPresenter mChatFragmentPresenter;
@@ -547,6 +549,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         });
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(mKeyboardListener);
 
+        mSendCmdLayout = (RelativeLayout) rootView.findViewById(R.id.send_cmd_layout);
+
         mSwitchButton = (Button) rootView.findViewById(R.id.switch_input_button);
         mSwitchButton.setOnClickListener(new OnClickListener() {
 
@@ -562,10 +566,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 //                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
 //                    toolButton.setVisibility(View.GONE);
 //                    animatorSet.start();
+//                    Animation animation = new ResizeHeightAnim(mSendCmdLayout, mSendCmdLayout.getHeight()*2);
+//                    animation.setDuration(300);
+//                    animation.setRepeatCount(0);
+//                    animation.setInterpolator(new AccelerateDecelerateInterpolator());
+//                    mSendCmdLayout.startAnimation(animation);
 
                     if (mKeyboard_open) {
-                        InputMethodManager inputManager =
-                                (InputMethodManager) getActivity().
+                        InputMethodManager inputManager = (InputMethodManager) getActivity().
                                         getSystemService(Context.INPUT_METHOD_SERVICE);
                         inputManager.hideSoftInputFromWindow(
                                 getActivity().getCurrentFocus().getWindowToken(),
@@ -577,6 +585,12 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 //                    switch_btn.setBackgroundResource(android.R.drawable.ic_btn_speak_now);
                     getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
                     getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
+
+//                    Animation animation = new ResizeHeightAnim(mSendCmdLayout, mSendCmdLayout.getHeight()/2);
+//                    animation.setDuration(300);
+//                    animation.setRepeatCount(0);
+//                    animation.setInterpolator(new AccelerateDecelerateInterpolator());
+//                    mSendCmdLayout.startAnimation(animation);
 
                     mSendCmdEdittext.requestFocus();
                     mSendCmdEdittext.postDelayed(new Runnable() {
@@ -768,7 +782,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 //                mCmdListview.setSelection(mAdapter.getCount() - 1);
                 mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
             }
-        }, 100);
+        }, 300);
     }
 
     public ChatItemArrayAdapter getAdapter() {

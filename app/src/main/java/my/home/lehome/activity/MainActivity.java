@@ -117,6 +117,8 @@ public class MainActivity extends FragmentActivity
     protected void onResume() {
         super.onResume();
         MainActivity.VISIBLE = true;
+        if (mMainActivityPresenter != null)
+            mMainActivityPresenter.onActivityResume();
 
         if (getIntent().getAction() == WakeupActivity.INTENT_VOICE_COMMAND) {
             Window wind = this.getWindow();
