@@ -41,6 +41,7 @@ import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.util.Constants;
 import my.home.lehome.util.PushUtils;
 import my.home.model.entities.ChatItem;
+import my.home.model.manager.DBStaticManager;
 
 public class MessageHelper {
     public final static String TAG = "MessageHelper";
@@ -160,7 +161,7 @@ public class MessageHelper {
         newItem.setIsMe(false);
         newItem.setDate(new Date());
         newItem.setSeq(seq);
-        DBHelper.addChatItem(context, newItem);
+        DBStaticManager.addChatItem(context, newItem);
 
         if (!MainActivity.VISIBLE) {
             unreadMsgCount++;

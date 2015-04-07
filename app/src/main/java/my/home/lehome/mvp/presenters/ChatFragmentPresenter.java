@@ -32,7 +32,6 @@ import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
 import my.home.domain.usecase.SaveAutoCompleteLocalHistoryUsecaseImpl;
-import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
@@ -41,6 +40,7 @@ import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
+import my.home.model.manager.DBStaticManager;
 
 /**
  * Created by legendmohe on 15/2/19.
@@ -163,7 +163,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
     }
 
     public void resetDatas(Context context) {
-        List<ChatItem> chatItems = DBHelper.loadLatest(context, Constants.CHATITEM_LOAD_LIMIT);
+        List<ChatItem> chatItems = DBStaticManager.loadLatest(context, Constants.CHATITEM_LOAD_LIMIT);
         if (chatItems != null) {
             Collections.reverse(chatItems); // reverse descend items
             mChatItemListView.get().onResetDatas(chatItems);

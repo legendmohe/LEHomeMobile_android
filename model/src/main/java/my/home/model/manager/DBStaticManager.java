@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.lehome.helper;
+package my.home.model.manager;
 
 import android.content.Context;
 import android.util.Log;
@@ -25,37 +25,44 @@ import my.home.model.datasource.ChatItemDao;
 import my.home.model.datasource.DaoMaster;
 import my.home.model.datasource.DaoMaster.OpenHelper;
 import my.home.model.datasource.DaoSession;
+import my.home.model.datasource.HistoryItemDao;
 import my.home.model.datasource.ShortcutDao;
 import my.home.model.entities.ChatItem;
+import my.home.model.entities.HistoryItem;
 import my.home.model.entities.Shortcut;
 
-public class DBHelper {
-    private static final String TAG = DBHelper.class.getName();
-    private static DaoMaster daoMaster;
-    private static DaoSession daoSession;
+public class DBStaticManager {
+    private static final String TAG = DBStaticManager.class.getName();
+    private static DaoMaster DAOMASTER;
+    private static DaoSession DAOSESSION;
+    private final static Object LOCK = new Object();
 
-    public static void initHelper(Context context) {
-        if (daoMaster == null) {
-            OpenHelper helper = new DaoMaster.DevOpenHelper(context, "lehome_db", null);
-            daoMaster = new DaoMaster(helper.getWritableDatabase());
-            daoSession = daoMaster.newSession();
+    public static void initManager(Context context) {
+        if (DAOMASTER == null) {
+            synchronized (LOCK) {
+                if (DAOMASTER == null) {
+                    OpenHelper helper = new DaoMaster.DevOpenHelper(context, "lehome_db", null);
+                    DAOMASTER = new DaoMaster(helper.getWritableDatabase());
+                    DAOSESSION = DAOMASTER.newSession();
+                }
+            }
         }
     }
 
     public static DaoMaster getDaoMaster(Context context) {
-        initHelper(context);
-        if (daoMaster == null) {
-            Log.w(TAG, "initHelper must be call first.");
+        initManager(context);
+        if (DAOMASTER == null) {
+            Log.w(TAG, "initManager must be call first.");
         }
-        return daoMaster;
+        return DAOMASTER;
     }
 
     public static DaoSession getDaoSession(Context context) {
-        initHelper(context);
-        if (daoSession == null) {
-            Log.w(TAG, "initHelper must be call first.");
+        initManager(context);
+        if (DAOSESSION == null) {
+            Log.w(TAG, "initManager must be call first.");
         }
-        return daoSession;
+        return DAOSESSION;
     }
 
     public static void addChatItem(Context context, ChatItem entity) {
@@ -122,11 +129,28 @@ public class DBHelper {
         bd.executeDeleteWithoutDetachingEntities();
     }
 
-    public static void destory() {
-        if (daoSession != null) {
-            daoSession.clear();
+    public static void addHistoryItem(Context context, HistoryItem item) {
+        getDaoSession(context).getHistoryItemDao().insert(item);
+    }
+
+    public static List<HistoryItem> getLatestItems(Context context, String from, int limit) {
+        if (limit <= 0) {
+            Log.w(TAG, "getLatestItems invaild limit.");
+            return null;
         }
-        daoMaster = null;
-        daoSession = null;
+        QueryBuilder<HistoryItem> queryBuilder = getDaoSession(context).getHistoryItemDao().queryBuilder();
+        return queryBuilder
+                .where(HistoryItemDao.Properties.From.eq(from))
+                .orderDesc(HistoryItemDao.Properties.Id)
+                .limit(limit)
+                .list();
+    }
+
+    public static void destory() {
+        if (DAOSESSION != null) {
+            DAOSESSION.clear();
+        }
+        DAOMASTER = null;
+        DAOSESSION = null;
     }
 }

@@ -24,8 +24,8 @@ import java.util.List;
 import my.home.lehome.R;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.fragment.ChatFragment;
-import my.home.lehome.helper.DBHelper;
 import my.home.model.entities.ChatItem;
+import my.home.model.manager.DBStaticManager;
 
 public class LoadMoreChatItemAsyncTask extends
         AsyncTask<Integer, String, List<ChatItem>> {
@@ -42,7 +42,7 @@ public class LoadMoreChatItemAsyncTask extends
             return null;
         }
         long currentId = fragment.getAdapter().getItem(0).getId();
-        return DBHelper.loadBefore(this.fragment.getActivity(), currentId, params[0]);
+        return DBStaticManager.loadBefore(this.fragment.getActivity(), currentId, params[0]);
     }
 
     @Override

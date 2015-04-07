@@ -35,8 +35,8 @@ import android.widget.ListView;
 
 import my.home.lehome.R;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
-import my.home.lehome.helper.DBHelper;
 import my.home.model.entities.Shortcut;
+import my.home.model.manager.DBStaticManager;
 
 public class ShortcutFragment extends ListFragment {
 
@@ -48,7 +48,7 @@ public class ShortcutFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.shortcut_fragment, container, false);
         if (adapter == null) {
             adapter = new ShortcutArrayAdapter(getActivity(), R.layout.shortcut_item);
-            adapter.setData(DBHelper.getAllShortcuts(this.getActivity()));
+            adapter.setData(DBStaticManager.getAllShortcuts(this.getActivity()));
         }
         setListAdapter(adapter);
         // for retainning fragment
@@ -88,7 +88,7 @@ public class ShortcutFragment extends ListFragment {
                 Shortcut shortcut = adapter.getItem(info.position);
                 adapter.remove(shortcut);
                 adapter.notifyDataSetChanged();
-                DBHelper.deleteShortcut(this.getActivity(), shortcut.getId());
+                DBStaticManager.deleteShortcut(this.getActivity(), shortcut.getId());
                 return true;
             case R.id.copy_shortcut_item:
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -176,7 +176,7 @@ public class ShortcutFragment extends ListFragment {
         shortcut.setInvoke_count(0);
         shortcut.setWeight(1.0);
         this.adapter.add(shortcut);
-        DBHelper.addShortcut(this.getActivity(), shortcut);
+        DBStaticManager.addShortcut(this.getActivity(), shortcut);
         return true;
     }
 }

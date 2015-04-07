@@ -76,9 +76,9 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         };
     }
 
-    private static class SingletonHolder {  
-        private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();  
-    }  
+    private static class SingletonHolder {
+        private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();
+    }
 
     public static AutoCompleteItemDataSourceImpl getInstance() {
         return SingletonHolder.INSTANCE;
@@ -385,6 +385,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             mWeightDivides = getWeightDivides(mAutoCompleteCountHolderMap);
         }
     }
+
+    // --------------------- auto item weight --------------------
 
     private AutoCompleteItem setItemWeight(AutoCompleteItem toItem, String from) {
         String key = from + toItem.getContent();

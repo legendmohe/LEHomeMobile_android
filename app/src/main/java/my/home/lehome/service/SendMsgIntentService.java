@@ -49,9 +49,9 @@ import java.util.Date;
 import java.util.List;
 
 import my.home.lehome.R;
-import my.home.lehome.helper.DBHelper;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
+import my.home.model.manager.DBStaticManager;
 
 /**
  * Created by legendmohe on 15/3/30.
@@ -133,7 +133,7 @@ public class SendMsgIntentService extends IntentService {
             item.setIsMe(true);
             item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
             item.setDate(new Date());
-            DBHelper.addChatItem(getApplicationContext(), item);
+            DBStaticManager.addChatItem(getApplicationContext(), item);
         }
         item.setState(Constants.CHATITEM_STATE_PENDING);
 
@@ -307,21 +307,21 @@ public class SendMsgIntentService extends IntentService {
         ChatItem newItem = null;
         if (rep_code == 200) {
             item.setState(Constants.CHATITEM_STATE_SUCCESS);
-            DBHelper.updateChatItem(context, item);
+            DBStaticManager.updateChatItem(context, item);
         } else {
             if (rep_code == 415) {
                 item.setState(Constants.CHATITEM_STATE_SUCCESS);
             } else {
                 item.setState(Constants.CHATITEM_STATE_ERROR);
             }
-            DBHelper.updateChatItem(context, item);
+            DBStaticManager.updateChatItem(context, item);
 
             newItem = new ChatItem();
             newItem.setContent(desc);
             newItem.setIsMe(false);
             newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
             newItem.setDate(new Date());
-            DBHelper.addChatItem(context, newItem);
+            DBStaticManager.addChatItem(context, newItem);
         }
 
         Log.d(TAG, "dequeue item: \n" + item);

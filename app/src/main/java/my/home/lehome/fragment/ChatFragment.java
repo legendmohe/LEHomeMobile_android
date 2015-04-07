@@ -81,7 +81,6 @@ import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter.ResendButtonClickListener;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
 import my.home.lehome.asynctask.LoadMoreChatItemAsyncTask;
-import my.home.lehome.helper.DBHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
@@ -97,6 +96,7 @@ import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.AutoCompleteToolItem;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.Shortcut;
+import my.home.model.manager.DBStaticManager;
 
 public class ChatFragment extends Fragment implements SpeechDialogResultListener
         , ResendButtonClickListener
@@ -574,7 +574,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 
                     if (mKeyboard_open) {
                         InputMethodManager inputManager = (InputMethodManager) getActivity().
-                                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
                         inputManager.hideSoftInputFromWindow(
                                 getActivity().getCurrentFocus().getWindowToken(),
                                 InputMethodManager.HIDE_NOT_ALWAYS);
@@ -648,7 +648,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                     shortcut.setContent(selectedString);
                     shortcut.setInvoke_count(0);
                     shortcut.setWeight(1.0);
-                    DBHelper.addShortcut(this.getActivity(), shortcut);
+                    DBStaticManager.addShortcut(this.getActivity(), shortcut);
                 } else {
                     activity.getShortcurFragment().addShortcut(selectedString);
                 }
@@ -779,8 +779,8 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
             @Override
             public void run() {
                 // Select the last row so it will scroll into view...
-//                mCmdListview.setSelection(mAdapter.getCount() - 1);
-                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
+                mCmdListview.setSelection(mAdapter.getCount() - 1);
+//                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
             }
         }, 300);
     }
@@ -1044,7 +1044,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 showTimeDialog();
                 break;
             case AutoCompleteToolItem.SPEC_TYPE_FAVOR:
-                List<Shortcut> items = DBHelper.getAllShortcuts(this.getActivity());
+                List<Shortcut> items = DBStaticManager.getAllShortcuts(this.getActivity());
                 showShortcutDialog(items);
                 break;
         }
