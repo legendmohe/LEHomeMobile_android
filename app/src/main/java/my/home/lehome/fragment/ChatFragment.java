@@ -539,7 +539,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                         ChatFragment.this.scrollMyListViewToBottom();
                     }
                     mKeyboard_open = true;
-                } else if (mKeyboard_open) {
+                } else {
                     mKeyboard_open = false;
                     mSendCmdEdittext.clearFocus();
                     mCmdListview.requestFocus();
@@ -755,7 +755,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     @Override
     public void onStop() {
         super.onStop();
-        mChatFragmentPresenter.saveSaveLocalHistory();
+//        mChatFragmentPresenter.saveSaveLocalHistory();
     }
 
 
@@ -775,14 +775,14 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
     }
 
     public void scrollMyListViewToBottom() {
-        mCmdListview.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+//        mCmdListview.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
                 // Select the last row so it will scroll into view...
                 mCmdListview.setSelection(mAdapter.getCount() - 1);
 //                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
-            }
-        }, 300);
+//            }
+//        }, 300);
     }
 
     public ChatItemArrayAdapter getAdapter() {

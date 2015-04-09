@@ -35,7 +35,8 @@ public class MarkCurrentInputUsecaseImpl implements MarkCurrentInputUsecase {
     @Override
     public void execute() {
 //        BusProvider.getRestBusInstance().register(this);
-        AutoCompleteItemDataSourceImpl.getInstance().markCurrentInput(mInput);
+        if (mContext.get() != null)
+            AutoCompleteItemDataSourceImpl.getInstance().markCurrentInput(mContext.get(), mInput);
 //        BusProvider.getRestBusInstance().unregister(this);
     }
 }

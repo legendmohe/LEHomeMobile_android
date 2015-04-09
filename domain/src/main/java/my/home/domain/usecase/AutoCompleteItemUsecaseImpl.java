@@ -60,7 +60,8 @@ public class AutoCompleteItemUsecaseImpl implements AutoCompleteItemUsecase {
         try {
             switch (this.mMode) {
                 case MODE_GETITEM:
-                    this.dataSource.getAutoCompleteItems(mInputText);
+                    if (mContext.get() != null)
+                        this.dataSource.getAutoCompleteItems(mContext.get(), mInputText);
                     break;
                 case MODE_LOAD_CONF:
                     this.dataSource.loadConf(mContext.get());

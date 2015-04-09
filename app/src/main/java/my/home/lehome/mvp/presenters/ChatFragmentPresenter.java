@@ -31,7 +31,6 @@ import my.home.common.BusProvider;
 import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
-import my.home.domain.usecase.SaveAutoCompleteLocalHistoryUsecaseImpl;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
@@ -158,9 +157,9 @@ public class ChatFragmentPresenter extends MVPPresenter {
 //            mChatItemListView.get().onChatItemRequest(item, true);
     }
 
-    public void saveSaveLocalHistory() {
-        new SaveAutoCompleteLocalHistoryUsecaseImpl(mSaveLocalHistoryView.get().getContext()).execute();
-    }
+//    public void saveSaveLocalHistory() {
+//        new SaveAutoCompleteLocalHistoryUsecaseImpl(mSaveLocalHistoryView.get().getContext()).execute();
+//    }
 
     public void resetDatas(Context context) {
         List<ChatItem> chatItems = DBStaticManager.loadLatest(context, Constants.CHATITEM_LOAD_LIMIT);

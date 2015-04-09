@@ -22,7 +22,6 @@ import java.lang.ref.WeakReference;
 
 import my.home.common.BusProvider;
 import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
-import my.home.model.datasource.AutoCompleteItemDataSourceImpl;
 import my.home.model.events.MSaveAutoCompleteLocalHistoryEvent;
 
 /**
@@ -38,7 +37,7 @@ public class SaveAutoCompleteLocalHistoryUsecaseImpl implements SaveAutoComplete
     @Override
     public void execute() {
         BusProvider.getRestBusInstance().register(this);
-        AutoCompleteItemDataSourceImpl.getInstance().saveLocalHistory(mContext.get());
+//        AutoCompleteItemDataSourceImpl.getInstance().saveLocalHistory(mContext.get());
         BusProvider.getRestBusInstance().unregister(this);
     }
 

@@ -18,14 +18,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,12 +34,12 @@ import java.util.Map;
 import java.util.Set;
 
 import my.home.common.BusProvider;
-import my.home.model.entities.AutoCompleteCountHolder;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.AutoCompleteToolItem;
+import my.home.model.entities.HistoryItem;
 import my.home.model.events.MConfAutoCompleteItemEvent;
 import my.home.model.events.MGetAutoCompleteItemEvent;
-import my.home.model.events.MSaveAutoCompleteLocalHistoryEvent;
+import my.home.model.manager.DBStaticManager;
 
 /**
  * Created by legendmohe on 15/2/13.
@@ -62,8 +58,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     private String mTimeSeq;
     private String mInitState;
     private boolean mLoadSuccess = false;
-    private Map<String, AutoCompleteCountHolder> mAutoCompleteCountHolderMap;
-    private HashMap<String, Integer> mWeightDivides;
+//    private Map<String, AutoCompleteCountHolder> mAutoCompleteCountHolderMap;
+//    private HashMap<String, Integer> mWeightDivides;
 
     private static Comparator<AutoCompleteItem> mResultComparator;
 
@@ -75,6 +71,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
         };
     }
+
+    private static final int HISTORY_ITEM_MAX_NUM = 50;
 
     private static class SingletonHolder {
         private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();
@@ -117,7 +115,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
         String confSrc = sharedPreferences.getString(CONF_KEY_GET_AUTOCOMPLETE_ITEM, "{}");
         if (initConf(confSrc)) {
-            loadAutoCompleteLocalHistory(context);
+//            loadAutoCompleteLocalHistory(context);
             BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.SUCCESS));
         } else {
             BusProvider.getRestBusInstance().post(new MConfAutoCompleteItemEvent(MConfAutoCompleteItemEvent.ERROR));
@@ -171,7 +169,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     }
 
     @Override
-    public void getAutoCompleteItems(String currentInput) {
+    public void getAutoCompleteItems(Context context, String currentInput) {
         if (!mLoadSuccess) {
             BusProvider.getRestBusInstance().post(new MGetAutoCompleteItemEvent(new ArrayList()));
             return;
@@ -317,6 +315,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 addDateToolItemToResult(resultSet);
                 addFavorToolItemToResult(resultSet);
             }
+            ArrayList<AutoCompleteItem> unweightItems = new ArrayList<>();
             for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
                     if (in_if_state || in_while_state) {
@@ -343,11 +342,13 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     }
                     for (String val : mNodes.get(nextState)) {
                         String cmd = cmdString + val;
-                        resultSet.add(
-                                setItemWeight(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd), lastString)
-                        );
+                        unweightItems.add(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
                     }
                 }
+            }
+            if (unweightItems.size() != 0) {
+                setItemWeight(context, unweightItems, lastString);
+                resultSet.addAll(unweightItems);
             }
         } else {
             String tempInput = inputBuffer.toString();
@@ -379,45 +380,89 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         result.add(new AutoCompleteToolItem("tool", "[时间]", AutoCompleteToolItem.SPEC_TYPE_TIME));
     }
 
-    private void loadAutoCompleteLocalHistory(Context context) {
-        mAutoCompleteCountHolderMap = loadLocalHistory(context);
-        if (mAutoCompleteCountHolderMap != null) {
-            mWeightDivides = getWeightDivides(mAutoCompleteCountHolderMap);
-        }
-    }
+//    private void loadAutoCompleteLocalHistory(Context context) {
+//        mAutoCompleteCountHolderMap = loadLocalHistory(context);
+//        if (mAutoCompleteCountHolderMap != null) {
+//            mWeightDivides = getWeightDivides(mAutoCompleteCountHolderMap);
+//        }
+//    }
 
     // --------------------- auto item weight --------------------
 
-    private AutoCompleteItem setItemWeight(AutoCompleteItem toItem, String from) {
-        String key = from + toItem.getContent();
-        AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
-        if (countHolder == null) {
-            toItem.setWeight(DEFAULT_AUTOCOMPLETE_WEIGHT);
-            return toItem;
+    private void setItemWeight(Context context, ArrayList<AutoCompleteItem> items, String from) {
+        List<HistoryItem> historyItems = DBStaticManager.getLatestItems(context, from, HISTORY_ITEM_MAX_NUM);
+        if (historyItems == null || historyItems.size() == 0) {
+            Log.d(TAG, "no history from: " + from + ". Use default value.");
+            return;
         }
-        float weight = mAutoCompleteCountHolderMap.get(key).count * 1.0f / mWeightDivides.get(from);
-        toItem.setWeight(weight);
 
-        Log.d(TAG, "from: " + from + " to: " + toItem.getContent() + " weight: " + weight);
-        return toItem;
-    }
-
-    private void incItemWeight(String from, String to) {
-        String key = from + to;
-        AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
-        if (countHolder == null) {
-            countHolder = new AutoCompleteCountHolder(from, to, 0);
-            mAutoCompleteCountHolderMap.put(key, countHolder);
-            if (!mWeightDivides.containsKey(from)) {
-                mWeightDivides.put(from, 0);
+        int hLen = historyItems.size();
+        /* TODO move to Util class */
+        HashMap<String, Integer> counter = new HashMap<>(hLen);
+        for (HistoryItem item : historyItems) {
+            String key = item.getFrom() + item.getTo();
+            if (counter.containsKey(key)) {
+                counter.put(key, counter.get(key) + 1);
+            } else {
+                counter.put(key, 1);
             }
         }
-        countHolder.count = countHolder.count + 1;
-        mWeightDivides.put(from, mWeightDivides.get(from) + 1);
-        Log.d(TAG, "from: " + from + ", to: " + to + " count: " + countHolder.count + " div: " + mWeightDivides.get(from));
+
+        String lastValue = "";
+        float lastWeight = 0.0f;
+        HashMap<String, Float> resultMap = new HashMap<>();
+        for (int i = 0; i < hLen; i++) {
+            HistoryItem cItem = historyItems.get(i);
+            String key = cItem.getFrom() + cItem.getTo();
+            // pos weight
+            float pos_w = (i + 1) * 1.0f / hLen;
+            pos_w = pos_w * pos_w;
+            // occ weight
+            float occ_w = counter.get(key) * 1.0f / hLen;
+            // ctu weight
+            float ctu_w = 0.0f;
+            if (lastValue.equals(key)) {
+                ctu_w = lastWeight / 2;
+            }
+            lastWeight = pos_w + occ_w + ctu_w;
+            lastValue = key;
+
+            if (resultMap.containsKey(key)) {
+                resultMap.put(key, resultMap.get(key) + lastWeight);
+            } else {
+                resultMap.put(key, lastWeight);
+            }
+        }
+        if (resultMap.size() != 0) {
+            for (AutoCompleteItem item : items) {
+                if (resultMap.containsKey(item.getCmd())) {
+                    item.setWeight(resultMap.get(item.getCmd()));
+                }
+            }
+        }
     }
 
-    public void markCurrentInput(String inputString) {
+    private void addNewHistoryItem(Context context, String from, String to) {
+//        String key = from + to;
+//        AutoCompleteCountHolder countHolder = mAutoCompleteCountHolderMap.get(key);
+//        if (countHolder == null) {
+//            countHolder = new AutoCompleteCountHolder(from, to, 0);
+//            mAutoCompleteCountHolderMap.put(key, countHolder);
+//            if (!mWeightDivides.containsKey(from)) {
+//                mWeightDivides.put(from, 0);
+//            }
+//        }
+//        countHolder.count = countHolder.count + 1;
+//        mWeightDivides.put(from, mWeightDivides.get(from) + 1);
+//        Log.d(TAG, "from: " + from + ", to: " + to + " count: " + countHolder.count + " div: " + mWeightDivides.get(from));
+        Log.d(TAG, "new HistoryItem from: " + from + ", to: " + to);
+        HistoryItem newItem = new HistoryItem();
+        newItem.setFrom(from);
+        newItem.setTo(to);
+        DBStaticManager.addHistoryItem(context, newItem);
+    }
+
+    public void markCurrentInput(Context context, String inputString) {
         Log.d(TAG, "mark: " + inputString);
         StringBuffer inputBuffer = new StringBuffer(inputString);
         boolean in_if_state = false;
@@ -454,7 +499,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 for (String val : mNodes.get(nextState)) {
                     if (tempInput.startsWith(val)) {
                         if (lastString != null) {
-                            incItemWeight(lastString, val);
+                            addNewHistoryItem(context, lastString, val);
                         }
 
                         lastString = val;
@@ -498,69 +543,70 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
     }
 
-    @Override
-    public void saveLocalHistory(Context context) {
-        if (saveLocalHistory(context, mAutoCompleteCountHolderMap)) {
-            BusProvider.getRestBusInstance().post(
-                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.SUCCESS)
-            );
-        } else {
-            BusProvider.getRestBusInstance().post(
-                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.ERROR)
-            );
-        }
-    }
+//    @Override
+//    public void saveLocalHistory(Context context) {
+//        if (saveLocalHistory(context, mAutoCompleteCountHolderMap)) {
+//            BusProvider.getRestBusInstance().post(
+//                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.SUCCESS)
+//            );
+//        } else {
+//            BusProvider.getRestBusInstance().post(
+//                    new MSaveAutoCompleteLocalHistoryEvent(MSaveAutoCompleteLocalHistoryEvent.ERROR)
+//            );
+//        }
+//    }
 
-    private boolean saveLocalHistory(Context context, Map<String, AutoCompleteCountHolder> localHistorys) {
-        if (context == null) {
-            Log.e(TAG, "invaild mcontext.");
-            return false;
-        }
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        String objJson = null;
-        if (localHistorys != null) {
-            objJson = new Gson().toJson(localHistorys);
-        }
-        editor.putString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, objJson);
-        editor.apply();
-        return true;
-    }
+//    private boolean saveLocalHistory(Context context, Map<String, AutoCompleteCountHolder> localHistorys) {
+//        if (context == null) {
+//            Log.e(TAG, "invaild mcontext.");
+//            return false;
+//        }
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        String objJson = null;
+//        if (localHistorys != null) {
+//            objJson = new Gson().toJson(localHistorys);
+//        }
+//        editor.putString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, objJson);
+//        editor.apply();SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+//
+//        return true;
+//    }
 
-    private Map<String, AutoCompleteCountHolder> loadLocalHistory(Context context) {
-        if (context == null) {
-            Log.e(TAG, "invaild mcontext.");
-            return null;
-        }
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
-        if (sharedPreferences == null) {
-            Log.e(TAG, "invaild share preference.");
-            return null;
-        }
-        String savedJson = sharedPreferences.getString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, null);
-        if (savedJson == null || savedJson.equals("null"))
-            return new HashMap<String, AutoCompleteCountHolder>();
+//    private Map<String, AutoCompleteCountHolder> loadLocalHistory(Context context) {
+//        if (context == null) {
+//            Log.e(TAG, "invaild mcontext.");
+//            return null;
+//        }
+//        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+//        if (sharedPreferences == null) {
+//            Log.e(TAG, "invaild share preference.");
+//            return null;
+//        }
+//        String savedJson = sharedPreferences.getString(CONF_KEY_SAVE_AUTOCOMPLETE_LOCAL_HISTORY, null);
+//        if (savedJson == null || savedJson.equals("null"))
+//            return new HashMap<String, AutoCompleteCountHolder>();
+//
+//        Type type = new TypeToken<Map<String, AutoCompleteCountHolder>>() {
+//        }.getType();
+//        Map<String, AutoCompleteCountHolder> result = new Gson().fromJson(savedJson, type);
+//        if (result != null) {
+//            return result;
+//        }
+//        return null;
+//    }
 
-        Type type = new TypeToken<Map<String, AutoCompleteCountHolder>>() {
-        }.getType();
-        Map<String, AutoCompleteCountHolder> result = new Gson().fromJson(savedJson, type);
-        if (result != null) {
-            return result;
-        }
-        return null;
-    }
-
-    public static HashMap<String, Integer> getWeightDivides(Map<String, AutoCompleteCountHolder> weightHolders) {
-        HashMap<String, Integer> result = new HashMap<String, Integer>(weightHolders.size());
-        for (AutoCompleteCountHolder holder : weightHolders.values()) {
-            String key = holder.from; // only 'from' as key
-            Integer val = result.get(key);
-            if (val == null) {
-                result.put(key, holder.count);
-            } else {
-                result.put(key, val + holder.count);
-            }
-        }
-        return result;
-    }
+//    public static HashMap<String, Integer> getWeightDivides(Map<String, AutoCompleteCountHolder> weightHolders) {
+//        HashMap<String, Integer> result = new HashMap<String, Integer>(weightHolders.size());
+//        for (AutoCompleteCountHolder holder : weightHolders.values()) {
+//            String key = holder.from; // only 'from' as key
+//            Integer val = result.get(key);
+//            if (val == null) {
+//                result.put(key, holder.count);
+//            } else {
+//                result.put(key, val + holder.count);
+//            }
+//        }
+//        return result;
+//    }
 }
+

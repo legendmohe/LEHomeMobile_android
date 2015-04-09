@@ -141,7 +141,7 @@ public class DBStaticManager {
         QueryBuilder<HistoryItem> queryBuilder = getDaoSession(context).getHistoryItemDao().queryBuilder();
         return queryBuilder
                 .where(HistoryItemDao.Properties.From.eq(from))
-                .orderDesc(HistoryItemDao.Properties.Id)
+                .orderAsc(HistoryItemDao.Properties.Id)
                 .limit(limit)
                 .list();
     }
