@@ -46,7 +46,7 @@ public class LocalMsgHelper {
         NetworkInfo wifiNetworkInfo = NetworkUtil.getWifiNetworkInfo(context);
         if (wifiNetworkInfo.isConnected()) {
             String ssid = NetworkUtil.getFormatSSID(context);
-            String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY);
+            String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY, null);
             if (ssid.equals(prefSSID)) {
                 return true;
             }

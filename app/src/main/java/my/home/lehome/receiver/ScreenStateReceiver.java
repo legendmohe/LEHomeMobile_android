@@ -39,7 +39,7 @@ public class ScreenStateReceiver extends BroadcastReceiver {
             if (wifiNetworkInfo.isConnected()) {
                 Log.d(TAG, "NetworkInfo: " + wifiNetworkInfo);
                 String ssid = NetworkUtil.getFormatSSID(context);
-                String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY);
+                String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY, null);
                 if (ssid.equals(prefSSID)) {
                     Log.d(TAG, "start " + TAG);
                     LocalMsgHelper.startLocalMsgService(context);

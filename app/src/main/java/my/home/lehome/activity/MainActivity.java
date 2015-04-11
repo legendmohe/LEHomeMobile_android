@@ -37,6 +37,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.NavigationDrawerFragment;
@@ -69,6 +70,7 @@ public class MainActivity extends FragmentActivity
     private boolean doubleBackToExitPressedOnce;
 
     private MainActivityPresenter mMainActivityPresenter;
+    private boolean mInVolumeDown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +131,7 @@ public class MainActivity extends FragmentActivity
             if (mCurrentSection != 0) {
                 onNavigationDrawerItemSelected(0);
             }
-            if (!getChatFragment().inRecogintion) {
+            if (!getChatFragment().isRecognizing()) {
                 Log.d(TAG, "get intent, startRecognize.");
                 Message msg = ChatFragment.PublicHandler
                         .obtainMessage(ChatFragment.MSG_TYPE_VOICE_CMD);
@@ -317,13 +319,46 @@ public class MainActivity extends FragmentActivity
     }
 
     @Override
-    public boolean onKeyDown(int keycode, KeyEvent e) {
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyDown(final int keycode, final KeyEvent e) {
         switch (keycode) {
             case KeyEvent.KEYCODE_MENU:
                 if (mCurrentSection == 0 && !mNavigationDrawerFragment.isDrawerOpen()) {
                     getChatFragment().switchInputMode();
                 }
                 return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (mCurrentSection != 0 || mNavigationDrawerFragment.isDrawerOpen()) {
+                    break;
+                }
+
+                if (!PrefUtil.getbooleanValue(this, "pref_volume_key_control_speech", true)) {
+                    break;
+                }
+                if (mInVolumeDown) {
+                    mInVolumeDown = false;
+                    ChatFragment chatFragment = getChatFragment();
+                    if (chatFragment != null && !chatFragment.isRecognizing()) {
+                        getChatFragment().startRecognize();
+                    }
+                    return true;
+                } else if (!mInVolumeDown) {
+                    mInVolumeDown = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mInVolumeDown) {
+                                mInVolumeDown = false;
+                            }
+                        }
+                    }, Constants.VOLUME_KEY_DOWN_DELAY);
+                    return true;
+                }
         }
 
         return super.onKeyDown(keycode, e);

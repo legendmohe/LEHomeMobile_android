@@ -91,14 +91,13 @@ import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
 import my.home.lehome.view.SimpleAnimationListener;
 import my.home.lehome.view.SpeechDialog;
-import my.home.lehome.view.SpeechDialog.SpeechDialogResultListener;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.AutoCompleteToolItem;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.Shortcut;
 import my.home.model.manager.DBStaticManager;
 
-public class ChatFragment extends Fragment implements SpeechDialogResultListener
+public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogListener
         , ResendButtonClickListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
@@ -144,7 +143,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
      */
     SpeechDialog mSpeechDialog;
     private boolean scriptInputMode;
-    public boolean inRecogintion = false;
+    private boolean inRecogintion = false;
     private int mScreenWidth = 0;
     private int mScreenHeight = 0;
 
@@ -236,7 +235,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                         }
                         break;
                     case MSG_TYPE_VOICE_CMD:
-                        fragment.startRecognize(fragment.getActivity());
+                        fragment.startRecognize();
                         break;
                     default:
                         break;
@@ -445,7 +444,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     speechButton.setSelected(true);
                     if (!mSpeechDialog.isShowing()) {
-                        startRecognize(getActivity());
+                        startRecognize();
                     }
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -629,7 +628,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
         switch (item.getItemId()) {
             case R.id.voice_input:
                 scriptInputMode = true;
-                startRecognize(getActivity());
+                startRecognize();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -796,17 +795,33 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
 	/*
      * Speech Dialog
 	 */
-    public void startRecognize(Context context) {
+    public boolean isRecognizing() {
+        return inRecogintion;
+    }
+
+    public void startRecognize() {
         Log.d(TAG, "show mSpeechDialog");
 
-        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         boolean auto_sco = mySharedPreferences.getBoolean("pref_auto_connect_sco", true);
         Log.d(TAG, "auto_sco: " + auto_sco);
 
         inRecogintion = true;
         mSpeechDialog.setmUseBluetooth(auto_sco);
-        mSpeechDialog.setup(context, ChatFragment.this);
+        mSpeechDialog.setup(getContext(), ChatFragment.this);
         mSpeechDialog.show();
+    }
+
+    public void finishVoiceRecognize() {
+        if (mSpeechDialog.isShowing() && inRecogintion) {
+            mSpeechDialog.finishListening();
+        }
+    }
+
+    public void cancelVoiceRecognize() {
+        if (mSpeechDialog.isShowing() && inRecogintion) {
+            mSpeechDialog.cancelListening();
+        }
     }
 
     @Override

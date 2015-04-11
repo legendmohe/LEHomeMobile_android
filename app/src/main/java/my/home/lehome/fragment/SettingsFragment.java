@@ -67,6 +67,10 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         boolean auto_sco = sharedPreferences.getBoolean("pref_auto_connect_sco", true);
         btSCOPreference.setChecked(auto_sco);
 
+        CheckBoxPreference volumeKeyPreference = (CheckBoxPreference) findPreference("pref_volume_key_control_speech");
+        boolean volume_key_speech = sharedPreferences.getBoolean("pref_volume_key_control_speech", true);
+        volumeKeyPreference.setChecked(volume_key_speech);
+
 //        Preference button = (Preference) findPreference("homescreen_shortcut");
 //        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 //            @Override

@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -73,7 +74,7 @@ public class SpeechDialog extends Dialog {
     private Handler mMainThreadHandler;
 
     private VoiceRecognitionClient mASREngine;
-    private SpeechDialogResultListener mResultListener;
+    private SpeechDialogListener mSpeechDialogListener;
     private MyVoiceRecogListener mVoiceRecogListener = new MyVoiceRecogListener();
 
     private TextView mStatusTextView;
@@ -207,6 +208,17 @@ public class SpeechDialog extends Dialog {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                finishListening();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     public void show() {
         super.show();
     }
@@ -220,8 +232,8 @@ public class SpeechDialog extends Dialog {
     @Override
     public void dismiss() {
         super.dismiss();
-        if (mResultListener != null) {
-            mResultListener.onDissmiss(CUR_STATE);
+        if (mSpeechDialogListener != null) {
+            mSpeechDialogListener.onDissmiss(CUR_STATE);
         }
         VoiceRecognitionClient.releaseInstance();
     }
@@ -229,11 +241,11 @@ public class SpeechDialog extends Dialog {
     /*
      * User must call setup() before showing the Speech Dialog.
      */
-    public void setup(Context contect, SpeechDialogResultListener listener) {
+    public void setup(Context contect, SpeechDialogListener listener) {
         mASREngine = VoiceRecognitionClient.getInstance(contect);
         mASREngine.setTokenApis(Constants.BAIDUVOICE_API_KEY, Constants.BAIDUVOICE_SECRET_KEY);
         mMainThreadHandler = new Handler();
-        mResultListener = listener;
+        mSpeechDialogListener = listener;
     }
 
     public void setHintText(String content) {
@@ -543,13 +555,13 @@ public class SpeechDialog extends Dialog {
     }
 
     private void parseResult(List<String> results) {
-        if (mResultListener != null) {
-            mResultListener.onResult(results);
+        if (mSpeechDialogListener != null) {
+            mSpeechDialogListener.onResult(results);
         }
     }
 
 
-    public interface SpeechDialogResultListener {
+    public interface SpeechDialogListener {
         void onResult(List<String> results);
 
         void onDissmiss(int state);

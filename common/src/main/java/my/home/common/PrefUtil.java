@@ -22,9 +22,9 @@ import android.preference.PreferenceManager;
  * Created by legendmohe on 15/3/8.
  */
 public class PrefUtil {
-    public static String getStringValue(Context context, String key) {
+    public static String getStringValue(Context context, String key, String def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(key, null);
+        return sharedPreferences.getString(key, def);
     }
 
     public static void setStringValue(Context context, String key, String val) {
@@ -34,9 +34,9 @@ public class PrefUtil {
         prefEditor.apply();
     }
 
-    public static int getIntValue(Context context, String key) {
+    public static int getIntValue(Context context, String key, int def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getInt(key, -1);
+        return sharedPreferences.getInt(key, def);
     }
 
     public static void setIntValue(Context context, String key, int val) {
@@ -46,9 +46,9 @@ public class PrefUtil {
         prefEditor.apply();
     }
 
-    public static boolean getbooleanValue(Context context, String key) {
+    public static boolean getbooleanValue(Context context, String key, boolean def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getBoolean(key, false);
+        return sharedPreferences.getBoolean(key, def);
     }
 
     public static void setBooleanValue(Context context, String key, boolean val) {
