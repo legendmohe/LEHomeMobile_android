@@ -15,7 +15,6 @@
 package my.home.lehome.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +113,7 @@ public class AutoCompleteAdapter extends BaseAdapter implements Filterable {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                Log.i(TAG, String.valueOf(results.count));
+//                Log.i(TAG, String.valueOf(results.count));
                 if (results != null && results.count > 0) {
                     notifyDataSetChanged();
                 } else {

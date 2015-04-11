@@ -539,7 +539,7 @@ public class ChatFragment extends Fragment implements SpeechDialogResultListener
                         ChatFragment.this.scrollMyListViewToBottom();
                     }
                     mKeyboard_open = true;
-                } else {
+                } else if (mKeyboard_open) {
                     mKeyboard_open = false;
                     mSendCmdEdittext.clearFocus();
                     mCmdListview.requestFocus();
