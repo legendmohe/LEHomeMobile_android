@@ -51,7 +51,7 @@
             android:layout_alignTop="@+id/linearLayout"
             android:layout_marginLeft="5dp" />
 
-        <LinearLayout
+        <FrameLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,6 +70,7 @@
                 android:lineSpacingExtra="2dp"
                 android:textColor="#ff2f2f2f"
                 android:textSize="@dimen/font_size"
+                android:text="asdasdasdasdasdasdasf"
                 android:autoLink="web"
                 android:layout_marginLeft="10dp"
                 android:paddingLeft="10dp"
@@ -77,7 +78,7 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:layout_gravity="center_vertical" />
-        </LinearLayout>
+        </FrameLayout>
 
     </RelativeLayout>
 

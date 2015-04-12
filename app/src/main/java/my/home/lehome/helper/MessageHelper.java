@@ -35,6 +35,7 @@ import java.util.List;
 
 import my.home.common.KeyValueStorage;
 import my.home.common.PrefKeyValueStorgeImpl;
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
@@ -48,15 +49,9 @@ public class MessageHelper {
 
     private static final int maxNotiLen = 140;
     private static int unreadMsgCount = 0;
-    public static String SERVER_ADDRESS = "";
-    public static String LOCAL_SERVER_ADDRESS = "";
-    public static String LOCAL_SERVER_SUBSCRIBE_ADDRESS;
     public static String MESSAGE_BEGIN = "";
     public static String MESSAGE_END = "";
-    public static String DEVICE_ID = "";
     public static boolean inNormalState = true;
-    public static boolean needCorrect = true;
-    public static boolean localMsgServiceEnable = false;
 
     public final static int NOTIFICATION_ID = 1;
     public final static String NOTIFICATION_INTENT_ACTION = "my.home.lehome.helper.MessagerHelper:noti_intent";
@@ -73,10 +68,6 @@ public class MessageHelper {
 
     public static void loadPref(Context context) {
         SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        DEVICE_ID = mySharedPreferences.getString("pref_bind_device", "");
-        SERVER_ADDRESS = mySharedPreferences.getString("pref_server_address", "http://lehome.sinaapp.com");
-        LOCAL_SERVER_ADDRESS = mySharedPreferences.getString("pref_local_msg_server_address", "http://192.168.1.111:8000");
-        LOCAL_SERVER_SUBSCRIBE_ADDRESS = mySharedPreferences.getString("pref_local_msg_subscribe_address", "tcp://192.168.1.111:9000");
         boolean auto_complete_cmd = mySharedPreferences.getBoolean("pref_auto_add_begin_and_end", false);
         if (auto_complete_cmd) {
             MESSAGE_BEGIN = mySharedPreferences.getString("pref_message_begin", "");
@@ -91,16 +82,14 @@ public class MessageHelper {
             MESSAGE_BEGIN = "";
             MESSAGE_END = "";
         }
-        needCorrect = mySharedPreferences.getBoolean("pref_cmd_need_correct", true);
-        localMsgServiceEnable = mySharedPreferences.getBoolean("pref_enable_local_msg", false);
     }
 
-    public static String getFormatMessage(String content) {
+    public static String getFormatMessage(Context context, String content) {
         if (!inNormalState) {
             return "*" + content;
         }
         content = MESSAGE_BEGIN + content + MESSAGE_END;
-        if (!needCorrect) {
+        if (!needCorrect(context)) {
             content = "*" + content;
         }
         return content;
@@ -114,8 +103,9 @@ public class MessageHelper {
         return content;
     }
 
-    public static String getServerURL(String content) {
-        if (TextUtils.isEmpty(SERVER_ADDRESS))
+    public static String getServerURL(Context context, String content) {
+        String serverAddress = getServerAddress(context);
+        if (TextUtils.isEmpty(serverAddress))
             return null;
         try {
             content = URLEncoder.encode(content, "utf-8");
@@ -123,21 +113,38 @@ public class MessageHelper {
             content = "";
             e.printStackTrace();
         }
-        return SERVER_ADDRESS + "/cmd/put/" + content + "?id=" + DEVICE_ID;
+        return serverAddress + "/cmd/put/" + content + "?id=" + getDeviceID(context);
     }
 
-    public static String getLocalServerURL() {
-        if (TextUtils.isEmpty(LOCAL_SERVER_ADDRESS))
+    public static String getLocalServerURL(Context context) {
+        String localServerAddress = getLocalServerAddress(context);
+        if (TextUtils.isEmpty(localServerAddress))
             return null;
-        return LOCAL_SERVER_ADDRESS + "/home/cmd";
+        return localServerAddress + "/home/cmd";
     }
 
-    public static String getLocalServerSubscribeURL() {
-        return LOCAL_SERVER_SUBSCRIBE_ADDRESS;
+    public static String getServerAddress(Context context) {
+        return PrefUtil.getStringValue(context, "pref_server_address", "http://lehome.sinaapp.com");
     }
 
-    public static boolean isLocalMsgServiceEnable() {
-        return localMsgServiceEnable;
+    public static String getLocalServerAddress(Context context) {
+        return PrefUtil.getStringValue(context, "pref_local_msg_server_address", "http://192.168.1.111:8000");
+    }
+
+    public static String getLocalServerSubscribeURL(Context context) {
+        return PrefUtil.getStringValue(context, "pref_local_msg_subscribe_address", "tcp://192.168.1.111:9000");
+    }
+
+    public static boolean isLocalMsgPrefEnable(Context context) {
+        return PrefUtil.getbooleanValue(context, "pref_enable_local_msg", false);
+    }
+
+    public static boolean needCorrect(Context context) {
+        return PrefUtil.getbooleanValue(context, "pref_cmd_need_correct", true);
+    }
+
+    public static String getDeviceID(Context context) {
+        return PrefUtil.getStringValue(context, "pref_bind_device", "");
     }
 
     public static void resetUnreadCount() {

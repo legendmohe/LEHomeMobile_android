@@ -14,6 +14,7 @@
 
 package my.home.lehome.fragment;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -170,6 +171,12 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             subscribeEditTextPreference.setEnabled(false);
             addressEditTextPreference.setEnabled(false);
         }
+
+        Intent retIntent = new Intent();
+        retIntent.putExtra("old_device_id", pubEditTextPreference.getSummary());
+        retIntent.putExtra("old_local_msg_state", enable_local_msg);
+        retIntent.putExtra("old_subscribe_address", subscribeEditTextPreference.getSummary());
+        this.getActivity().setResult(0, retIntent);
     }
 
     @Override

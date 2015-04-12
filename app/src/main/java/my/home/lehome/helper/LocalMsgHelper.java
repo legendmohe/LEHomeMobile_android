@@ -29,7 +29,7 @@ import my.home.lehome.util.Constants;
 public class LocalMsgHelper {
 
     public static boolean startLocalMsgService(Context context) {
-        if (!MessageHelper.isLocalMsgServiceEnable())
+        if (!MessageHelper.isLocalMsgPrefEnable(context))
             return false;
         Intent serviceIntent = new Intent(context, LocalMessageService.class);
         context.startService(serviceIntent);

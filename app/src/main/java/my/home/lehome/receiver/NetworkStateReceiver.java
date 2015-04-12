@@ -48,7 +48,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 String ssid = NetworkUtil.getFormatSSID(context);
                 String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY, null);
                 if (ssid.equals(prefSSID)) {
-                    Log.d(TAG, "start " + "LocalMessageService");
+                    Log.d(TAG, "start " + "LocalMessageService " + LocalMsgHelper.startLocalMsgService(context));
                     if (LocalMsgHelper.startLocalMsgService(context)) {
                         stopBaiduPush(context);
                         Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
@@ -72,10 +72,12 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     }
 
     private void stopBaiduPush(Context context) {
+        Log.d(TAG, "stopBaiduPush");
         PushManager.stopWork(context);
     }
 
     private void startBaiduPush(Context context) {
+        Log.d(TAG, "startBaiduPush");
         PushManager.startWork(context,
                 PushConstants.LOGIN_TYPE_API_KEY,
                 PushUtils.getMetaValue(context, "api_key"));

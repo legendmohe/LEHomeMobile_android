@@ -82,11 +82,18 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             else
                 convertView = inflater.inflate(R.layout.chat_item_onleft, parent, false);
 
-            ViewHolder viewHolder = new ViewHolder();
-            viewHolder.chatTextView = (TextView) convertView.findViewById(R.id.chat_content_textview);
+            final ViewHolder viewHolder = new ViewHolder();
             viewHolder.rippleBackground = (RippleBackground) convertView.findViewById(R.id.profile_rippleBackground);
             viewHolder.errorButton = (ImageButton) convertView.findViewById(R.id.resend_imagebutton);
             viewHolder.dateTextView = (TextView) convertView.findViewById(R.id.date_textview);
+            viewHolder.chatTextView = (TextView) convertView.findViewById(R.id.chat_content_textview);
+            // 先使textview捕获longpress事件
+            viewHolder.chatTextView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return false;
+                }
+            });
             convertView.setTag(viewHolder);
         }
 

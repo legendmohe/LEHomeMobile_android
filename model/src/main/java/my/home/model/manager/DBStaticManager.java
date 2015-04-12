@@ -81,7 +81,7 @@ public class DBStaticManager {
 
     public static List<ChatItem> loadLatest(Context context, int limit) {
         if (limit <= 0) {
-            Log.w(TAG, "loadAfter invaild limit.");
+            Log.w(TAG, "loadAfter invalid limit.");
             return null;
         }
         QueryBuilder<ChatItem> queryBuilder = getDaoSession(context).getChatItemDao().queryBuilder();
@@ -93,7 +93,7 @@ public class DBStaticManager {
 
     public static List<ChatItem> loadBefore(Context context, long id, int limit) {
         if (limit <= 0) {
-            Log.e(TAG, "loadAfter invaild limit.");
+            Log.e(TAG, "loadAfter invalid limit.");
             return null;
         }
         QueryBuilder<ChatItem> queryBuilder = getDaoSession(context).getChatItemDao().queryBuilder();
@@ -118,7 +118,7 @@ public class DBStaticManager {
         QueryBuilder<ChatItem> queryBuilder = getDaoSession(context).getChatItemDao().queryBuilder();
         queryBuilder.where(ChatItemDao.Properties.Content.eq(shortcut.getContent()))
                 .limit(1);
-        return queryBuilder.buildCount().count() > 0 ? true : false;
+        return queryBuilder.buildCount().count() > 0;
     }
 
     public static List<Shortcut> getAllShortcuts(Context context) {
@@ -137,7 +137,7 @@ public class DBStaticManager {
 
     public static List<HistoryItem> getLatestItems(Context context, String from, int limit) {
         if (limit <= 0) {
-            Log.e(TAG, "getLatestItems invaild limit.");
+            Log.e(TAG, "getLatestItems invalid limit.");
             return null;
         }
         QueryBuilder<HistoryItem> queryBuilder = getDaoSession(context).getHistoryItemDao().queryBuilder();
@@ -153,7 +153,7 @@ public class DBStaticManager {
         List<MsgHistoryItem> oldItems = queryBuilder
                 .where(MsgHistoryItemDao.Properties.From.eq(item.getFrom()), MsgHistoryItemDao.Properties.Msg.eq(item.getMsg()))
                 .list();
-        if (oldItems != null || oldItems.size() != 0) {
+        if (oldItems != null && oldItems.size() != 0) {
             getDaoSession(context).getMsgHistoryItemDao().deleteInTx(oldItems);
         }
         getDaoSession(context).getMsgHistoryItemDao().insert(item);
@@ -161,7 +161,7 @@ public class DBStaticManager {
 
     public static List<MsgHistoryItem> getMsgHistoryItems(Context context, String from, int limit) {
         if (limit <= 0) {
-            Log.e(TAG, "getMsgHistoryItems invaild limit.");
+            Log.e(TAG, "getMsgHistoryItems invalid limit.");
             return null;
         }
         QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
