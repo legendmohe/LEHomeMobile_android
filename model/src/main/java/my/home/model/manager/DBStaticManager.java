@@ -150,11 +150,12 @@ public class DBStaticManager {
 
     public static void addMsgHistoryItem(Context context, MsgHistoryItem item) {
         QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
-        long count = queryBuilder
+        List<MsgHistoryItem> oldItems = queryBuilder
                 .where(MsgHistoryItemDao.Properties.From.eq(item.getFrom()), MsgHistoryItemDao.Properties.Msg.eq(item.getMsg()))
-                .count();
-        if (count != 0)
-            return;
+                .list();
+        if (oldItems != null || oldItems.size() != 0) {
+            getDaoSession(context).getMsgHistoryItemDao().deleteInTx(oldItems);
+        }
         getDaoSession(context).getMsgHistoryItemDao().insert(item);
     }
 
@@ -166,7 +167,7 @@ public class DBStaticManager {
         QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
         return queryBuilder
                 .where(MsgHistoryItemDao.Properties.From.eq(from))
-                .orderDesc(MsgHistoryItemDao.Properties.Id)
+                .orderAsc(MsgHistoryItemDao.Properties.Id)
                 .limit(limit)
                 .list();
     }

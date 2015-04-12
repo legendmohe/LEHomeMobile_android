@@ -72,6 +72,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     }
 
     private static final int HISTORY_ITEM_MAX_NUM = 50;
+    private static final int MAX_MSG_HISTORY_NUM = 30;
 
     private static class SingletonHolder {
         private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();
@@ -389,7 +390,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         int indexOfSeq = cmdString.lastIndexOf(mMessageSeq);
         String unfinishedPart = cmdString.substring(indexOfSeq + 1);
         String finishedPart = cmdString.substring(0, indexOfSeq + 1);
-        List<MsgHistoryItem> msgHistoryItems = DBStaticManager.getMsgHistoryItems(context, lastPreMsg, 30);
+        List<MsgHistoryItem> msgHistoryItems = DBStaticManager.getMsgHistoryItems(context, lastPreMsg, MAX_MSG_HISTORY_NUM);
         for (MsgHistoryItem item : msgHistoryItems) {
             if (item.getMsg().startsWith(unfinishedPart) && !item.getMsg().equals(unfinishedPart)) {
                 result.add(new AutoCompleteItem(curState, 1.0f, item.getMsg(), finishedPart + item.getMsg()));
