@@ -29,6 +29,8 @@ import my.home.model.datasource.HistoryItemDao;
 import my.home.model.datasource.ShortcutDao;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.HistoryItem;
+import my.home.model.entities.MsgHistoryItem;
+import my.home.model.entities.MsgHistoryItemDao;
 import my.home.model.entities.Shortcut;
 
 public class DBStaticManager {
@@ -91,7 +93,7 @@ public class DBStaticManager {
 
     public static List<ChatItem> loadBefore(Context context, long id, int limit) {
         if (limit <= 0) {
-            Log.w(TAG, "loadAfter invaild limit.");
+            Log.e(TAG, "loadAfter invaild limit.");
             return null;
         }
         QueryBuilder<ChatItem> queryBuilder = getDaoSession(context).getChatItemDao().queryBuilder();
@@ -135,13 +137,36 @@ public class DBStaticManager {
 
     public static List<HistoryItem> getLatestItems(Context context, String from, int limit) {
         if (limit <= 0) {
-            Log.w(TAG, "getLatestItems invaild limit.");
+            Log.e(TAG, "getLatestItems invaild limit.");
             return null;
         }
         QueryBuilder<HistoryItem> queryBuilder = getDaoSession(context).getHistoryItemDao().queryBuilder();
         return queryBuilder
                 .where(HistoryItemDao.Properties.From.eq(from))
                 .orderAsc(HistoryItemDao.Properties.Id)
+                .limit(limit)
+                .list();
+    }
+
+    public static void addMsgHistoryItem(Context context, MsgHistoryItem item) {
+        QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
+        long count = queryBuilder
+                .where(MsgHistoryItemDao.Properties.From.eq(item.getFrom()), MsgHistoryItemDao.Properties.Msg.eq(item.getMsg()))
+                .count();
+        if (count != 0)
+            return;
+        getDaoSession(context).getMsgHistoryItemDao().insert(item);
+    }
+
+    public static List<MsgHistoryItem> getMsgHistoryItems(Context context, String from, int limit) {
+        if (limit <= 0) {
+            Log.e(TAG, "getMsgHistoryItems invaild limit.");
+            return null;
+        }
+        QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
+        return queryBuilder
+                .where(MsgHistoryItemDao.Properties.From.eq(from))
+                .orderDesc(MsgHistoryItemDao.Properties.Id)
                 .limit(limit)
                 .list();
     }
