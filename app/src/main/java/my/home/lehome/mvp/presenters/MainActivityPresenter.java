@@ -170,7 +170,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             MessageHelper.delPushTag(context, old_device_id);
             MessageHelper.setPushTag(context, MessageHelper.getDeviceID(context));
         }
-        if (mBinded) {
+        if (mBinded && MessageHelper.isLocalMsgPrefEnable(context)) {
             Message msg = Message.obtain(null, LocalMessageService.MSG_SET_SUBSCRIBE_ADDRESS);
             Bundle bundle = new Bundle();
             bundle.putString("server_address", MessageHelper.getLocalServerSubscribeURL(context));
@@ -185,13 +185,13 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         }
 
         if (MessageHelper.isLocalMsgPrefEnable(context)) {
-            if (old_local_msg_state == false
+            if (!old_local_msg_state
                     || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
                 Intent i = new Intent("my.home.lehome.service.LocalMessageService");
-                context.bindService(i, mConnection, context.BIND_AUTO_CREATE);
+                context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
             }
         } else {
-            if (old_local_msg_state == true) {
+            if (old_local_msg_state) {
                 context.unbindService(mConnection);
                 LocalMsgHelper.stopLocalMsgService(context);
                 onServiceUnbind();

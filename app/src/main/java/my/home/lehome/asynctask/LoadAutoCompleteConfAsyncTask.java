@@ -44,16 +44,18 @@ import my.home.model.events.MConfAutoCompleteItemEvent;
 public class LoadAutoCompleteConfAsyncTask extends AsyncTask<String, String, Boolean> {
 
     public static final String TAG = "LoadAutoCompleteConfAsyncTask";
-    public static final String CONF_URL = "http://lehome.sinaapp.com/auto/init";
+    public static final String CONF_URL = "auto/init";
+    private final String mServerURL;
 
     private WeakReference<Context> mContext;
     private String mDeviceID;
     private boolean mResult;
     private AutoCompleteItemUsecase mAutoCompleteItemUsecase;
 
-    public LoadAutoCompleteConfAsyncTask(Context context, String deviceID) {
+    public LoadAutoCompleteConfAsyncTask(Context context, String serverURL, String deviceID) {
         mContext = new WeakReference<Context>(context);
         mDeviceID = deviceID;
+        mServerURL = serverURL;
         mAutoCompleteItemUsecase = new AutoCompleteItemUsecaseImpl(context);
     }
 
@@ -74,7 +76,7 @@ public class LoadAutoCompleteConfAsyncTask extends AsyncTask<String, String, Boo
             HttpClient httpclient = new DefaultHttpClient();
 
             HttpGet request = new HttpGet();
-            request.setURI(new URI(CONF_URL + "?id=" + mDeviceID));
+            request.setURI(new URI(mServerURL + CONF_URL + "?id=" + mDeviceID));
             HttpResponse response = httpclient.execute(request);
             String repString = EntityUtils.toString(response.getEntity());
 

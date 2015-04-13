@@ -108,10 +108,12 @@
                 android:layout_height="26dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:text="显示"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:gravity="center_vertical|center_horizontal" />
 
             <my.home.lehome.view.DelayAutoCompleteTextView
                 android:id="@+id/send_cmd_edittext"

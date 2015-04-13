@@ -30,9 +30,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
@@ -69,6 +66,7 @@ public class LocalMessageService extends Service {
         @Override
         public void handleMessage(Message msg) {
             Bundle bundle = null;
+            Log.d(TAG, "handle msg: " + msg.what);
             switch (msg.what) {
 //                case MSG_REGISTER_CLIENT:
 //                    mClients.add(msg.replyTo);
@@ -157,13 +155,12 @@ public class LocalMessageService extends Service {
             unregisterReceiver(mScreenStateReceiver);
             mScreenStateReceiver = null;
         }
-        Log.d(TAG, "in onDestroy");
         super.onDestroy();
-
         if (mWakeLock != null) {
             mWakeLock.release();
             mWakeLock = null;
         }
+        Log.d(TAG, "onDestroy");
     }
 
     @Override
@@ -181,6 +178,7 @@ public class LocalMessageService extends Service {
 
     private void stopLocalMsgService() {
         Log.d(TAG, "disconnect server: " + mServiceAddress);
+        mSubRunnable.setGoingStop(true);
         stopSelf();
     }
 
@@ -226,16 +224,17 @@ public class LocalMessageService extends Service {
     }
 
     private boolean shouldSendReponse(String repString) {
-        JSONTokener jsonParser = new JSONTokener(repString);
-        try {
-            JSONObject repJO = (JSONObject) jsonParser.nextValue();
-            String type = repJO.getString("type");
-            if (!type.equals("heartbeat"))
-                return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return !repString.contains("\"heartbeat\"");
+//        JSONTokener jsonParser = new JSONTokener(repString);
+//        try {
+//            JSONObject repJO = (JSONObject) jsonParser.nextValue();
+//            String type = repJO.getString("type");
+//            if (!type.equals("heartbeat"))
+//                return true;
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
     }
 
     private class SubRunnable implements Runnable {
@@ -284,6 +283,7 @@ public class LocalMessageService extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Log.d(TAG, "SubRunnable exit. " + isGoingStop + " thread: " + Thread.currentThread().isInterrupted());
         }
     }
 

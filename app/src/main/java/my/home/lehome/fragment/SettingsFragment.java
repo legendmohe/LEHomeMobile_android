@@ -14,6 +14,7 @@
 
 package my.home.lehome.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -29,6 +30,9 @@ import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
 import my.home.lehome.helper.NetworkHelper;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
+    private String mDeviceId;
+    private String mServerAddress;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,12 +133,13 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 //                return true;
 //            }
 //        });
-        final String device_id = sharedPreferences.getString("pref_bind_device", "");
-        Preference button = (Preference) findPreference("load_auto_item");
+        mDeviceId = sharedPreferences.getString("pref_bind_device", "");
+        mServerAddress = sharedPreferences.getString("pref_server_address", "");
+        Preference button = findPreference("load_auto_item");
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference arg0) {
-                new LoadAutoCompleteConfAsyncTask(getActivity(), device_id).execute();
+                new LoadAutoCompleteConfAsyncTask(getActivity(), mServerAddress, mDeviceId).execute();
                 return true;
             }
         });
@@ -176,7 +181,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         retIntent.putExtra("old_device_id", pubEditTextPreference.getSummary());
         retIntent.putExtra("old_local_msg_state", enable_local_msg);
         retIntent.putExtra("old_subscribe_address", subscribeEditTextPreference.getSummary());
-        this.getActivity().setResult(0, retIntent);
+        this.getActivity().setResult(Activity.RESULT_OK, retIntent);
     }
 
     @Override
@@ -197,9 +202,14 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         if (key.equals("pref_message_begin") || key.equals("pref_message_end")) {
             Preference exercisesPref = findPreference(key);
             exercisesPref.setSummary(sharedPreferences.getString(key, ""));
-        } else if (key.equals("pref_server_address") || key.equals("pref_bind_device")) {
+        } else if (key.equals("pref_server_address")) {
             Preference exercisesPref = findPreference(key);
             exercisesPref.setSummary(sharedPreferences.getString(key, ""));
+            mServerAddress = sharedPreferences.getString("pref_server_address", "");
+        } else if (key.equals("pref_bind_device")) {
+            Preference exercisesPref = findPreference(key);
+            exercisesPref.setSummary(sharedPreferences.getString(key, ""));
+            mDeviceId = sharedPreferences.getString("pref_bind_device", "");
         } else if (key.equals("pref_auto_add_begin_and_end")) {
             if (sharedPreferences.getBoolean("pref_auto_add_begin_and_end", false)) {
                 findPreference("pref_message_begin").setEnabled(true);
