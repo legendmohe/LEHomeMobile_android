@@ -21,14 +21,10 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
+import com.tencent.android.tpush.XGPushManager;
 
 import my.home.common.NetworkUtil;
-import my.home.common.PrefUtil;
 import my.home.lehome.helper.LocalMsgHelper;
-import my.home.lehome.util.Constants;
-import my.home.lehome.util.PushUtils;
 
 /**
  * Created by legendmohe on 15/3/8.
@@ -73,13 +69,15 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
     private void stopBaiduPush(Context context) {
         Log.d(TAG, "stopBaiduPush");
-        PushManager.stopWork(context);
+//        PushManager.stopWork(context);
+        XGPushManager.unregisterPush(context);
     }
 
     private void startBaiduPush(Context context) {
         Log.d(TAG, "startBaiduPush");
-        PushManager.startWork(context,
-                PushConstants.LOGIN_TYPE_API_KEY,
-                PushUtils.getMetaValue(context, "api_key"));
+        XGPushManager.registerPush(context);
+//        PushManager.startWork(context,
+//                PushConstants.LOGIN_TYPE_API_KEY,
+//                PushUtils.getMetaValue(context, "api_key"));
     }
 }

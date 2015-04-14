@@ -25,13 +25,12 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
-import com.baidu.android.pushservice.PushManager;
+import com.tencent.android.tpush.XGPushManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 import my.home.common.KeyValueStorage;
 import my.home.common.PrefKeyValueStorgeImpl;
@@ -40,7 +39,6 @@ import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.util.Constants;
-import my.home.lehome.util.PushUtils;
 import my.home.model.entities.ChatItem;
 import my.home.model.manager.DBStaticManager;
 
@@ -57,13 +55,15 @@ public class MessageHelper {
     public final static String NOTIFICATION_INTENT_ACTION = "my.home.lehome.helper.MessagerHelper:noti_intent";
 
     public static void setPushTag(Context context, String tagText) {
-        List<String> tags = PushUtils.getTagsList(tagText);
-        PushManager.setTags(context, tags);
+//        List<String> tags = PushUtils.getTagsList(tagText);
+//        PushManager.setTags(context, tags);
+        XGPushManager.setTag(context, tagText);
     }
 
     public static void delPushTag(Context context, String tagText) {
-        List<String> tags = PushUtils.getTagsList(tagText);
-        PushManager.delTags(context, tags);
+//        List<String> tags = PushUtils.getTagsList(tagText);
+//        PushManager.delTags(context, tags);
+        XGPushManager.deleteTag(context, tagText);
     }
 
     public static void loadPref(Context context) {

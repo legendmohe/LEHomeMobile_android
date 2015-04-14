@@ -27,8 +27,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
+import com.tencent.android.tpush.XGPushManager;
 
 import java.lang.ref.WeakReference;
 
@@ -39,7 +38,6 @@ import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.MainActivityView;
 import my.home.lehome.receiver.NetworkStateReceiver;
 import my.home.lehome.service.LocalMessageService;
-import my.home.lehome.util.PushUtils;
 
 /**
  * Created by legendmohe on 15/3/15.
@@ -80,11 +78,13 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         Context context = mMainActivityView.get().getContext();
         MessageHelper.loadPref(context);
         if (!initLocalMessageService()) {
-            PushManager.startWork(context,
-                    PushConstants.LOGIN_TYPE_API_KEY,
-                    PushUtils.getMetaValue(context, "api_key"));
+            XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
+//            PushManager.startWork(context,
+//                    PushConstants.LOGIN_TYPE_API_KEY,
+//                    PushUtils.getMetaValue(context, "api_key"));
         } else {
-            PushManager.stopWork(context);
+//            PushManager.stopWork(context);
+            XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
             LocalMsgHelper.stopLocalMsgService(context);
         }
     }
@@ -117,7 +117,8 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                             + context.getString(R.string.title_local_msg_mode)
                             + ")"
             );
-            PushManager.stopWork(context);
+//            PushManager.stopWork(context);
+            XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -135,9 +136,10 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                 context.getString(R.string.app_name)
         );
 
-        PushManager.startWork(context,
-                PushConstants.LOGIN_TYPE_API_KEY,
-                PushUtils.getMetaValue(context, "api_key"));
+        XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
+//        PushManager.startWork(context,
+//                PushConstants.LOGIN_TYPE_API_KEY,
+//                PushUtils.getMetaValue(context, "api_key"));
     }
 
     public boolean isLocalMessageServiceBinded() {
@@ -145,7 +147,8 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     public boolean onAppExit() {
-        PushManager.stopWork(mMainActivityView.get().getContext());
+//        PushManager.stopWork(mMainActivityView.get().getContext());
+        XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
         if (mBinded) {
             Message msg = Message.obtain();
             msg.what = LocalMessageService.MSG_STOP_SERVICE;

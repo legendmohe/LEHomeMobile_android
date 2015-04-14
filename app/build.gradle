@@ -39,7 +39,10 @@ dependencies {
 
     compile 'com.android.support:support-v4:21.0.3'
     compile files('libs/VoiceRecognition.jar')
-    compile files('libs/pushservice-4.4.0.71.jar')
+    compile files('libs/jg_filter_sdk_1.1.jar')
+    compile files('libs/mid-sdk-2.10.jar')
+    compile files('libs/wup-1.0.0-SNAPSHOT.jar')
+    compile files('libs/Xg_sdk_v2.38_20150405_2046.jar')
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     compile("com.doomonafireball.betterpickers:library:1.5.3") {

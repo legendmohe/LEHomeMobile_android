@@ -14,14 +14,19 @@
 
 package my.home.lehome.application;
 
-import com.baidu.frontia.FrontiaApplication;
+import android.app.Application;
 
-public class LEHomeApplication extends FrontiaApplication {
+import com.tencent.android.tpush.XGPushConfig;
+
+public class LEHomeApplication extends Application {
     private final static String TAG = "LEHomeApplication";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        XGPushConfig.enableDebug(getApplicationContext(), false);
+//        XGPushConfig.setAccessId(getApplicationContext(), 2100063377);
+//        XGPushConfig.setAccessKey(getApplicationContext(), "AE398MRA65DZ");
     }
 
 }

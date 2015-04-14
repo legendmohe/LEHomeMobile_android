@@ -14,9 +14,13 @@
 
 package my.home.lehome.mvp.views;
 
+import android.content.Context;
+
 /**
  * Created by legendmohe on 15/3/15.
  */
 public interface MainActivityView extends MVPView {
     public void setActionBarTitle(String title);
+
+    public Context getApplicationContext();
 }
