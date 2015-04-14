@@ -263,7 +263,7 @@ public class LocalMessageService extends Service {
                 subscriber.connect(serverAddress);
                 subscriber.subscribe("".getBytes());
                 while (!Thread.currentThread().isInterrupted() && !isGoingStop) {
-                    poller.poll(1000 * 3);
+                    poller.poll(1000 * 5);
                     if (poller.pollin(0) && !isGoingStop) {
                         String repString = subscriber.recvStr(ZMQ.DONTWAIT);
                         Log.d(TAG, "received response: " + repString);
@@ -271,17 +271,19 @@ public class LocalMessageService extends Service {
                             sendSubResponse(repString);
                     }
                 }
-                if (!Thread.currentThread().isInterrupted()) {
-                    subscriber.close();
-                    zmqContext.term();
-                }
             } catch (ZMQException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
                 e.printStackTrace();
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.error_connect_local_server),
                         Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, Log.getStackTraceString(e));
+            } finally {
+                if (!Thread.currentThread().isInterrupted()) {
+                    subscriber.close();
+                    zmqContext.term();
+                }
             }
             Log.d(TAG, "SubRunnable exit. " + isGoingStop + " thread: " + Thread.currentThread().isInterrupted());
         }

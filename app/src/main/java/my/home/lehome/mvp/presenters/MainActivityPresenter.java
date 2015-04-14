@@ -145,6 +145,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     public boolean onAppExit() {
+        PushManager.stopWork(mMainActivityView.get().getContext());
         if (mBinded) {
             Message msg = Message.obtain();
             msg.what = LocalMessageService.MSG_STOP_SERVICE;

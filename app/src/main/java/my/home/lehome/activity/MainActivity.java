@@ -278,10 +278,10 @@ public class MainActivity extends FragmentActivity
                 // the event in other item selection functions.
                 return true;
             case R.id.action_exit:
-                this.finish();
                 if (!mMainActivityPresenter.onAppExit())
                     Toast.makeText(this, getResources().getString(R.string.error_stop_local_msg_service), Toast.LENGTH_SHORT).show();
                 STOPPED = true;
+                this.finish();
                 return true;
             default:
                 break;
@@ -307,7 +307,7 @@ public class MainActivity extends FragmentActivity
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, getResources().getString(R.string.double_back_to_quit), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), getResources().getString(R.string.double_back_to_quit), Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 
