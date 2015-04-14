@@ -27,6 +27,8 @@ import my.home.lehome.util.Constants;
  * Created by legendmohe on 15/3/15.
  */
 public class LocalMsgHelper {
+    
+    public static final String PREF_SSID_KEY = "pref_local_ssid";
 
     public static boolean startLocalMsgService(Context context) {
         if (!MessageHelper.isLocalMsgPrefEnable(context))
@@ -46,12 +48,15 @@ public class LocalMsgHelper {
         NetworkInfo wifiNetworkInfo = NetworkUtil.getWifiNetworkInfo(context);
         if (wifiNetworkInfo.isConnected()) {
             String ssid = NetworkUtil.getFormatSSID(context);
-            String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY, null);
+            String prefSSID = getLocalSSID(context);
             if (ssid.equals(prefSSID)) {
                 return true;
             }
         }
         return false;
     }
-
+    
+    public static String getLocalSSID(Context context) {
+        return PrefUtil.getStringValue(context, PREF_SSID_KEY, "");
+    }
 }
