@@ -27,8 +27,6 @@ public class Constants {
     public static final String BAIDUVOICE_API_KEY = "7P5ZCG6WTAGWr5TuURBgndRH";
     public static final String BAIDUVOICE_SECRET_KEY = "gggk30ubCSFGM5uXYfwGll4vILlnQ0em";
 
-    public static final String PREF_SSID_KEY = "pref_local_ssid";
-
     public static final int SETTINGS_ACTIVITY_RESULT_CODE = 100;
 
     public static final int MESSAGE_SEQ_QUEUE_LIMIT = 45;
