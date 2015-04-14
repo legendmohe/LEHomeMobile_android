@@ -46,7 +46,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             Log.d(TAG, "NetworkInfo: " + info);
             if (info.isConnected()) {
                 String ssid = NetworkUtil.getFormatSSID(context);
-                String prefSSID = PrefUtil.getStringValue(context, Constants.PREF_SSID_KEY, null);
+                String prefSSID = LocalMsgHelper.getLocalSSID(context);
                 if (ssid.equals(prefSSID)) {
                     Log.d(TAG, "start " + "LocalMessageService " + LocalMsgHelper.startLocalMsgService(context));
                     if (LocalMsgHelper.startLocalMsgService(context)) {
