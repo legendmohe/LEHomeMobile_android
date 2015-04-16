@@ -35,6 +35,7 @@ import my.home.common.BusProvider;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.helper.PushSDKManager;
 import my.home.lehome.mvp.views.MainActivityView;
 import my.home.lehome.receiver.NetworkStateReceiver;
 import my.home.lehome.service.LocalMessageService;
@@ -78,7 +79,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         Context context = mMainActivityView.get().getContext();
         MessageHelper.loadPref(context);
         if (!initLocalMessageService()) {
-            XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
+            PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
 //            PushManager.startWork(context,
 //                    PushConstants.LOGIN_TYPE_API_KEY,
 //                    PushUtils.getMetaValue(context, "api_key"));
@@ -118,12 +119,13 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                             + ")"
             );
 //            PushManager.stopWork(context);
-            XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
+            PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
         }
 
         public void onServiceDisconnected(ComponentName className) {
             Log.d(TAG, className + " unbinded.");
             onServiceUnbind();
+            PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
         }
     };
 
@@ -136,7 +138,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                 context.getString(R.string.app_name)
         );
 
-        XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
+//        XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
 //        PushManager.startWork(context,
 //                PushConstants.LOGIN_TYPE_API_KEY,
 //                PushUtils.getMetaValue(context, "api_key"));
@@ -149,10 +151,18 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public boolean onAppExit() {
         Context context = mMainActivityView.get().getContext();
 //        PushManager.stopWork(mMainActivityView.get().getContext());
-        XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
+        PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
         if (mBinded) {
-            context.unbindService(mConnection);
-            LocalMsgHelper.stopLocalMsgService(context);
+//            context.unbindService(mConnection);
+//            LocalMsgHelper.stopLocalMsgService(context);
+            Message msg = Message.obtain();
+            msg.what = LocalMessageService.MSG_STOP_SERVICE;
+            try {
+                mLocalMsgService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
         return true;
     }
@@ -190,12 +200,18 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                     Intent i = new Intent("my.home.lehome.service.LocalMessageService");
                     context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
                 }
+            } else if (mBinded) {
+                context.unbindService(mConnection);
+                LocalMsgHelper.stopLocalMsgService(context);
+                PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
+                onServiceUnbind();
             }
         } else {
             if (old_local_msg_state) {
                 if (mBinded) {
                     context.unbindService(mConnection);
                     LocalMsgHelper.stopLocalMsgService(context);
+                    PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
                     onServiceUnbind();
                 }
             }

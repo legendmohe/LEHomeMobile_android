@@ -44,7 +44,7 @@ import my.home.model.events.MConfAutoCompleteItemEvent;
 public class LoadAutoCompleteConfAsyncTask extends AsyncTask<String, String, Boolean> {
 
     public static final String TAG = "LoadAutoCompleteConfAsyncTask";
-    public static final String CONF_URL = "auto/init";
+    public static final String CONF_URL = "/auto/init";
     private final String mServerURL;
 
     private WeakReference<Context> mContext;

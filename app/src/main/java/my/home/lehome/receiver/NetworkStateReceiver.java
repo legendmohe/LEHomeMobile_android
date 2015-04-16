@@ -21,10 +21,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.tencent.android.tpush.XGPushManager;
-
 import my.home.common.NetworkUtil;
 import my.home.lehome.helper.LocalMsgHelper;
+import my.home.lehome.helper.PushSDKManager;
 
 /**
  * Created by legendmohe on 15/3/8.
@@ -46,7 +45,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 if (ssid.equals(prefSSID)) {
                     Log.d(TAG, "start " + "LocalMessageService " + LocalMsgHelper.startLocalMsgService(context));
                     if (LocalMsgHelper.startLocalMsgService(context)) {
-                        stopBaiduPush(context);
+                        PushSDKManager.stopPushSDKService(context);
                         Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
                         context.sendBroadcast(startIntent);
                     }
@@ -55,29 +54,15 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                     LocalMsgHelper.stopLocalMsgService(context);
                     Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
                     context.sendBroadcast(stopIntent);
-                    startBaiduPush(context);
+                    PushSDKManager.startPushSDKService(context);
                 }
             } else if (!info.isConnectedOrConnecting()) {
                 Log.d(TAG, "stop " + "LocalMessageService");
                 LocalMsgHelper.stopLocalMsgService(context);
-                startBaiduPush(context);
+                PushSDKManager.startPushSDKService(context);
                 Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
                 context.sendBroadcast(stopIntent);
             }
         }
-    }
-
-    private void stopBaiduPush(Context context) {
-        Log.d(TAG, "stopBaiduPush");
-//        PushManager.stopWork(context);
-        XGPushManager.unregisterPush(context);
-    }
-
-    private void startBaiduPush(Context context) {
-        Log.d(TAG, "startBaiduPush");
-        XGPushManager.registerPush(context);
-//        PushManager.startWork(context,
-//                PushConstants.LOGIN_TYPE_API_KEY,
-//                PushUtils.getMetaValue(context, "api_key"));
     }
 }

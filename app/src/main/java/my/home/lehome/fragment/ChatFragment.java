@@ -327,7 +327,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             private final GestureDetector gestureDetector = new GestureDetector(
                     getContext(), new GestureDetector.SimpleOnGestureListener() {
 
-                private final float _SHOW_KEYBOARD_Y = 40.0f;
+                private final float _SHOW_KEYBOARD_Y = 140.0f;
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
