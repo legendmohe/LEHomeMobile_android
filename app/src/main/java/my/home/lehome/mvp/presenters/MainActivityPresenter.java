@@ -147,17 +147,12 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     public boolean onAppExit() {
+        Context context = mMainActivityView.get().getContext();
 //        PushManager.stopWork(mMainActivityView.get().getContext());
         XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
         if (mBinded) {
-            Message msg = Message.obtain();
-            msg.what = LocalMessageService.MSG_STOP_SERVICE;
-            try {
-                mLocalMsgService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-                return false;
-            }
+            context.unbindService(mConnection);
+            LocalMsgHelper.stopLocalMsgService(context);
         }
         return true;
     }
