@@ -188,17 +188,21 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             }
         }
 
-        if (MessageHelper.isLocalMsgPrefEnable(context) && LocalMsgHelper.canUseLocalMessageService(context)) {
-            if (!old_local_msg_state
-                    || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
-                Intent i = new Intent("my.home.lehome.service.LocalMessageService");
-                context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        if (MessageHelper.isLocalMsgPrefEnable(context)) {
+            if (LocalMsgHelper.canUseLocalMessageService(context)) {
+                if (!old_local_msg_state
+                        || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
+                    Intent i = new Intent("my.home.lehome.service.LocalMessageService");
+                    context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+                }
             }
         } else {
             if (old_local_msg_state) {
-                context.unbindService(mConnection);
-                LocalMsgHelper.stopLocalMsgService(context);
-                onServiceUnbind();
+                if (mBinded) {
+                    context.unbindService(mConnection);
+                    LocalMsgHelper.stopLocalMsgService(context);
+                    onServiceUnbind();
+                }
             }
         }
         return true;
