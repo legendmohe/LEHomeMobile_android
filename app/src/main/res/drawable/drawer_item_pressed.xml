@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -12,10 +12,7 @@
   ~ limitations under the License.
   -->
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_recycler_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#c4000000"
-    android:scrollbars="vertical" />
-
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    android:shape="rectangle">
+    <solid android:color="@color/darker_blue" />
+</shape>

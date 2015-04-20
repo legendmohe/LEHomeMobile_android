@@ -24,24 +24,26 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import my.home.lehome.R;
+import my.home.lehome.adapter.DrawerItemAdapter;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment extends Fragment implements DrawerItemAdapter.IDrawerItemClickListener {
+
+    public static final String TAG = "NavigationDrawerFragment";
 
     /**
      * Remember the position of the selected item.
@@ -65,7 +67,8 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    //    private ListView mDrawerListView;
+    private RecyclerView mRecyclerView;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -103,24 +106,55 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
+        mRecyclerView = (RecyclerView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                }));
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+//        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+////                selectItem(position);
+//                Log.d(TAG, "recycler view clicked.");
+//            }
+//        });
+        mRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(layoutManager);
+
+//        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+//                getActionBar().getThemedContext(),
+//                android.R.layout.simple_list_item_activated_1,
+//                android.R.id.text1,
+//                new String[]{
+//                        getString(R.string.title_section1),
+//                        getString(R.string.title_section2),
+//                        getString(R.string.title_section3),
+//                        getString(R.string.title_section4),
+//                }));
+//        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+        DrawerItemAdapter drawerItemAdapter = new DrawerItemAdapter(
+                new int[]{
+                        android.R.drawable.ic_menu_send,
+                        android.R.drawable.ic_menu_save,
+                        android.R.drawable.ic_menu_compass,
+                        android.R.drawable.ic_menu_gallery,
+                },
+                new int[]{
+                        R.string.title_section1,
+                        R.string.title_section2,
+                        R.string.title_section3,
+                        R.string.title_section4
+                },
+                this
+        );
+
+        mRecyclerView.setAdapter(drawerItemAdapter);
+        return mRecyclerView;
+    }
+
+    @Override
+    public void onDrawerItemClick(int i) {
+        selectItem(i);
     }
 
     public boolean isDrawerOpen() {
@@ -210,9 +244,6 @@ public class NavigationDrawerFragment extends Fragment {
 
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;
-        if (mDrawerListView != null) {
-            mDrawerListView.setItemChecked(position, true);
-        }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }

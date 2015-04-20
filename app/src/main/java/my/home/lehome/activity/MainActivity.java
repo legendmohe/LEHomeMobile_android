@@ -40,6 +40,8 @@ import android.widget.Toast;
 import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.fragment.ChatFragment;
+import my.home.lehome.fragment.FindMyTagFragment;
+import my.home.lehome.fragment.HomeStateFragment;
 import my.home.lehome.fragment.NavigationDrawerFragment;
 import my.home.lehome.fragment.ShortcutFragment;
 import my.home.lehome.mvp.presenters.MainActivityPresenter;
@@ -60,9 +62,10 @@ public class MainActivity extends FragmentActivity
     public static boolean VISIBLE = false;
     private final String CHAT_FRAGMENT_TAG = "CHAT_FRAGMENT_TAG";
     private final String SHORTCUT_FRAGMENT_TAG = "SHORTCUT_FRAGMENT_TAG";
+    private final String FIND_TAG_FRAGMENT_TAG = "FIND_TAG_FRAGMENT_TAG";
+    private final String HOME_STATE_FRAGMENT_TAG = "HOME_STATE_FRAGMENT_TAG";
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private CharSequence mTitle;
     private ActionBar mActionBar;
     private int mActionBarHeight;
 
@@ -100,7 +103,6 @@ public class MainActivity extends FragmentActivity
         this.setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -188,7 +190,22 @@ public class MainActivity extends FragmentActivity
                 fragment_tag = SHORTCUT_FRAGMENT_TAG;
                 fragment = shortcutFragment;
                 break;
-
+            case 2:
+                FindMyTagFragment findMyTagFragment = (FindMyTagFragment) fm.findFragmentByTag(FIND_TAG_FRAGMENT_TAG);
+                if (findMyTagFragment == null) {
+                    findMyTagFragment = FindMyTagFragment.newInstance();
+                }
+                fragment_tag = FIND_TAG_FRAGMENT_TAG;
+                fragment = findMyTagFragment;
+                break;
+            case 3:
+                HomeStateFragment homeStateFragment = (HomeStateFragment) fm.findFragmentByTag(HOME_STATE_FRAGMENT_TAG);
+                if (homeStateFragment == null) {
+                    homeStateFragment = HomeStateFragment.newInstance();
+                }
+                fragment_tag = HOME_STATE_FRAGMENT_TAG;
+                fragment = homeStateFragment;
+                break;
             default:
                 break;
         }
@@ -217,17 +234,6 @@ public class MainActivity extends FragmentActivity
 
     public void onSectionAttached(int number) {
         mCurrentSection = number;
-        switch (number) {
-            case 0:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 1:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
     }
 
     public void restoreActionBar() {

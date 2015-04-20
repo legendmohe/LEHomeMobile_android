@@ -19,7 +19,8 @@
     <string name="app_service_running">服务正在运行</string>
     <string name="title_section1">控制</string>
     <string name="title_section2">收藏</string>
-    <string name="title_section3">历史</string>
+    <string name="title_section3">定位器</string>
+    <string name="title_section4">运行情况</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="voice_input">语音脚本</string>
@@ -114,5 +115,8 @@
     <string name="error_connect_local_server">连接本地消息服务器失败</string>
     <string name="pref_volume_key_control_speech">使用音量键唤起语音识别</string>
     <string name="pref_sum_volume_key_control_speech">双击音量键即可进行语音输入</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
