@@ -56,6 +56,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <!-- 蓝牙需要。。。 -->
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
 
     <application
         android:name=".application.LEHomeApplication"

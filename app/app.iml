@@ -91,6 +91,7 @@
     <orderEntry type="library" exported="" name="VoiceRecognition" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="mid-sdk-2.10" level="project" />
+    <orderEntry type="library" exported="" name="android-beacon-library-2.1.4" level="project" />
     <orderEntry type="library" exported="" name="otto-1.3.6" level="project" />
     <orderEntry type="library" exported="" name="jg_filter_sdk_1.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-21.0.3" level="project" />

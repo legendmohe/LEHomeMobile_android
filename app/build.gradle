@@ -50,4 +50,5 @@ dependencies {
     }
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'com.android.support:recyclerview-v7:+'
+    compile 'org.altbeacon:android-beacon-library:2+'
 }

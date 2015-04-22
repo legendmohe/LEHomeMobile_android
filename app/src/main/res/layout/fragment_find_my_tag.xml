@@ -18,10 +18,37 @@
     android:layout_height="match_parent"
     tools:context="my.home.lehome.fragment.FindMyTagFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/distance_textview"
+            android:layout_gravity="center"
+            android:textSize="150dp"
+            android:text="0.0"
+            android:textColor="#ff252525"
+            android:textIsSelectable="true"
+            android:longClickable="false"
+            android:focusable="false"
+            android:editable="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:id="@+id/uid_textview"
+            android:layout_gravity="center"
+            android:textSize="24dp"
+            android:textColor="#ff494949"
+            android:longClickable="false"
+            android:focusable="false"
+            android:editable="false" />
+    </LinearLayout>
 
 </FrameLayout>

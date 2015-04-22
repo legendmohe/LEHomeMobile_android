@@ -14,16 +14,27 @@
 
 package my.home.lehome.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import my.home.lehome.R;
+import my.home.lehome.mvp.presenters.FindMyTagPresenter;
+import my.home.lehome.mvp.views.FindMyTagView;
 
 
-public class FindMyTagFragment extends Fragment {
+public class FindMyTagFragment extends Fragment implements FindMyTagView {
+    public static final String TAG = "FindMyTagFragment";
+
+    private FindMyTagPresenter mFindMyTagPresenter;
+    private TextView mDistanceTextView;
+    private TextView mUidTextView;
+    private Handler mHandler;
 
     public static FindMyTagFragment newInstance() {
         FindMyTagFragment fragment = new FindMyTagFragment();
@@ -31,21 +42,89 @@ public class FindMyTagFragment extends Fragment {
     }
 
     public FindMyTagFragment() {
-        // Required empty public constructor
+        mFindMyTagPresenter = new FindMyTagPresenter(this);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        mHandler = new Handler();
+    }
+
+    @Override
+    public void onDestroy() {
+        mHandler = null;
+        super.onDestroy();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_find_my_tag, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_find_my_tag, container, false);
+        setupViews(rootView);
+        return rootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mFindMyTagPresenter.start();
+    }
+
+    @Override
+    public void onStop() {
+        mFindMyTagPresenter.stop();
+        super.onStop();
+    }
+
+    @Override
+    public void setupViews(View rootView) {
+        mDistanceTextView = (TextView) rootView.findViewById(R.id.distance_textview);
+        mUidTextView = (TextView) rootView.findViewById(R.id.uid_textview);
+    }
+
+    @Override
+    public Context getContext() {
+        return getActivity();
+    }
+
+    @Override
+    public Context getApplicationContext() {
+        return getActivity().getApplicationContext();
+    }
+
+    @Override
+    public void onBeaconEnter(String uid) {
+
+    }
+
+    @Override
+    public void onBeaconExit(String uid) {
+
+    }
+
+    @Override
+    public void onBeaconState(int var1, String uid) {
+
+    }
+
+    @Override
+    public void onBeaconDistance(String uid, double distance) {
+        final double d = distance;
+        final String u = uid;
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mDistanceTextView != null) {
+                    mDistanceTextView.setText(String.format("%1.2f", d));
+                    mUidTextView.setText(u);
+                }
+            }
+        });
+    }
 }
