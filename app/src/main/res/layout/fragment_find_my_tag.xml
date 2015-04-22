@@ -34,7 +34,6 @@
             android:text="0.0"
             android:textColor="#ff252525"
             android:textIsSelectable="true"
-            android:longClickable="false"
             android:focusable="false"
             android:editable="false" />
 
@@ -42,13 +41,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="..."
-            android:id="@+id/uid_textview"
+            android:id="@+id/bdname_textview"
             android:layout_gravity="center"
             android:textSize="24dp"
             android:textColor="#ff494949"
-            android:longClickable="false"
+            android:focusable="false"
+            android:editable="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/power_textview"
+            android:layout_gravity="center"
+            android:textSize="18dp"
+            android:textColor="#ff666668"
             android:focusable="false"
             android:editable="false" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/uidd_textview"
+        android:layout_gravity="center_horizontal|bottom"
+        android:textColor="#ffa3a3a6"
+        android:layout_margin="4dp"
+        android:focusable="false"
+        android:editable="false" />
 
 </FrameLayout>

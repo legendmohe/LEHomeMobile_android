@@ -16,17 +16,21 @@ package my.home.lehome.mvp.views;
 
 import android.content.Context;
 
+import java.util.List;
+
 /**
  * Created by legendmohe on 15/4/21.
  */
-public interface FindMyTagView extends MVPView {
+public interface FindMyTagDistanceView extends MVPView {
     public Context getApplicationContext();
 
-    void onBeaconEnter(String uid);
+//    void onBeaconEnter(String uid);
+//
+//    void onBeaconExit(String uid);
+//
+//    void onBeaconState(int var1, String uid);
 
-    void onBeaconExit(String uid);
+    void onBeaconDistance(String uid, String bdName, double distance, List<Long> data);
 
-    void onBeaconState(int var1, String uid);
-
-    void onBeaconDistance(String uid, double distance);
+    void showBeaconsDialog();
 }

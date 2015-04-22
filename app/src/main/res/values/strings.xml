@@ -118,5 +118,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="find_my_tag_power_title">电量</string>
+    <string name="refresh_tag_list">重新选择</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="find_my_tag_select_beacon">选择测量目标</string>
 
 </resources>

@@ -25,7 +25,6 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -33,7 +32,7 @@ import java.lang.ref.WeakReference;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 
-import my.home.lehome.mvp.views.FindMyTagView;
+import my.home.lehome.mvp.views.FindMyTagDistanceView;
 
 /**
  * Created by legendmohe on 15/4/21.
@@ -43,21 +42,20 @@ public class FindMyTagPresenter extends MVPPresenter implements BeaconConsumer {
 
     private static final String RANGE_UNI_ID = "FindMyTagPresenter_ID";
     // layout for iBeacon
-    public static final String MY_BEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
+    public static final String MY_BEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25";
 
-    private WeakReference<FindMyTagView> mFindMyTagView;
+    private WeakReference<FindMyTagDistanceView> mFindMyTagView;
     private BluetoothAdapter mBluetoothAdapter;
     private BeaconManager mBeaconManager;
 
-    private static final int REQUEST_ENABLE_BT = 1;
     private boolean mIsBtEnableAlready = false;
     private boolean mBinded = false;
 
-    public FindMyTagPresenter(FindMyTagView view) {
+    public FindMyTagPresenter(FindMyTagDistanceView view) {
         if (view == null)
             throw new InvalidParameterException("view cannot be null");
 
-        mFindMyTagView = new WeakReference<FindMyTagView>(view);
+        mFindMyTagView = new WeakReference<FindMyTagDistanceView>(view);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
@@ -88,11 +86,12 @@ public class FindMyTagPresenter extends MVPPresenter implements BeaconConsumer {
     @Override
     public void onBeaconServiceConnect() {
         try {
-            mBeaconManager.startMonitoringBeaconsInRegion(new Region(RANGE_UNI_ID, null, null, null));
+//            mBeaconManager.startMonitoringBeaconsInRegion(new Region(RANGE_UNI_ID, null, null, null));
             mBeaconManager.startRangingBeaconsInRegion(new Region(RANGE_UNI_ID, null, null, null));
         } catch (RemoteException e) {
             Log.e(TAG, Log.getStackTraceString(e));
         }
+        mFindMyTagView.get().showBeaconsDialog();
     }
 
     private void setupBeaconManager() {
@@ -101,33 +100,33 @@ public class FindMyTagPresenter extends MVPPresenter implements BeaconConsumer {
         mBeaconManager.getBeaconParsers().add(
                 new BeaconParser().setBeaconLayout(MY_BEACON_LAYOUT)
         );
-        mBeaconManager.setMonitorNotifier(new MonitorNotifier() {
-            @Override
-            public void didEnterRegion(Region region) {
-                Log.i(TAG, "I just saw an beacon for the first time!");
-                mFindMyTagView.get().onBeaconEnter(region.getUniqueId());
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-                Log.i(TAG, "I no longer see an beacon");
-                mFindMyTagView.get().onBeaconExit(region.getUniqueId());
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int state, Region region) {
-                Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state);
-                mFindMyTagView.get().onBeaconState(state, region.getUniqueId());
-            }
-        });
+//        mBeaconManager.setMonitorNotifier(new MonitorNotifier() {
+//            @Override
+//            public void didEnterRegion(Region region) {
+//                Log.d(TAG, "didEnterRegion: " + region.toString());
+//                mFindMyTagView.get().onBeaconEnter(region.toString());
+//            }
+//
+//            @Override
+//            public void didExitRegion(Region region) {
+//                Log.d(TAG, "didExitRegion: " + region.toString());
+//                mFindMyTagView.get().onBeaconExit(region.toString());
+//            }
+//
+//            @Override
+//            public void didDetermineStateForRegion(int state, Region region) {
+//                Log.d(TAG, "didDetermineStateForRegion: " + region.toString() + " state: " + state);
+//                mFindMyTagView.get().onBeaconState(state, region.toString());
+//            }
+//        });
 
         mBeaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     Beacon beacon = beacons.iterator().next();
-                    Log.i(TAG, "The first beacon " + beacon.getBluetoothName() + " I see is about " + beacon.getDistance() + " meters away.");
-                    mFindMyTagView.get().onBeaconDistance(beacon.getBluetoothName(), beacon.getDistance());
+                    Log.i(TAG, "UUID: " + beacon.getBluetoothAddress() + " beacon: " + beacon.getBluetoothName() + " distance: " + beacon.getDistance() + " data: " + beacon.getDataFields());
+                    mFindMyTagView.get().onBeaconDistance(beacon.getBluetoothAddress(), beacon.getBluetoothName(), beacon.getDistance(), beacon.getDataFields());
                 }
             }
         });

@@ -257,6 +257,9 @@ public class MainActivity extends FragmentActivity
                 case 1:
                     getMenuInflater().inflate(R.menu.shortcut, menu);
                     break;
+                case 2:
+                    getMenuInflater().inflate(R.menu.find_my_tag, menu);
+                    break;
                 default:
                     break;
             }
