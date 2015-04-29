@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 
 import my.home.lehome.R;
 import my.home.lehome.adapter.DrawerItemAdapter;
+import my.home.lehome.view.decoration.SimpleDividerItemDecoration;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -108,6 +109,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerItemAdap
                              Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getResources()));
 //        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -133,12 +135,13 @@ public class NavigationDrawerFragment extends Fragment implements DrawerItemAdap
 //                }));
 //        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         DrawerItemAdapter drawerItemAdapter = new DrawerItemAdapter(
-                new int[]{
-                        android.R.drawable.ic_menu_send,
-                        android.R.drawable.ic_menu_save,
-                        android.R.drawable.ic_menu_compass,
-                        android.R.drawable.ic_menu_gallery,
-                },
+                null,
+//                new int[]{
+//                        android.R.drawable.ic_menu_send,
+//                        android.R.drawable.ic_menu_save,
+//                        android.R.drawable.ic_menu_compass,
+//                        android.R.drawable.ic_menu_gallery,
+//                },
                 new int[]{
                         R.string.title_section1,
                         R.string.title_section2,

@@ -122,5 +122,7 @@
     <string name="refresh_tag_list">重新选择</string>
     <string name="dialog_cancel">取消</string>
     <string name="find_my_tag_select_beacon">选择测量目标</string>
+    <string name="find_my_tag_bt_turning_on">正在打开蓝牙</string>
+    <string name="find_my_tag_bt_off">蓝牙已关闭</string>
 
 </resources>

@@ -25,6 +25,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.android.tpush.XGPushManager;
@@ -95,7 +96,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             return false;
         }
         Context context = mMainActivityView.get().getContext();
-        boolean ret = LocalMsgHelper.canUseLocalMessageService(context);
+        boolean ret = LocalMsgHelper.isLMSSID(context);
         if (ret) {
             return LocalMsgHelper.startLocalMsgService(context);
         }
@@ -175,11 +176,12 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         String old_subscribe_address = extras.getString("old_subscribe_address");
 
         MessageHelper.loadPref(context);
-        if (!old_device_id.equals(MessageHelper.getDeviceID(context))) {
+        if (old_device_id != null && !old_device_id.equals(MessageHelper.getDeviceID(context))) {
             MessageHelper.delPushTag(context, old_device_id);
             MessageHelper.setPushTag(context, MessageHelper.getDeviceID(context));
         }
-        if (mBinded && MessageHelper.isLocalMsgPrefEnable(context)) {
+        if (mBinded && MessageHelper.isLocalMsgPrefEnable(context)
+                && !TextUtils.isEmpty(MessageHelper.getLocalServerSubscribeURL(context))) {
             Message msg = Message.obtain(null, LocalMessageService.MSG_SET_SUBSCRIBE_ADDRESS);
             Bundle bundle = new Bundle();
             bundle.putString("server_address", MessageHelper.getLocalServerSubscribeURL(context));
@@ -194,7 +196,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         }
 
         if (MessageHelper.isLocalMsgPrefEnable(context)) {
-            if (LocalMsgHelper.canUseLocalMessageService(context)) {
+            if (LocalMsgHelper.isLMSSID(context)) {
                 if (!old_local_msg_state
                         || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
                     Intent i = new Intent("my.home.lehome.service.LocalMessageService");
@@ -223,7 +225,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void onActivityCreate() {
         Context context = mMainActivityView.get().getContext();
         // bind service if needed.
-        if (LocalMsgHelper.canUseLocalMessageService(context) && MessageHelper.isLocalMsgPrefEnable(context)) {
+        if (LocalMsgHelper.isLMSSID(context) && MessageHelper.isLocalMsgPrefEnable(context)) {
             Intent i = new Intent("my.home.lehome.service.LocalMessageService");
             context.bindService(i, mConnection, context.BIND_AUTO_CREATE);
         }

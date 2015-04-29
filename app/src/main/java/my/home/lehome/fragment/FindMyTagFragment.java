@@ -20,7 +20,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,7 +48,6 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
 
     private ArrayAdapter<String> mBeaconsArrayAdapter;
     private AlertDialog mBeaconsDialog;
-    private String mFliterUid = "";
 
     public static FindMyTagFragment newInstance() {
         FindMyTagFragment fragment = new FindMyTagFragment();
@@ -92,12 +90,12 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
         super.onStart();
         mBeaconsArrayAdapter.clear();
         mFindMyTagPresenter.start();
+        mNameTextView.setText(getString(R.id.tag_finding_tag));
     }
 
     @Override
     public void onStop() {
         mFindMyTagPresenter.stop();
-        mFindMyTagPresenter = null;
         mBeaconsArrayAdapter.clear();
         if (mBeaconsDialog != null && mBeaconsDialog.isShowing()) {
             mBeaconsDialog.dismiss();
@@ -147,27 +145,31 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
 
     public void onBeaconEnter(String uid) {
         final String u = uid;
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mBeaconsArrayAdapter.getPosition(u) != -1) {
-                    return;
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mBeaconsArrayAdapter.getPosition(u) != -1) {
+                        return;
+                    }
+                    mBeaconsArrayAdapter.add(u);
+                    mBeaconsArrayAdapter.notifyDataSetChanged();
                 }
-                mBeaconsArrayAdapter.add(u);
-                mBeaconsArrayAdapter.notifyDataSetChanged();
-            }
-        });
+            });
+        }
     }
 
     public void onBeaconExit(String uid) {
         final String u = uid;
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mBeaconsArrayAdapter.remove(u);
-                mBeaconsArrayAdapter.notifyDataSetChanged();
-            }
-        });
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mBeaconsArrayAdapter.remove(u);
+                    mBeaconsArrayAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
 //    public void onBeaconState(int var1, String uid) {
@@ -183,10 +185,6 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
             return;
         final String p = getString(R.string.find_my_tag_power_title) + ": " + data.get(0).toString();
 
-        this.onBeaconEnter(uid);
-
-        if (TextUtils.isEmpty(mFliterUid) || !uid.equals(mFliterUid))
-            return;
 
         mHandler.post(new Runnable() {
             @Override
@@ -218,12 +216,29 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mFliterUid = mBeaconsArrayAdapter.getItem(which);
+                        String fliterUid = mBeaconsArrayAdapter.getItem(which);
+                        mFindMyTagPresenter.setFliterUid(fliterUid);
                         cleanScreen();
                     }
                 });
         mBeaconsArrayAdapter.clear();
         mBeaconsDialog = builderSingle.show();
+    }
+
+    @Override
+    public void onBtEnable() {
+        cleanScreen();
+    }
+
+    @Override
+    public void onBtDisable() {
+        cleanScreen();
+        mUUIDTextView.setText(getString(R.string.find_my_tag_bt_off));
+    }
+
+    @Override
+    public void onBtTurningOn() {
+        mUUIDTextView.setText(getString(R.string.find_my_tag_bt_turning_on));
     }
 
     public void cleanScreen() {

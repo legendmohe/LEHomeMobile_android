@@ -30,8 +30,8 @@ import my.home.lehome.R;
  */
 public class DrawerItemAdapter extends RecyclerView.Adapter<DrawerItemAdapter.ViewHolder> {
 
-    private int[] mIcons;
-    private int[] mTitles;
+    private int[] mIcons = null;
+    private int[] mTitles = null;
     private WeakReference<IDrawerItemClickListener> mListener;
 
     public DrawerItemAdapter(int[] icons, int[] titles, IDrawerItemClickListener listener) {
@@ -48,7 +48,9 @@ public class DrawerItemAdapter extends RecyclerView.Adapter<DrawerItemAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        viewHolder.mImageView.setImageResource(this.mIcons[i]);
+        if (this.mIcons != null && this.mIcons.length != 0) {
+            viewHolder.mImageView.setImageResource(this.mIcons[i]);
+        }
         viewHolder.mTextView.setText(this.mTitles[i]);
         viewHolder.mIndex = i;
     }

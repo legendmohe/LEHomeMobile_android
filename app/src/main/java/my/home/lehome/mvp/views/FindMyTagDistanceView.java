@@ -24,7 +24,7 @@ import java.util.List;
 public interface FindMyTagDistanceView extends MVPView {
     public Context getApplicationContext();
 
-//    void onBeaconEnter(String uid);
+    void onBeaconEnter(String uid);
 //
 //    void onBeaconExit(String uid);
 //
@@ -33,4 +33,10 @@ public interface FindMyTagDistanceView extends MVPView {
     void onBeaconDistance(String uid, String bdName, double distance, List<Long> data);
 
     void showBeaconsDialog();
+
+    void onBtEnable();
+
+    void onBtDisable();
+
+    void onBtTurningOn();
 }

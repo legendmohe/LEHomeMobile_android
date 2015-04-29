@@ -22,13 +22,19 @@ import com.tencent.android.tpush.XGPushManager;
  * Created by legendmohe on 15/4/16.
  */
 public class PushSDKManager {
+    public static boolean PushSDKEnable = false;
+
     public static void stopPushSDKService(Context context) {
-        if (XGPushManager.isEnableService(context)) ;
-        XGPushManager.unregisterPush(context);
+        if (PushSDKEnable) {
+            XGPushManager.unregisterPush(context);
+            PushSDKEnable = false;
+        }
     }
 
     public static void startPushSDKService(Context context) {
-        if (!XGPushManager.isEnableService(context)) ;
-        XGPushManager.registerPush(context);
+        if (!PushSDKEnable) {
+            XGPushManager.registerPush(context);
+            PushSDKEnable = true;
+        }
     }
 }

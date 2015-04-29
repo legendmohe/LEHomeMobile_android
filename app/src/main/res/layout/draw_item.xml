@@ -16,6 +16,7 @@
     android:id="@+id/drawer_item"
     android:layout_width="match_parent"
     android:background="?android:attr/selectableItemBackground"
+    android:padding="4dp"
     android:layout_height="42dp">
 
     <ImageView
@@ -34,6 +35,6 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/icon_imageview"
         android:textSize="18dp"
-        android:textColor="#fff9f9f9"
+        android:textColor="#ffd2d2d2"
         android:layout_margin="6dp" />
 </RelativeLayout>

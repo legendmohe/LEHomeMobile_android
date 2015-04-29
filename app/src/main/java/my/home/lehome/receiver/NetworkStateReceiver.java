@@ -45,21 +45,21 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 if (ssid.equals(prefSSID)) {
                     Log.d(TAG, "start " + "LocalMessageService " + LocalMsgHelper.startLocalMsgService(context));
                     if (LocalMsgHelper.startLocalMsgService(context)) {
-                        PushSDKManager.stopPushSDKService(context);
                         Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
                         context.sendBroadcast(startIntent);
+                        PushSDKManager.stopPushSDKService(context);
                     }
                 } else {
                     Log.d(TAG, "stop " + "LocalMessageService");
+                    PushSDKManager.startPushSDKService(context);
                     LocalMsgHelper.stopLocalMsgService(context);
                     Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
                     context.sendBroadcast(stopIntent);
-                    PushSDKManager.startPushSDKService(context);
                 }
             } else if (!info.isConnectedOrConnecting()) {
                 Log.d(TAG, "stop " + "LocalMessageService");
-                LocalMsgHelper.stopLocalMsgService(context);
                 PushSDKManager.startPushSDKService(context);
+                LocalMsgHelper.stopLocalMsgService(context);
                 Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
                 context.sendBroadcast(stopIntent);
             }

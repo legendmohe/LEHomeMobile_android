@@ -21,7 +21,6 @@ import android.net.NetworkInfo;
 import my.home.common.NetworkUtil;
 import my.home.common.PrefUtil;
 import my.home.lehome.service.LocalMessageService;
-import my.home.lehome.util.Constants;
 
 /**
  * Created by legendmohe on 15/3/15.
@@ -44,7 +43,7 @@ public class LocalMsgHelper {
         return;
     }
 
-    public static boolean canUseLocalMessageService(Context context) {
+    public static boolean isLMSSID(Context context) {
         NetworkInfo wifiNetworkInfo = NetworkUtil.getWifiNetworkInfo(context);
         if (wifiNetworkInfo.isConnected()) {
             String ssid = NetworkUtil.getFormatSSID(context);
