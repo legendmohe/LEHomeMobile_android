@@ -453,8 +453,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         }
         if (resultMap.size() != 0) {
             for (AutoCompleteItem item : items) {
-                if (resultMap.containsKey(item.getCmd())) {
-                    item.setWeight(resultMap.get(item.getCmd()));
+                if (resultMap.containsKey(from + item.getContent())) {
+                    item.setWeight(resultMap.get(from + item.getContent()));
                 }
             }
         }
