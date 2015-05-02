@@ -162,7 +162,7 @@ public class MessageHelper {
         ChatFragment.sendMessage(msg);
     }
 
-    public static void sendServerMsgToList(int seq, String content, Context context) {
+    public static void sendServerMsgToList(int seq, String type, String content, Context context) {
         ChatItem newItem = new ChatItem();
         newItem.setContent(content);
         newItem.setIsMe(false);

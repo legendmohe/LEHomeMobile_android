@@ -67,7 +67,7 @@ public class LocalMessageReceiver extends BroadcastReceiver {
                     return;
                 }
 
-                if (type.equals("normal")) {
+                if (type.equals("normal") || type.equals("capture")) {
                     MessageHelper.inNormalState = true;
                 } else if (type.equals("toast")) {
                     MessageHelper.sendToast(msg);
@@ -75,7 +75,7 @@ public class LocalMessageReceiver extends BroadcastReceiver {
                 } else {
                     MessageHelper.inNormalState = false;
                 }
-                MessageHelper.sendServerMsgToList(seq, msg, context);
+                MessageHelper.sendServerMsgToList(seq, type, msg, context);
             }
         }
     }
