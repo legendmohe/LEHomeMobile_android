@@ -18,7 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import my.home.common.NetworkUtil;
@@ -36,10 +36,16 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-        if (info != null) {
-            Log.d(TAG, "NetworkInfo: " + info);
-            if (info.isConnected()) {
+        if (!intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+            return;
+        }
+        if (intent.getExtras() == null) {
+            return;
+        }
+        final NetworkInfo info = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+        Log.d(TAG, "NetworkInfo: " + info);
+        if (info != null && info.isConnected()) {
+            if (info.getType() == ConnectivityManager.TYPE_WIFI) {
                 String ssid = NetworkUtil.getFormatSSID(context);
                 String prefSSID = LocalMsgHelper.getLocalSSID(context);
                 if (ssid.equals(prefSSID)) {
@@ -56,7 +62,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                     Intent stopIntent = new Intent(VALUE_INTENT_STOP_LOCAL_SERVER);
                     context.sendBroadcast(stopIntent);
                 }
-            } else if (!info.isConnectedOrConnecting()) {
+            } else {
                 Log.d(TAG, "stop " + "LocalMessageService");
                 PushSDKManager.startPushSDKService(context);
                 LocalMsgHelper.stopLocalMsgService(context);
