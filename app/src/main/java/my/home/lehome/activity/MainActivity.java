@@ -301,11 +301,11 @@ public class MainActivity extends FragmentActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.SETTINGS_ACTIVITY_RESULT_CODE) {
+        if (requestCode == Constants.SETTINGS_ACTIVITY_RESULT_CODE && data != null) {
             if (!mMainActivityPresenter.onSettingsActivityResult(resultCode, data))
                 Toast.makeText(this, getResources().getString(R.string.error_local_msg_service), Toast.LENGTH_SHORT).show();
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
