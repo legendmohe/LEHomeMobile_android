@@ -28,6 +28,9 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.tencent.android.tpush.XGPushManager;
 
 import java.lang.ref.WeakReference;
@@ -60,17 +63,26 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void start() {
         BusProvider.getRestBusInstance().register(this);
         setupService();
+        setupImageLoader();
     }
 
     @Override
     public void stop() {
         BusProvider.getRestBusInstance().unregister(this);
+        destoryImageLoader();
     }
 
     @Override
     public void onActivityResume() {
         super.onActivityResume();
+        ImageLoader.getInstance().resume();
         MessageHelper.removeNotification(mMainActivityView.get().getContext());
+    }
+
+    @Override
+    public void onActivityPause() {
+        super.onActivityPause();
+        ImageLoader.getInstance().pause();
     }
 
     private void setupService() {
@@ -89,6 +101,31 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
             LocalMsgHelper.stopLocalMsgService(context);
         }
+    }
+
+    public void setupImageLoader() {
+//        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mMainActivityView.get().getContext())
+//            .build();
+//        ImageLoader.getInstance().init(config);
+        // UNIVERSAL IMAGE LOADER SETUP
+//        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+//                .resetViewBeforeLoading(true)
+//                .postProcessor(null).delayBeforeLoading(0)
+//                .cacheOnDisk(true).cacheInMemory(true)
+//                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+//                .displayer(new SimpleBitmapDisplayer()).build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+                mMainActivityView.get().getContext())
+//                .defaultDisplayImageOptions(defaultOptions)
+                .memoryCache(new WeakMemoryCache())
+                .diskCacheSize(10 * 1024 * 1024).build();
+
+        ImageLoader.getInstance().init(config);
+    }
+
+    private void destoryImageLoader() {
+        ImageLoader.getInstance().destroy();
     }
 
     private boolean initLocalMessageService() {

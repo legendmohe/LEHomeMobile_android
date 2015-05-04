@@ -40,6 +40,7 @@ import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
+import my.home.model.entities.ChatItemConstants;
 import my.home.model.manager.DBStaticManager;
 
 public class MessageHelper {
@@ -165,9 +166,15 @@ public class MessageHelper {
     public static void sendServerMsgToList(int seq, String type, String content, Context context) {
         ChatItem newItem = new ChatItem();
         newItem.setContent(content);
-        newItem.setIsMe(false);
         newItem.setDate(new Date());
         newItem.setSeq(seq);
+
+        if (type.equals("capture")) {
+            newItem.setType(ChatItemConstants.TYPE_SERVER_IMAGE);
+        } else {
+            newItem.setType(ChatItemConstants.TYPE_SERVER);
+        }
+
         DBStaticManager.addChatItem(context, newItem);
 
         if (!MainActivity.VISIBLE) {

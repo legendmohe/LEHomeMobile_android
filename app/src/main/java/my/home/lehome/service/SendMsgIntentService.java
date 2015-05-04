@@ -51,6 +51,7 @@ import java.util.List;
 import my.home.lehome.R;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
+import my.home.model.entities.ChatItemConstants;
 import my.home.model.manager.DBStaticManager;
 
 /**
@@ -130,7 +131,7 @@ public class SendMsgIntentService extends IntentService {
         if (item == null) {
             item = new ChatItem();
             item.setContent(intent.getStringExtra("cmd"));
-            item.setIsMe(true);
+            item.setType(ChatItemConstants.TYPE_ME);
             item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
             item.setDate(new Date());
             DBStaticManager.addChatItem(getApplicationContext(), item);
@@ -318,7 +319,7 @@ public class SendMsgIntentService extends IntentService {
 
             newItem = new ChatItem();
             newItem.setContent(desc);
-            newItem.setIsMe(false);
+            newItem.setType(ChatItemConstants.TYPE_SERVER);
             newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
             newItem.setDate(new Date());
             DBStaticManager.addChatItem(context, newItem);

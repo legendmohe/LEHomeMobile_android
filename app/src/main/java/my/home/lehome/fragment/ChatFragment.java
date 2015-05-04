@@ -615,7 +615,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
             MenuInflater inflater = getActivity().getMenuInflater();
             ChatItem chatItem = mAdapter.getItem(info.position);
-            if (chatItem.getIsMe()) {
+            if (chatItem.isMe()) {
                 inflater.inflate(R.menu.chat_item_is_me, menu);
             } else {
                 inflater.inflate(R.menu.chat_item_not_me, menu);

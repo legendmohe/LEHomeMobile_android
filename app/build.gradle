@@ -51,4 +51,5 @@ dependencies {
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'com.android.support:recyclerview-v7:21.0.+'
     compile 'org.altbeacon:android-beacon-library:2+'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
 }

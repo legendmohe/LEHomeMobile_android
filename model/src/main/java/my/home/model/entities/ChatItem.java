@@ -29,7 +29,7 @@ public class ChatItem implements Parcelable {
      * Not-null value.
      */
     private String content;
-    private boolean isMe;
+    private int type;
     private int state;
     private int seq;
     private java.util.Date date;
@@ -41,10 +41,10 @@ public class ChatItem implements Parcelable {
         this.id = id;
     }
 
-    public ChatItem(Long id, String content, boolean isMe, int state, int seq, java.util.Date date) {
+    public ChatItem(Long id, String content, int type, int state, int seq, java.util.Date date) {
         this.id = id;
         this.content = content;
-        this.isMe = isMe;
+        this.type = type;
         this.state = state;
         this.seq = seq;
         this.date = date;
@@ -58,26 +58,22 @@ public class ChatItem implements Parcelable {
         this.id = id;
     }
 
-    /**
-     * Not-null value.
-     */
+    /** Not-null value. */
     public String getContent() {
         return content;
     }
 
-    /**
-     * Not-null value; ensure this value is available before it is saved to the database.
-     */
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setContent(String content) {
         this.content = content;
     }
 
-    public boolean getIsMe() {
-        return isMe;
+    public int getType() {
+        return type;
     }
 
-    public void setIsMe(boolean isMe) {
-        this.isMe = isMe;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getState() {
@@ -104,6 +100,34 @@ public class ChatItem implements Parcelable {
         this.date = date;
     }
 
+    public boolean isMe() {
+        if (this.getType() == ChatItemConstants.TYPE_ME) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isServer() {
+        if (this.getType() == ChatItemConstants.TYPE_SERVER) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isMeImageItem() {
+        if (this.getType() == ChatItemConstants.TYPE_ME_IMAGE) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isServerImageItem() {
+        if (this.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -120,7 +144,7 @@ public class ChatItem implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
         dest.writeString(content);
-        dest.writeInt(isMe ? 1 : 0);
+        dest.writeInt(type);
         dest.writeInt(state);
         dest.writeInt(seq);
         dest.writeLong(date.getTime());
@@ -142,7 +166,7 @@ public class ChatItem implements Parcelable {
     private ChatItem(Parcel in) {
         setId(in.readLong());
         setContent(in.readString());
-        setIsMe(in.readInt() == 1);
+        setType(in.readInt());
         setState(in.readInt());
         setSeq(in.readInt());
         setDate(new java.util.Date(in.readLong()));
@@ -152,7 +176,7 @@ public class ChatItem implements Parcelable {
     public String toString() {
         return "info: " + id + "\n"
                 + "content: " + content + "\n"
-                + "isMe: " + isMe + "\n"
+                + "type: " + type + "\n"
                 + "state: " + state + "\n"
                 + "seq: " + seq + "\n"
                 + "date: " + date + "\n";

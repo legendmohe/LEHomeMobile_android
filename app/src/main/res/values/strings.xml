@@ -124,5 +124,6 @@
     <string name="find_my_tag_select_beacon">选择测量目标</string>
     <string name="find_my_tag_bt_turning_on">正在打开蓝牙</string>
     <string name="find_my_tag_bt_off">蓝牙已关闭</string>
+    <string name="save_capture_to_sdcard">保存图片到手机</string>
 
 </resources>
