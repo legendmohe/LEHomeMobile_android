@@ -41,4 +41,11 @@ public class NetworkUtil {
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return mWifi;
     }
+    
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager 
+              = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+}
 }
