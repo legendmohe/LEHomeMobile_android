@@ -31,7 +31,6 @@ import android.util.Log;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.tencent.android.tpush.XGPushManager;
 
 import java.lang.ref.WeakReference;
 
@@ -98,7 +97,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
 //                    PushUtils.getMetaValue(context, "api_key"));
         } else {
 //            PushManager.stopWork(context);
-            XGPushManager.unregisterPush(mMainActivityView.get().getApplicationContext());
+            PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
             LocalMsgHelper.stopLocalMsgService(context);
         }
     }

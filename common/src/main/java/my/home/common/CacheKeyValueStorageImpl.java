@@ -60,7 +60,7 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     }
 
     @Override
-    public boolean hasKey(String key) {
+    public synchronized boolean hasKey(String key) {
         if (mCache.containsKey(key))
             return true;
         return storageHasKey(key);
@@ -92,17 +92,17 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     }
     
     @Override
-    public void removeString(String key) {
+    public synchronized void removeString(String key) {
         mCache.remove(key);
         storageRemoveString(key);
     }
 
-    public abstract boolean storageHasKey(String key);
+    abstract boolean storageHasKey(String key);
 
-    public abstract void storagePutString(String key, String value);
+    abstract void storagePutString(String key, String value);
 
-    public abstract String storageGetString(String key);
-    
-    public abstract void storageRemoveString(String key);
+    abstract String storageGetString(String key);
+
+    abstract void storageRemoveString(String key);
 }
 

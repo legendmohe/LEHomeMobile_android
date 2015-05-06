@@ -33,25 +33,25 @@ public class PrefKeyValueStorgeImpl extends CacheKeyValueStorageImpl {
     }
 
     @Override
-    public boolean storageHasKey(String key) {
+    boolean storageHasKey(String key) {
         if (mPref.getString(key, null) == null)
             return false;
         return true;
     }
 
     @Override
-    public void storagePutString(String key, String value) {
+    void storagePutString(String key, String value) {
         mEditor.putString(key, value);
     }
 
     @Override
-    public String storageGetString(String key) {
+    String storageGetString(String key) {
         return mPref.getString(key, null);
     }
     
     @Override
-    public void storageRemoveString(String key) {
-    	mEditor.remove(key);
+    void storageRemoveString(String key) {
+        mEditor.remove(key);
     }
 
     @Override

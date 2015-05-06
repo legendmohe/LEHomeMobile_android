@@ -39,10 +39,12 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListe
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.skyfishjy.library.RippleBackground;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.lehome.R;
+import my.home.lehome.asynctask.SaveCaptureAsyncTask;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
@@ -175,6 +177,9 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                     alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
                             , new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
+                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+                            String fileName = new File(image_url).getName();
+                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
                         }
                     });
 

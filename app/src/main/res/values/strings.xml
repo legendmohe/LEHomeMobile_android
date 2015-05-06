@@ -125,5 +125,9 @@
     <string name="find_my_tag_bt_turning_on">正在打开蓝牙</string>
     <string name="find_my_tag_bt_off">蓝牙已关闭</string>
     <string name="save_capture_to_sdcard">保存图片到手机</string>
+    <string name="noti_bref_new_capture">图片消息，点击查看</string>
+    <string name="toast_saving_capture">正在保存</string>
+    <string name="toast_saving_capture_success">已保存</string>
+    <string name="toast_saving_capture_faild">保存失败</string>
 
 </resources>
