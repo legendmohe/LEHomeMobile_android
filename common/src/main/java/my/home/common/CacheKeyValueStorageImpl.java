@@ -36,13 +36,13 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
 
         @Override
         public boolean handleMessage(Message msg) {
-        	synchronized (mSyncLock) {
+            synchronized (mSyncLock) {
                 Log.d(TAG, "sync cache: " + mSyncCache.size());
                 for (String keyString : mSyncCache.keySet()) {
-	        		storagePutString(keyString, mSyncCache.get(keyString));
-				}
-	        	mSyncCache.clear();
-        	}
+                    storagePutString(keyString, mSyncCache.get(keyString));
+                }
+                mSyncCache.clear();
+            }
             return false;
         }
     }
@@ -74,14 +74,14 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
         msg.what = MSG_STORAGE_WHAT;
 
         synchronized (mSyncLock) {
-        	mSyncCache.put(key, value);
+            mSyncCache.put(key, value);
             mHandler.removeMessages(MSG_STORAGE_WHAT);
             mHandler.sendMessageDelayed(msg, 300);
         }
     }
 
     @Override
-    public String getString(String key) {
+    public synchronized String getString(String key) {
         if (mCache.containsKey(key)) {
             return mCache.get(key);
         }
@@ -93,8 +93,8 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     
     @Override
     public void removeString(String key) {
-    	mCache.remove(key);
-    	storageRemoveString(key);
+        mCache.remove(key);
+        storageRemoveString(key);
     }
 
     public abstract boolean storageHasKey(String key);
@@ -105,3 +105,4 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     
     public abstract void storageRemoveString(String key);
 }
+
