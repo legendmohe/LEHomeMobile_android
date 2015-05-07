@@ -14,12 +14,9 @@
 
 package my.home.lehome.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.lehome.R;
-import my.home.lehome.asynctask.SaveCaptureAsyncTask;
+import my.home.lehome.activity.PhotoViewerActivity;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
@@ -163,36 +160,38 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                 @Override
                 public void onClick(View v) {
                     String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse("file://" + path), "image/*");
+                    String fileName = new File(image_url).getName();
+                    Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
+                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_URL, path);
+                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_NAME, fileName);
                     getContext().startActivity(intent);
                 }
             });
-            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle(getContext().getResources().getString(R.string.save_capture_to_sdcard));
-                    alert.setMessage(Uri.parse(image_url).getLastPathSegment());
-                    alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
-                            , new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-                            String fileName = new File(image_url).getName();
-                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
-                        }
-                    });
-
-                    alert.setNegativeButton(getContext().getResources().getString(R.string.com_cancel),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                }
-                            });
-
-                    alert.show();
-                    return true;
-                }
-            });
+//            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {
+//                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+//                    alert.setTitle(getContext().getResources().getString(R.string.save_capture_to_sdcard));
+//                    alert.setMessage(Uri.parse(image_url).getLastPathSegment());
+//                    alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
+//                            , new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+//                            String fileName = new File(image_url).getName();
+//                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
+//                        }
+//                    });
+//
+//                    alert.setNegativeButton(getContext().getResources().getString(R.string.com_cancel),
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//                                }
+//                            });
+//
+//                    alert.show();
+//                    return true;
+//                }
+//            });
 
             ImageAware imageAware = new ImageViewAware(viewHolder.imageView, false);
             ImageLoader.getInstance().displayImage(image_url, imageAware, options, new SimpleImageLoadingListener() {

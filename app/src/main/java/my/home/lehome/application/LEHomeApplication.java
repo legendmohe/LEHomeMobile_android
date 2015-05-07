@@ -16,6 +16,9 @@ package my.home.lehome.application;
 
 import android.app.Application;
 
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.tencent.android.tpush.XGPushConfig;
 
 public class LEHomeApplication extends Application {
@@ -25,8 +28,13 @@ public class LEHomeApplication extends Application {
     public void onCreate() {
         super.onCreate();
         XGPushConfig.enableDebug(getApplicationContext(), false);
-//        XGPushConfig.setAccessId(getApplicationContext(), 2100063377);
-//        XGPushConfig.setAccessKey(getApplicationContext(), "AE398MRA65DZ");
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+                getApplicationContext())
+//                .defaultDisplayImageOptions(defaultOptions)
+                .memoryCache(new WeakMemoryCache())
+                .diskCacheSize(10 * 1024 * 1024).build();
+
+        ImageLoader.getInstance().init(config);
     }
 
 }

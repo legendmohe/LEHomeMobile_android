@@ -28,9 +28,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.lang.ref.WeakReference;
 
@@ -62,13 +60,11 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void start() {
         BusProvider.getRestBusInstance().register(this);
         setupService();
-        setupImageLoader();
     }
 
     @Override
     public void stop() {
         BusProvider.getRestBusInstance().unregister(this);
-        destoryImageLoader();
     }
 
     @Override
@@ -114,18 +110,18 @@ public class MainActivityPresenter extends MVPActivityPresenter {
 //                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
 //                .displayer(new SimpleBitmapDisplayer()).build();
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-                mMainActivityView.get().getContext())
-//                .defaultDisplayImageOptions(defaultOptions)
-                .memoryCache(new WeakMemoryCache())
-                .diskCacheSize(10 * 1024 * 1024).build();
-
-        ImageLoader.getInstance().init(config);
+//        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+//                mMainActivityView.get().getContext())
+////                .defaultDisplayImageOptions(defaultOptions)
+//                .memoryCache(new WeakMemoryCache())
+//                .diskCacheSize(10 * 1024 * 1024).build();
+//
+//        ImageLoader.getInstance().init(config);
     }
 
-    private void destoryImageLoader() {
-        ImageLoader.getInstance().destroy();
-    }
+//    private void destoryImageLoader() {
+//        ImageLoader.getInstance().destroy();
+//    }
 
     private boolean initLocalMessageService() {
         if (mMainActivityView.get() == null) {

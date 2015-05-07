@@ -129,5 +129,5 @@
     <string name="toast_saving_capture">正在保存</string>
     <string name="toast_saving_capture_success">已保存</string>
     <string name="toast_saving_capture_faild">保存失败</string>
-
+    <string name="title_activity_photo_viewer">图片</string>
 </resources>
