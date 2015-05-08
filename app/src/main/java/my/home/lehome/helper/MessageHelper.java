@@ -29,6 +29,7 @@ import com.tencent.android.tpush.XGPushManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -241,21 +242,22 @@ public class MessageHelper {
             if (KeyValueStorage.getInstance().getStorageImpl() == null) {
                 KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(context));
             }
-            LinkedList<Integer> limitedQueue = null;
+            Integer[] resultArray = null;
             if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
-                limitedQueue = (LinkedList<Integer>) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, LinkedList.class);
-//                Log.d(TAG, "limitedQueue" + limitedQueue);
-                if (limitedQueue != null && limitedQueue.contains(seq))
-                    return true;
+                resultArray = (Integer[]) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, Integer[].class);
+                for (Integer i : resultArray) {
+                    if (i.equals(seq)) return true;
+                }
             }
-            if (limitedQueue == null) {
-                limitedQueue = new LinkedList<>();
+            LinkedList<Integer> limitedQueue = new LinkedList<>();
+            if (resultArray != null && resultArray.length != 0) {
+                limitedQueue.addAll(Arrays.asList(resultArray));
             }
-            boolean added = limitedQueue.add(seq);
-            while (added && limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
-                limitedQueue.remove();
+            limitedQueue.addFirst(seq);
+            while (limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
+                limitedQueue.removeLast();
             }
-            KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue);
+            KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue.toArray(), Integer[].class);
         }
         return false;
     }

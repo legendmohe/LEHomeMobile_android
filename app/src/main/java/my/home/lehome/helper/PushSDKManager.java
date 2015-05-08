@@ -25,16 +25,10 @@ public class PushSDKManager {
     public static boolean PushSDKEnable = false;
 
     public static void stopPushSDKService(Context context) {
-        if (PushSDKEnable) {
-            XGPushManager.unregisterPush(context);
-            PushSDKEnable = false;
-        }
+        XGPushManager.unregisterPush(context);
     }
 
     public static void startPushSDKService(Context context) {
-        if (!PushSDKEnable) {
-            XGPushManager.registerPush(context);
-            PushSDKEnable = true;
-        }
+        XGPushManager.registerPush(context);
     }
 }

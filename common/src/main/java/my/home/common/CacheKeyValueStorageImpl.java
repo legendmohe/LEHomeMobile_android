@@ -41,6 +41,7 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
                 for (String keyString : mSyncCache.keySet()) {
                     storagePutString(keyString, mSyncCache.get(keyString));
                 }
+                storageSync();
                 mSyncCache.clear();
             }
             return false;
@@ -90,11 +91,16 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
             mCache.put(key, value);
         return value;
     }
-    
+
     @Override
     public synchronized void removeString(String key) {
         mCache.remove(key);
         storageRemoveString(key);
+    }
+
+    @Override
+    public void sync() {
+        storageSync();
     }
 
     abstract boolean storageHasKey(String key);
@@ -104,5 +110,7 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
     abstract String storageGetString(String key);
 
     abstract void storageRemoveString(String key);
+
+    abstract void storageSync();
 }
 

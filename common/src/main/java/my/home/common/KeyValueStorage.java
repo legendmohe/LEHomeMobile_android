@@ -68,17 +68,17 @@ public class KeyValueStorage {
         return false;
     }
 
-    public void putObject(String key, Object obj) {
-        String objJson = new Gson().toJson(obj);
+    public <T> void putObject(String key, Object obj, final Class<T> clazz) {
+        String objJson = new Gson().toJson(obj, clazz);
         putString(key, objJson);
     }
 
-    public Object getObject(String key, Class type) {
+    public <T> Object getObject(String key, Class<T> clazz) {
         String objJson = getString(key);
         if (TextUtils.isEmpty(objJson)) {
             return null;
         }
-        Object result = new Gson().fromJson(objJson, type);
+        Object result = new Gson().fromJson(objJson, clazz);
         return result;
     }
 

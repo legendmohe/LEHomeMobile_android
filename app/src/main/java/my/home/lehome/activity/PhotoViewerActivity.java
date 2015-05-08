@@ -14,9 +14,9 @@
 
 package my.home.lehome.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +27,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import my.home.lehome.R;
 import my.home.lehome.asynctask.SaveCaptureAsyncTask;
 
-public class PhotoViewerActivity extends ActionBarActivity {
+public class PhotoViewerActivity extends Activity {
     public static final String TAG = "PhotoViewerActivity";
 
     public static final String EXTRA_IMAGE_URL = "EXTRA_IMAGE_URL";
@@ -51,7 +51,8 @@ public class PhotoViewerActivity extends ActionBarActivity {
             imageView.setImage(ImageSource.uri(mImageUrl));
         }
 
-        getSupportActionBar().setTitle(mImageName);
+        if (getActionBar() != null)
+            getActionBar().setTitle(mImageName);
     }
 
     @Override
@@ -69,9 +70,6 @@ public class PhotoViewerActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement

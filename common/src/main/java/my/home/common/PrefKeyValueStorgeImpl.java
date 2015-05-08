@@ -55,7 +55,7 @@ public class PrefKeyValueStorgeImpl extends CacheKeyValueStorageImpl {
     }
 
     @Override
-    public void sync() {
+    void storageSync() {
         mEditor.apply();
     }
 }

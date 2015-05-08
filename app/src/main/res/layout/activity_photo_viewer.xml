@@ -18,7 +18,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="my.home.lehome.activity.PhotoViewerActivity"
-    android:background="@color/background_material_dark">
+    android:background="#c8000000">
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         ssiv:tileBackgroundColor="#000000"
