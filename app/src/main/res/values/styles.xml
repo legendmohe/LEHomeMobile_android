@@ -36,8 +36,6 @@
     </style>
 
     <style name="PhotoViewerAcvitity" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
-        <!--<item name="android:windowContentOverlay">@null</item>-->
-        <!--<item name="android:windowBackground">@null</item>-->
         <item name="android:windowAnimationStyle">@style/ShowPhotoAnimation</item>
     </style>
 

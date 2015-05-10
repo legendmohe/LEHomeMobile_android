@@ -12,16 +12,30 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="my.home.lehome.fragment.HomeStateFragment">
+    tools:context="my.home.lehome.fragment.HomeStateFragment"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:id="@+id/speed_textView"
+        android:textSize="12sp"
+        android:textAlignment="gravity"
+        android:textColor="#ccf3f3f3"
+        android:background="#cc141414"
+        android:focusable="false"
+        android:enabled="false"
+        android:gravity="center_horizontal"
+        android:clickable="false"
+        android:padding="4dp" />
 
-</FrameLayout>
+    <WebView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/camera_stream_webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+</LinearLayout>

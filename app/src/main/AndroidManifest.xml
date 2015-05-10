@@ -97,10 +97,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.PhotoViewerActivity"
-            android:label="@string/title_activity_photo_viewer"
-            android:theme="@style/PhotoViewerAcvitity"></activity>
 
         <!--
         <receiver

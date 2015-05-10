@@ -174,7 +174,7 @@ public class FindMyTagPresenter extends MVPPresenter implements BeaconConsumer {
         mBeaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
+                if (mFindMyTagView.get() != null && beacons.size() > 0) {
                     Beacon beacon = beacons.iterator().next();
                     Log.i(TAG, "UUID: " + beacon.getBluetoothAddress() + " beacon: " + beacon.getBluetoothName() + " distance: " + beacon.getDistance() + " data: " + beacon.getDataFields());
 

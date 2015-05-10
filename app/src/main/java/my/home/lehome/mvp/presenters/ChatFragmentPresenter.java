@@ -21,8 +21,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.otto.Subscribe;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +33,7 @@ import my.home.common.BusProvider;
 import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
+import my.home.lehome.asynctask.SaveCaptureAsyncTask;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
@@ -39,6 +42,7 @@ import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
+import my.home.model.entities.ChatItemConstants;
 import my.home.model.manager.DBStaticManager;
 
 /**
@@ -224,4 +228,16 @@ public class ChatFragmentPresenter extends MVPPresenter {
 //            mChatSuggestionView.get().onGetAutoCompleteItems(event.getResultList());
 //        }
 //    }
+
+    public void saveImageItem(ChatItem item) {
+        if (mChatItemListView.get() == null
+                || item == null
+                || (item.getType() != ChatItemConstants.TYPE_SERVER_IMAGE
+                && item.getType() != ChatItemConstants.TYPE_ME_IMAGE))
+            return;
+        String image_url = item.getContent();
+        String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+        String fileName = new File(image_url).getName();
+        new SaveCaptureAsyncTask(mChatItemListView.get().getContext()).execute(path, fileName);
+    }
 }

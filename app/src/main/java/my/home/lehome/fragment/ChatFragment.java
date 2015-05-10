@@ -89,6 +89,7 @@ import my.home.lehome.mvp.views.SaveLocalHistoryView;
 import my.home.lehome.util.Constants;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
+import my.home.lehome.view.PhotoViewerDialog;
 import my.home.lehome.view.SimpleAnimationListener;
 import my.home.lehome.view.SpeechDialog;
 import my.home.model.entities.AutoCompleteItem;
@@ -99,13 +100,16 @@ import my.home.model.manager.DBStaticManager;
 
 public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogListener
         , ResendButtonClickListener
+        , ChatItemArrayAdapter.ImageClickListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
         , ChatItemListView
         , ChatSuggestionView
         , CalendarDatePickerDialog.OnDateSetListener
         , RadialTimePickerDialog.OnTimeSetListener {
+
     public static final String TAG = ChatFragment.class.getName();
+    public static final String BUNDLE_KEY_SCROLL_TO_BOTTOM = "BUNDLE_KEY_SCROLL_TO_BOTTOM";
     private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
     private static final String FRAG_TAG_DATE_PICKER = "calendarDatePickerDialog";
 
@@ -148,6 +152,11 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     private int mScreenHeight = 0;
 
     /*
+     * photo
+     */
+    private PhotoViewerDialog mPhotoDialog = null;
+
+    /*
      * constant
      */
     public static final int MSG_TYPE_CHATITEM = 1;
@@ -162,11 +171,13 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         if (mAdapter == null) {
             mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_onright);
             mAdapter.setResendButtonClickListener(this);
+            mAdapter.setImageClickListener(this);
         }
         PublicHandler = new MyHandler(this);
         mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
         mChatFragmentPresenter.start();
 
+        mPhotoDialog = new PhotoViewerDialog(getActivity());
     }
 
     public boolean isScrollViewInButtom() {
@@ -191,6 +202,22 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
     public void setNeedShowUnread(boolean mNeedShowUnread) {
         this.mNeedShowUnread = mNeedShowUnread;
+    }
+
+    @Override
+    public void onImageViewClicked(String path, String fileName) {
+        if (mPhotoDialog != null) {
+            mPhotoDialog.setTarget(path, fileName);
+            mPhotoDialog.show();
+        }
+    }
+
+    @Override
+    public void onImageViewLongClicked(String path, String fileName) {
+        if (mPhotoDialog != null) {
+            mPhotoDialog.setTarget(path, fileName);
+            mPhotoDialog.show();
+        }
     }
 
     private static class MyHandler extends Handler {
@@ -273,7 +300,10 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         // for retainning fragment
         setRetainInstance(true);
         // for user experience
-        scrollMyListViewToBottom();
+        if (getArguments() != null && getArguments().getBoolean(BUNDLE_KEY_SCROLL_TO_BOTTOM)) {
+            scrollMyListViewToBottom();
+            getArguments().clear();
+        }
         return rootView;
     }
 
@@ -617,8 +647,10 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             ChatItem chatItem = mAdapter.getItem(info.position);
             if (chatItem.isMe()) {
                 inflater.inflate(R.menu.chat_item_is_me, menu);
-            } else {
+            } else if (chatItem.isServer()) {
                 inflater.inflate(R.menu.chat_item_not_me, menu);
+            } else if (chatItem.isServerImageItem()) {
+                inflater.inflate(R.menu.chat_item_server_image, menu);
             }
         }
     }
@@ -678,6 +710,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                     }, 200);
                 }
                 return true;
+            case R.id.save_item:
+                mChatFragmentPresenter.saveImageItem(mAdapter.getItem(info.position));
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -715,6 +750,10 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         mToast.cancel();
         if (null != mSpeechDialog && mSpeechDialog.isShowing()) {
             mSpeechDialog.dismiss();
+        }
+
+        if (null != mPhotoDialog && mPhotoDialog.isShowing()) {
+            mPhotoDialog.dismiss();
         }
 
         View rootView = getView();
@@ -774,14 +813,14 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     }
 
     public void scrollMyListViewToBottom() {
-//        mCmdListview.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
+        mCmdListview.postDelayed(new Runnable() {
+            @Override
+            public void run() {
                 // Select the last row so it will scroll into view...
                 mCmdListview.setSelection(mAdapter.getCount() - 1);
 //                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
-//            }
-//        }, 300);
+            }
+        }, 300);
     }
 
     public ChatItemArrayAdapter getAdapter() {

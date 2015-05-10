@@ -15,7 +15,6 @@
 package my.home.lehome.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,16 +40,17 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.lehome.R;
-import my.home.lehome.activity.PhotoViewerActivity;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
+    public static final String TAG = ChatItemArrayAdapter.class.getSimpleName();
 
     private static final int TYPE_CHATTO = 0;
     private static final int TYPE_CHATFROM = 1;
 
     private ResendButtonClickListener mResendButtonClickListener;
+    private ImageClickListener mImageClickListener;
     private TextView chatTextView;
 
     private DisplayImageOptions options;
@@ -159,39 +159,49 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-                    String fileName = new File(image_url).getName();
-                    Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
-                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_URL, path);
-                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_NAME, fileName);
-                    getContext().startActivity(intent);
+                    if (mImageClickListener != null) {
+                        String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+                        String fileName = new File(image_url).getName();
+                        mImageClickListener.onImageViewClicked(path, fileName);
+                    }
+//                    Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
+//                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_URL, path);
+//                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_NAME, fileName);
+//                    getContext().startActivity(intent);
                 }
             });
-//            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View v) {
-//                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-//                    alert.setTitle(getContext().getResources().getString(R.string.save_capture_to_sdcard));
-//                    alert.setMessage(Uri.parse(image_url).getLastPathSegment());
-//                    alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
-//                            , new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int whichButton) {
-//                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-//                            String fileName = new File(image_url).getName();
-//                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
-//                        }
-//                    });
-//
-//                    alert.setNegativeButton(getContext().getResources().getString(R.string.com_cancel),
-//                            new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int whichButton) {
-//                                }
-//                            });
-//
-//                    alert.show();
+            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return false;
+//                    Log.d(TAG, "image view long click");
+//                    if (mImageClickListener != null) {
+//                        String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+//                        String fileName = new File(image_url).getName();
+//                        mImageClickListener.onImageViewLongClicked(path, fileName);
+//                    }
+////                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+////                    alert.setTitle(getContext().getResources().getString(R.string.save_capture_to_sdcard));
+////                    alert.setMessage(Uri.parse(image_url).getLastPathSegment());
+////                    alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
+////                            , new DialogInterface.OnClickListener() {
+////                        public void onClick(DialogInterface dialog, int whichButton) {
+////                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
+////                            String fileName = new File(image_url).getName();
+////                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
+////                        }
+////                    });
+////
+////                    alert.setNegativeButton(getContext().getResources().getString(R.string.com_cancel),
+////                            new DialogInterface.OnClickListener() {
+////                                public void onClick(DialogInterface dialog, int whichButton) {
+////                                }
+////                            });
+////
+////                    alert.show();
 //                    return true;
-//                }
-//            });
+                }
+            });
 
             ImageAware imageAware = new ImageViewAware(viewHolder.imageView, false);
             ImageLoader.getInstance().displayImage(image_url, imageAware, options, new SimpleImageLoadingListener() {
@@ -254,6 +264,10 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         }
     }
 
+    public void setImageClickListener(ImageClickListener mImageClickListener) {
+        this.mImageClickListener = mImageClickListener;
+    }
+
     static class ViewHolder {
         ImageView imageView;
         TextView chatTextView;
@@ -267,10 +281,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
      * delegate
 	 */
 
-    public ResendButtonClickListener getResendButtonClickListener() {
-        return mResendButtonClickListener;
-    }
-
     public void setResendButtonClickListener(
             ResendButtonClickListener mResendButtonClickListener) {
         this.mResendButtonClickListener = mResendButtonClickListener;
@@ -278,5 +288,11 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
     public interface ResendButtonClickListener {
         public void onResendButtonClicked(int pos);
+    }
+
+    public interface ImageClickListener {
+        public void onImageViewClicked(String path, String fileName);
+
+        public void onImageViewLongClicked(String path, String fileName);
     }
 }

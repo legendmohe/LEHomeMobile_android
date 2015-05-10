@@ -69,7 +69,7 @@ public class MainActivity extends FragmentActivity
     private ActionBar mActionBar;
     private int mActionBarHeight;
 
-    private int mCurrentSection;
+    private int mCurrentSection = -1;
     private boolean doubleBackToExitPressedOnce;
 
     private MainActivityPresenter mMainActivityPresenter;
@@ -170,6 +170,9 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        if (mCurrentSection == position)
+            return;
+
         Fragment fragment = null;
         FragmentManager fm = getSupportFragmentManager();
         String fragment_tag = null;
@@ -181,6 +184,14 @@ public class MainActivity extends FragmentActivity
                 }
                 fragment_tag = CHAT_FRAGMENT_TAG;
                 fragment = chatFragment;
+
+                if (!fragment.isAdded()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean(ChatFragment.BUNDLE_KEY_SCROLL_TO_BOTTOM, true);
+                    fragment.setArguments(bundle);
+                } else {
+                    fragment.getArguments().putBoolean(ChatFragment.BUNDLE_KEY_SCROLL_TO_BOTTOM, true);
+                }
                 break;
             case 1:
                 ShortcutFragment shortcutFragment = (ShortcutFragment) fm.findFragmentByTag(SHORTCUT_FRAGMENT_TAG);
@@ -212,6 +223,7 @@ public class MainActivity extends FragmentActivity
         this.onSectionAttached(position);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 .replace(R.id.container, fragment, fragment_tag)
                 .commit();
     }
