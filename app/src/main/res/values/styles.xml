@@ -39,6 +39,10 @@
         <item name="android:windowAnimationStyle">@style/ShowPhotoAnimation</item>
     </style>
 
+    <style name="AddPattenDialog" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:windowAnimationStyle">@style/ShowPhotoAnimation</item>
+    </style>
+
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/fade_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out</item>

@@ -222,6 +222,18 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
     private static class MyHandler extends Handler {
         private final WeakReference<ChatFragment> mFragment;
+        private Runnable mToastRunnable = new Runnable() {
+            @Override
+            public void run() {
+                ChatFragment fragment = mFragment.get();
+                if (!fragment.isScrollViewInButtom()) {
+                    int newNum = fragment.getNewMsgNum();
+                    fragment.setNewMsgNum(++newNum);
+                    fragment.showTip(newNum + " new message");
+                    fragment.setNeedShowUnread(true);
+                }
+            }
+        };
 
         public MyHandler(ChatFragment fragment) {
             mFragment = new WeakReference<>(fragment);
@@ -229,7 +241,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
         @Override
         public void handleMessage(Message msg) {
-            ChatFragment fragment = mFragment.get();
+            final ChatFragment fragment = mFragment.get();
             if (fragment != null) {
                 switch (msg.what) {
                     case MSG_TYPE_CHATITEM:
@@ -239,10 +251,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                             fragment.getAdapter().add(newItem);
                             fragment.getAdapter().notifyDataSetChanged();
                             if (!fragment.isScrollViewInButtom()) {
-                                int newNum = fragment.getNewMsgNum();
-                                fragment.setNewMsgNum(++newNum);
-                                fragment.showTip(newNum + " new message");
-                                fragment.setNeedShowUnread(true);
+                                fragment.getCmdListView().removeCallbacks(mToastRunnable);
+                                fragment.getCmdListView().postDelayed(mToastRunnable, 500);
                             } else {
                                 fragment.setNewMsgNum(0);
                                 fragment.scrollMyListViewToBottom();
@@ -338,17 +348,17 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                     return;
                 topVisibleIndex = firstVisibleItem;
                 int vH = view.getHeight();
-                int bottomPos = view.getChildAt(visibleItemCount - 1).getBottom();
-
-                if (firstVisibleItem + visibleItemCount == totalItemCount && vH >= bottomPos) {
+                View childView = view.getChildAt(visibleItemCount - 1);
+                if (firstVisibleItem + visibleItemCount == totalItemCount && vH >= childView.getBottom()) {
                     Log.d(TAG, "reach buttom");
                     mScrollViewInButtom = true;
                     if (mNeedShowUnread) {
                         mNeedShowUnread = false;
                     }
                 } else {
-                    if (mScrollViewInButtom == true)
+                    if (mScrollViewInButtom == true) {
                         mScrollViewInButtom = false;
+                    }
                 }
             }
         });
@@ -813,18 +823,22 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     }
 
     public void scrollMyListViewToBottom() {
-        mCmdListview.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+//        mCmdListview.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
                 // Select the last row so it will scroll into view...
                 mCmdListview.setSelection(mAdapter.getCount() - 1);
 //                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
-            }
-        }, 300);
+//            }
+//        }, 300);
     }
 
     public ChatItemArrayAdapter getAdapter() {
         return mAdapter;
+    }
+
+    public ListView getCmdListView() {
+        return mCmdListview;
     }
 
     /**

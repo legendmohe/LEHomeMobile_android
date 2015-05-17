@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import my.home.lehome.R;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
@@ -67,6 +68,9 @@ public class ShortcutFragment extends ListFragment {
         // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
         registerForContextMenu(getListView());
+
+//        AddPattenDialog addPattenDialog = new AddPattenDialog(getActivity());
+//        addPattenDialog.show();
     }
 
     @Override
@@ -103,16 +107,27 @@ public class ShortcutFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView parent, View v,
                                 int position, long id) {
-//        Shortcut shortcut = adapter.getItem(position);
-//        shortcut.setInvoke_count(shortcut.getInvoke_count() + 1);
-//        DBHelper.updateShortcut(this.getActivity(), shortcut);
+        final Shortcut shortcut = adapter.getItem(position);
+        shortcut.setInvoke_count(shortcut.getInvoke_count() + 1);
+        DBStaticManager.updateShortcut(this.getActivity(), shortcut);
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        alert.setTitle(R.string.qs_run_favor);
+        alert.setMessage(getString(R.string.qs_run_quote, shortcut.getContent()));
+        alert.setPositiveButton(R.string.com_comfirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getActivity(),
+                        getResources().getString(R.string.com_exec) + ":" + shortcut.getContent(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        alert.setNegativeButton(R.string.com_cancel, null);
+        alert.show();
 //
 //        MainActivity mainActivity = (MainActivity) getActivity();
 //        new SendCommandAsyncTask(mainActivity, shortcut.getContent()).execute();
 //
-//        Toast.makeText(getActivity(),
-//                getResources().getString(R.string.com_exec) + ":" + shortcut.getContent(),
-//                Toast.LENGTH_SHORT).show();
     }
 
     @Override

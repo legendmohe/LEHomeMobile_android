@@ -53,7 +53,7 @@
     <string name="qs_default_input">开灯</string>
     <string name="add_shortcut_item_summ">键入命令</string>
     <string name="add_chat_item_to_shortcut">添加到收藏</string>
-    <string name="delete_shortcut_item">删除收藏</string>
+    <string name="delete_shortcut_item">删除</string>
     <string name="copy_item">复制消息</string>
     <string name="copy_to_input">复制到输入框</string>
     <string name="edittext_hint">输入命令</string>
@@ -130,4 +130,6 @@
     <string name="toast_saving_capture_success">已保存</string>
     <string name="toast_saving_capture_faild">保存失败</string>
     <string name="title_activity_photo_viewer">图片</string>
+    <string name="qs_run_favor">直接执行</string>
+    <string name="qs_run_quote">[%1$s]</string>
 </resources>
