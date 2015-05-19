@@ -15,7 +15,6 @@
 package my.home.common;
 
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 
@@ -29,13 +28,9 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
 
     private final int MSG_STORAGE_WHAT = 0;
 
-    class CacheHandlerThread extends HandlerThread implements Handler.Callback {
-        public CacheHandlerThread(String name) {
-            super(name);
-        }
-
+    private final Runnable mSyncRunnable = new Runnable() {
         @Override
-        public boolean handleMessage(Message msg) {
+        public void run() {
             synchronized (mSyncLock) {
                 Log.d(TAG, "sync cache: " + mSyncCache.size());
                 for (String keyString : mSyncCache.keySet()) {
@@ -44,20 +39,20 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
                 storageSync();
                 mSyncCache.clear();
             }
-            return false;
         }
-    }
+    };
 
     final ConcurrentHashMap<String, String> mCache = new ConcurrentHashMap<>();
     final ConcurrentHashMap<String, String> mSyncCache = new ConcurrentHashMap<>();
     private final Object mSyncLock = new Object();
-    private Handler mHandler;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            new Thread(mSyncRunnable).start();
+        }
+    };
 
     public CacheKeyValueStorageImpl() {
-        CacheHandlerThread cacheHandlerThread = new CacheHandlerThread("CacheKeyValueStorageImpl");
-        cacheHandlerThread.setPriority(Thread.MIN_PRIORITY);
-        cacheHandlerThread.start();
-        mHandler = new Handler(cacheHandlerThread.getLooper(), cacheHandlerThread);
     }
 
     @Override
@@ -77,7 +72,7 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
         synchronized (mSyncLock) {
             mSyncCache.put(key, value);
             mHandler.removeMessages(MSG_STORAGE_WHAT);
-            mHandler.sendMessageDelayed(msg, 300);
+            mHandler.sendMessageDelayed(msg, 800);
         }
     }
 

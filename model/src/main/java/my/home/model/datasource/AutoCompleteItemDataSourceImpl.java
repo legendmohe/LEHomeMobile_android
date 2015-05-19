@@ -285,6 +285,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             // 3
             resultSet.add(new AutoCompleteItem(curState, 1.0f, mMessageSeq, cmd));
         } else if (inputBuffer.length() == 0) {
+            ArrayList<AutoCompleteItem> unweightItems = new ArrayList<>();
             String tempLeft = new StringBuilder(leftString).delete(0, lastString.length()).toString();
             if (tempLeft.length() != 0) {
                 if (curState.equals("message") || curState.equals("time")) {
@@ -293,7 +294,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                             if (val.startsWith(tempLeft)) {
                                 String tempCmd = new StringBuilder(val).delete(0, tempLeft.length()).toString();
                                 String cmd = cmdString + tempCmd;
-                                resultSet.add(new AutoCompleteItem(nextState, Float.MAX_VALUE, val, cmd));
+//                                resultSet.add(new AutoCompleteItem(nextState, Float.MAX_VALUE, val, cmd));
+                                unweightItems.add(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
                             }
                         }
                     }
@@ -302,7 +304,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                         if (val.startsWith(tempLeft) && !val.equals(tempLeft)) {
                             String tempCmd = new StringBuilder(val).delete(0, lastString.length()).toString();
                             String cmd = cmdString + tempCmd;
-                            resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
+//                            resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
+                            unweightItems.add(new AutoCompleteItem(curState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
                         }
                     }
                 }
@@ -311,7 +314,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                     if (val.startsWith(leftString) && val.length() != leftString.length()) {
                         String tempCmd = new StringBuilder(val).delete(0, lastString.length()).toString();
                         String cmd = cmdString + tempCmd;
-                        resultSet.add(new AutoCompleteItem(curState, Float.MAX_VALUE, val, cmd));
+//                        resultSet.add(new AutoCompleteItem(curState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
+                        unweightItems.add(new AutoCompleteItem(curState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
                     }
                 }
             }
@@ -321,7 +325,6 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
                 addDateToolItemToResult(resultSet);
                 addFavorToolItemToResult(resultSet);
             }
-            ArrayList<AutoCompleteItem> unweightItems = new ArrayList<>();
             for (String nextState : mLinks.get(curState)) {
                 if (nextState.equals("then")) {
                     if (in_if_state || in_while_state) {
@@ -358,15 +361,20 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             }
         } else {
             String tempInput = inputBuffer.toString();
+            ArrayList<AutoCompleteItem> unweightItems = new ArrayList<>();
             if (tempInput.length() != 0) {
                 for (String nextState : mLinks.get(curState)) {
                     for (String val : mNodes.get(nextState)) {
                         if (val.startsWith(tempInput)) {
                             String cmd = cmdString + val;
-                            resultSet.add(new AutoCompleteItem(nextState, 1.0f, val, cmd));
+                            unweightItems.add(new AutoCompleteItem(nextState, DEFAULT_AUTOCOMPLETE_WEIGHT, val, cmd));
                         }
                     }
                 }
+            }
+            if (unweightItems.size() != 0) {
+                setItemWeight(context, unweightItems, tempInput);
+                resultSet.addAll(unweightItems);
             }
         }
         List<AutoCompleteItem> resultList = new ArrayList<>(resultSet);

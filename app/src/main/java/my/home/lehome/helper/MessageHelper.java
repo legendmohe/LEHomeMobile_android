@@ -245,17 +245,19 @@ public class MessageHelper {
             Integer[] resultArray = null;
             if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
                 resultArray = (Integer[]) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, Integer[].class);
-                for (Integer i : resultArray) {
-                    if (i.equals(seq)) return true;
+                Arrays.sort(resultArray);
+                int idx = Arrays.binarySearch(resultArray, seq);
+                if (idx >= 0) {
+                    return true;
                 }
             }
             LinkedList<Integer> limitedQueue = new LinkedList<>();
             if (resultArray != null && resultArray.length != 0) {
                 limitedQueue.addAll(Arrays.asList(resultArray));
             }
-            limitedQueue.addFirst(seq);
+            limitedQueue.add(seq);
             while (limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
-                limitedQueue.removeLast();
+                limitedQueue.removeFirst();
             }
             KeyValueStorage.getInstance().putObject(MSG_SEQ_STORAGE_KEY, limitedQueue.toArray(), Integer[].class);
         }
