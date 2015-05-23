@@ -40,15 +40,14 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.lehome.R;
+import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.util.ChatItemUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
+import my.home.model.entities.ChatItemConstants;
 
 public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     public static final String TAG = ChatItemArrayAdapter.class.getSimpleName();
-
-    private static final int TYPE_CHATTO = 0;
-    private static final int TYPE_CHATFROM = 1;
 
     private ResendButtonClickListener mResendButtonClickListener;
     private ImageClickListener mImageClickListener;
@@ -88,27 +87,32 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
     @Override
     public int getViewTypeCount() {
-        return 2;
+        return 4;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (getItem(position).isMe()) {
-            return TYPE_CHATTO;
-        } else {
-            return TYPE_CHATFROM;
-        }
+        return getItem(position).getType();
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ChatItem chatItem = getItem(position);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            if (chatItem.isMe())
-                convertView = inflater.inflate(R.layout.chat_item_onright, parent, false);
-            else
-                convertView = inflater.inflate(R.layout.chat_item_onleft, parent, false);
-
+            switch (chatItem.getType()) {
+                case ChatItemConstants.TYPE_ME:
+                    convertView = inflater.inflate(R.layout.chat_item_client, parent, false);
+                    break;
+                case ChatItemConstants.TYPE_SERVER:
+                    convertView = inflater.inflate(R.layout.chat_item_server, parent, false);
+                    break;
+                case ChatItemConstants.TYPE_SERVER_IMAGE:
+                    convertView = inflater.inflate(R.layout.chat_item_server_img, parent, false);
+                    break;
+                case ChatItemConstants.TYPE_SERVER_LOC:
+                    convertView = inflater.inflate(R.layout.chat_item_server_loc, parent, false);
+                    break;
+            }
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.rippleBackground = (RippleBackground) convertView.findViewById(R.id.profile_rippleBackground);
             viewHolder.errorButton = (ImageButton) convertView.findViewById(R.id.resend_imagebutton);
@@ -130,11 +134,12 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
         if (chatItem.isMe()) {
             handleMeItem(position, chatItem, viewHolder);
-        }
-        if (chatItem.isServerImageItem()) {
+        } else if (chatItem.isServerImageItem()) {
             handlerServerImageItem(chatItem, viewHolder);
         } else if (chatItem.isServer()) {
             handleServerItem(chatItem, viewHolder);
+        } else if (chatItem.isServerLocItem()) {
+            handlerServerLocItem(chatItem, viewHolder);
         }
 
         String dateString = getTimeWithFormat(position);
@@ -147,6 +152,72 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
 
         return convertView;
+    }
+
+    private void handlerServerLocItem(ChatItem chatItem, final ViewHolder viewHolder) {
+        Context context = getContext();
+        String src = chatItem.getContent();
+        String[] location = src.split("\\|");
+        if (location.length != 4) {
+            viewHolder.chatTextView.setText(location[0]);
+            return;
+        }
+
+        String summary = context.getString(R.string.loc_current_addr, location[0], location[1]);
+        viewHolder.chatTextView.setText(summary);
+
+        final String latitude = location[2];
+        final String longitude = location[3];
+        final String mapUrl = LocationHelper.baiduStaticMapImgUrl(
+                longitude,
+                latitude,
+                viewHolder.imageView.getWidth(),
+                viewHolder.imageView.getHeight(),
+                18);
+        viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mImageClickListener != null) {
+                    mImageClickListener.onImageViewClicked(mapUrl);
+                }
+            }
+        });
+        viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
+
+        ImageAware imageAware = new ImageViewAware(viewHolder.imageView, false);
+        ImageLoader.getInstance().displayImage(mapUrl, imageAware, options, new SimpleImageLoadingListener() {
+
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        viewHolder.progressBar.setProgress(0);
+                        viewHolder.progressBar.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view,
+                                                FailReason failReason) {
+                        Log.w(TAG, failReason.toString());
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri,
+                                                  View view, Bitmap loadedImage) {
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                        viewHolder.imageView.setVisibility(View.VISIBLE);
+                    }
+                }, new ImageLoadingProgressListener() {
+                    @Override
+                    public void onProgressUpdate(String imageUri, View view, int current, int total) {
+                        viewHolder.progressBar.setProgress(Math.round(100.0f * current / total));
+                    }
+                }
+        );
     }
 
     private void handleMeItem(int position, ChatItem chatItem, ViewHolder viewHolder) {

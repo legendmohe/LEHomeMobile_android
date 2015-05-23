@@ -132,4 +132,9 @@
     <string name="title_activity_photo_viewer">图片</string>
     <string name="qs_run_favor">直接执行</string>
     <string name="qs_run_quote">[%1$s]</string>
+    <string name="pref_client_id">我的名字</string>
+    <string name="loc_current_addr">%1$s现在位于:%2$s</string>
+    <string name="loc_no_addr">%1$s不知道在哪里...</string>
+    <string name="loc_sending_loc">定位成功，正在发送位置到服务器...</string>
+    <string name="loc_send_error">上传地址失败</string>
 </resources>

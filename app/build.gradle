@@ -36,13 +36,13 @@ dependencies {
     compile project(':common')
     compile project(':domain')
     compile project(':model')
-
     compile files('libs/VoiceRecognition.jar')
     compile files('libs/jg_filter_sdk_1.1.jar')
     compile files('libs/mid-sdk-2.10.jar')
     compile files('libs/wup-1.0.0-SNAPSHOT.jar')
     compile files('libs/Xg_sdk_v2.38_20150405_2046.jar')
-    compile("com.doomonafireball.betterpickers:library:1.5.3") {
+    compile files('libs/BaiduLBS_Android.jar')
+    compile('com.doomonafireball.betterpickers:library:1.5.3') {
         exclude group: 'com.android.support', module: 'support-v4'
     }
     compile 'com.android.support:support-v4:21.0.3'

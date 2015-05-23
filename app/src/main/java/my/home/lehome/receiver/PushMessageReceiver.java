@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import my.home.lehome.R;
+import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;
 
 
@@ -64,7 +65,11 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
             return;
         }
 
-        if (type.equals("normal") || type.equals("capture")) {
+        if (type.equals("req_loc")) {
+            LocationHelper.enqueueLocationRequest(context, seq, type, msg);
+            return;
+        } else if (type.equals("bc_loc")) {
+        } else if (type.equals("normal") || type.equals("capture")) {
             MessageHelper.inNormalState = true;
         } else if (type.equals("toast")) {
             MessageHelper.sendToast(msg);

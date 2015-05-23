@@ -169,7 +169,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (mAdapter == null) {
-            mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_onright);
+            mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_client);
             mAdapter.setResendButtonClickListener(this);
             mAdapter.setImageClickListener(this);
         }

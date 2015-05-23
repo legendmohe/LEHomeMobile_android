@@ -127,6 +127,10 @@ public class SendMsgIntentService extends IntentService {
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
+        boolean isBackgroundCmd = intent.getBooleanExtra("bg", false);
+        if (isBackgroundCmd)
+            return;
+
         ChatItem item = intent.getParcelableExtra("update");
         if (item == null) {
             item = new ChatItem();
@@ -306,23 +310,35 @@ public class SendMsgIntentService extends IntentService {
 
         ChatItem item = intent.getParcelableExtra("pass_item");
         ChatItem newItem = null;
-        if (rep_code == 200) {
-            item.setState(Constants.CHATITEM_STATE_SUCCESS);
-            DBStaticManager.updateChatItem(context, item);
-        } else {
-            if (rep_code == 415) {
+        if (item != null) {
+            if (rep_code == 200) {
                 item.setState(Constants.CHATITEM_STATE_SUCCESS);
+                DBStaticManager.updateChatItem(context, item);
             } else {
-                item.setState(Constants.CHATITEM_STATE_ERROR);
-            }
-            DBStaticManager.updateChatItem(context, item);
+                if (rep_code == 415) {
+                    item.setState(Constants.CHATITEM_STATE_SUCCESS);
+                } else {
+                    item.setState(Constants.CHATITEM_STATE_ERROR);
+                }
+                DBStaticManager.updateChatItem(context, item);
 
-            newItem = new ChatItem();
-            newItem.setContent(desc);
-            newItem.setType(ChatItemConstants.TYPE_SERVER);
-            newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
-            newItem.setDate(new Date());
-            DBStaticManager.addChatItem(context, newItem);
+                newItem = new ChatItem();
+                newItem.setContent(desc);
+                newItem.setType(ChatItemConstants.TYPE_SERVER);
+                newItem.setState(Constants.CHATITEM_STATE_ERROR); // always set true
+                newItem.setDate(new Date());
+                DBStaticManager.addChatItem(context, newItem);
+            }
+        } else {
+            //TODO bug! need refresh list but no messager to use
+            if (rep_code != 200) {
+                newItem = new ChatItem();
+                newItem.setContent(getString(R.string.loc_send_error));
+                newItem.setType(ChatItemConstants.TYPE_ME);
+                newItem.setState(Constants.CHATITEM_STATE_SUCCESS); // always set true
+                newItem.setDate(new Date());
+                DBStaticManager.addChatItem(context, newItem);
+            }
         }
 
         Log.d(TAG, "dequeue item: \n" + item);

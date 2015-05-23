@@ -113,16 +113,23 @@ public class ChatItem implements Parcelable {
         }
         return false;
     }
+//
+//    public boolean isMeImageItem() {
+//        if (this.getType() == ChatItemConstants.TYPE_ME_IMAGE) {
+//            return true;
+//        }
+//        return false;
+//    }
 
-    public boolean isMeImageItem() {
-        if (this.getType() == ChatItemConstants.TYPE_ME_IMAGE) {
+    public boolean isServerImageItem() {
+        if (this.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
             return true;
         }
         return false;
     }
 
-    public boolean isServerImageItem() {
-        if (this.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
+    public boolean isServerLocItem() {
+        if (this.getType() == ChatItemConstants.TYPE_SERVER_LOC) {
             return true;
         }
         return false;

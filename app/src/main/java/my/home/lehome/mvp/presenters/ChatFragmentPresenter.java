@@ -232,8 +232,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
     public void saveImageItem(ChatItem item) {
         if (mChatItemListView.get() == null
                 || item == null
-                || (item.getType() != ChatItemConstants.TYPE_SERVER_IMAGE
-                && item.getType() != ChatItemConstants.TYPE_ME_IMAGE))
+                || item.getType() != ChatItemConstants.TYPE_SERVER_IMAGE)
             return;
         String image_url = item.getContent();
         String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();

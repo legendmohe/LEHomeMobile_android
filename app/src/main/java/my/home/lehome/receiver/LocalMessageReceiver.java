@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import my.home.lehome.R;
+import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;
 
 /**
@@ -64,6 +65,11 @@ public class LocalMessageReceiver extends BroadcastReceiver {
 
                 if (!TextUtils.isEmpty(err_msg)) {
                     MessageHelper.sendToast(err_msg);
+                    return;
+                }
+
+                if (type.equals("req_loc")) {
+                    LocationHelper.enqueueLocationRequest(context, seq, type, msg);
                     return;
                 }
 

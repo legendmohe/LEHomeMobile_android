@@ -15,6 +15,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/pref_user_profile">
         <EditTextPreference
+            android:title="@string/pref_client_id"
+            android:defaultValue=""
+            android:key="pref_client_id" />
+        <EditTextPreference
             android:title="@string/pref_bind_device"
             android:defaultValue=""
             android:key="pref_bind_device" />

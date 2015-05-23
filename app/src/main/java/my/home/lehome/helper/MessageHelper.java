@@ -172,6 +172,10 @@ public class MessageHelper {
 
         if (type.equals("capture")) {
             newItem.setType(ChatItemConstants.TYPE_SERVER_IMAGE);
+        } else if (type.equals("bc_loc")) {
+            newItem.setType(ChatItemConstants.TYPE_SERVER_LOC);
+        } else if (type.equals("client")) {
+            newItem.setType(ChatItemConstants.TYPE_ME);
         } else {
             newItem.setType(ChatItemConstants.TYPE_SERVER);
         }

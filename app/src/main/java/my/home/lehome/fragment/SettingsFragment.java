@@ -60,8 +60,10 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         beginEditTextPreference.setSummary(sharedPreferences.getString("pref_message_begin", ""));
         endEditTextPreference.setSummary(sharedPreferences.getString("pref_message_end", ""));
 
+        EditTextPreference nameEditTextPreference = (EditTextPreference) findPreference("pref_client_id");
         EditTextPreference subEditTextPreference = (EditTextPreference) findPreference("pref_server_address");
         EditTextPreference pubEditTextPreference = (EditTextPreference) findPreference("pref_bind_device");
+        nameEditTextPreference.setSummary(sharedPreferences.getString("pref_client_id", ""));
         subEditTextPreference.setSummary(sharedPreferences.getString("pref_server_address", ""));
         pubEditTextPreference.setSummary(sharedPreferences.getString("pref_bind_device", ""));
 
@@ -143,7 +145,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return true;
             }
         });
-        button = (Preference) findPreference("local_ip_item");
+        button = findPreference("local_ip_item");
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference arg0) {
@@ -210,6 +212,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             Preference exercisesPref = findPreference(key);
             exercisesPref.setSummary(sharedPreferences.getString(key, ""));
             mDeviceId = sharedPreferences.getString("pref_bind_device", "");
+        } else if (key.equals("pref_client_id")) {
+            Preference exercisesPref = findPreference(key);
+            exercisesPref.setSummary(sharedPreferences.getString(key, ""));
         } else if (key.equals("pref_auto_add_begin_and_end")) {
             if (sharedPreferences.getBoolean("pref_auto_add_begin_and_end", false)) {
                 findPreference("pref_message_begin").setEnabled(true);
