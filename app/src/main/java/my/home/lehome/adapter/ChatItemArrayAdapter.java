@@ -16,6 +16,7 @@ package my.home.lehome.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,11 +36,11 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListe
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.skyfishjy.library.RippleBackground;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import my.home.lehome.R;
+import my.home.lehome.util.ChatItemUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 
@@ -128,112 +129,12 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         final ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 
         if (chatItem.isMe()) {
-            viewHolder.rippleBackground.startRippleAnimation();
-            if (chatItem.getState() == Constants.CHATITEM_STATE_SUCCESS
-                    || !chatItem.isMe()) {
-                viewHolder.errorButton.setVisibility(View.GONE);
-                viewHolder.rippleBackground.stopRippleAnimation();
-            } else if (chatItem.getState() == Constants.CHATITEM_STATE_PENDING) {
-                viewHolder.errorButton.setVisibility(View.GONE);
-                viewHolder.rippleBackground.startRippleAnimation();
-            } else {
-                viewHolder.errorButton.setVisibility(View.VISIBLE);
-                viewHolder.rippleBackground.stopRippleAnimation();
-                if (mResendButtonClickListener != null) {
-                    final int pos = position;
-                    viewHolder.errorButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            mResendButtonClickListener.onResendButtonClicked(pos);
-                        }
-                    });
-                }
-            }
-            viewHolder.chatTextView.setText(chatItem.getContent());
+            handleMeItem(position, chatItem, viewHolder);
         }
         if (chatItem.isServerImageItem()) {
-            viewHolder.imageView.setVisibility(View.VISIBLE);
-            viewHolder.chatTextView.setVisibility(View.GONE);
-
-            final String image_url = chatItem.getContent();
-            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mImageClickListener != null) {
-                        String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-                        String fileName = new File(image_url).getName();
-                        mImageClickListener.onImageViewClicked(path, fileName);
-                    }
-//                    Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
-//                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_URL, path);
-//                    intent.putExtra(PhotoViewerActivity.EXTRA_IMAGE_NAME, fileName);
-//                    getContext().startActivity(intent);
-                }
-            });
-            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    return false;
-//                    Log.d(TAG, "image view long click");
-//                    if (mImageClickListener != null) {
-//                        String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-//                        String fileName = new File(image_url).getName();
-//                        mImageClickListener.onImageViewLongClicked(path, fileName);
-//                    }
-////                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-////                    alert.setTitle(getContext().getResources().getString(R.string.save_capture_to_sdcard));
-////                    alert.setMessage(Uri.parse(image_url).getLastPathSegment());
-////                    alert.setPositiveButton(getContext().getResources().getString(R.string.com_comfirm)
-////                            , new DialogInterface.OnClickListener() {
-////                        public void onClick(DialogInterface dialog, int whichButton) {
-////                            String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-////                            String fileName = new File(image_url).getName();
-////                            new SaveCaptureAsyncTask(getContext()).execute(path, fileName);
-////                        }
-////                    });
-////
-////                    alert.setNegativeButton(getContext().getResources().getString(R.string.com_cancel),
-////                            new DialogInterface.OnClickListener() {
-////                                public void onClick(DialogInterface dialog, int whichButton) {
-////                                }
-////                            });
-////
-////                    alert.show();
-//                    return true;
-                }
-            });
-
-            ImageAware imageAware = new ImageViewAware(viewHolder.imageView, false);
-            ImageLoader.getInstance().displayImage(image_url, imageAware, options, new SimpleImageLoadingListener() {
-
-                        @Override
-                        public void onLoadingStarted(String imageUri, View view) {
-                            viewHolder.progressBar.setProgress(0);
-                            viewHolder.progressBar.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onLoadingFailed(String imageUri, View view,
-                                                    FailReason failReason) {
-                            viewHolder.progressBar.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onLoadingComplete(String imageUri,
-                                                      View view, Bitmap loadedImage) {
-                            viewHolder.progressBar.setVisibility(View.GONE);
-                        }
-                    }, new ImageLoadingProgressListener() {
-                        @Override
-                        public void onProgressUpdate(String imageUri, View view, int current, int total) {
-                            viewHolder.progressBar.setProgress(Math.round(100.0f * current / total));
-                        }
-                    }
-            );
+            handlerServerImageItem(chatItem, viewHolder);
         } else if (chatItem.isServer()) {
-            viewHolder.imageView.setVisibility(View.GONE);
-            viewHolder.chatTextView.setVisibility(View.VISIBLE);
-            viewHolder.chatTextView.setText(chatItem.getContent());
+            handleServerItem(chatItem, viewHolder);
         }
 
         String dateString = getTimeWithFormat(position);
@@ -246,6 +147,87 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
 
         return convertView;
+    }
+
+    private void handleMeItem(int position, ChatItem chatItem, ViewHolder viewHolder) {
+        viewHolder.rippleBackground.startRippleAnimation();
+        if (chatItem.getState() == Constants.CHATITEM_STATE_SUCCESS
+                || !chatItem.isMe()) {
+            viewHolder.errorButton.setVisibility(View.GONE);
+            viewHolder.rippleBackground.stopRippleAnimation();
+        } else if (chatItem.getState() == Constants.CHATITEM_STATE_PENDING) {
+            viewHolder.errorButton.setVisibility(View.GONE);
+            viewHolder.rippleBackground.startRippleAnimation();
+        } else {
+            viewHolder.errorButton.setVisibility(View.VISIBLE);
+            viewHolder.rippleBackground.stopRippleAnimation();
+            if (mResendButtonClickListener != null) {
+                final int pos = position;
+                viewHolder.errorButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mResendButtonClickListener.onResendButtonClicked(pos);
+                    }
+                });
+            }
+        }
+        viewHolder.chatTextView.setText(chatItem.getContent());
+    }
+
+    private void handleServerItem(ChatItem chatItem, ViewHolder viewHolder) {
+        viewHolder.imageView.setVisibility(View.GONE);
+        viewHolder.chatTextView.setVisibility(View.VISIBLE);
+        viewHolder.chatTextView.setText(chatItem.getContent());
+    }
+
+    private void handlerServerImageItem(ChatItem chatItem, final ViewHolder viewHolder) {
+        viewHolder.imageView.setVisibility(View.VISIBLE);
+        viewHolder.chatTextView.setVisibility(View.GONE);
+
+        final String image_url = chatItem.getContent();
+        viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mImageClickListener != null) {
+                    mImageClickListener.onImageViewClicked(image_url);
+                }
+            }
+        });
+        viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
+
+        ImageAware imageAware = new ImageViewAware(viewHolder.imageView, false);
+        ImageLoader.getInstance().displayImage(ChatItemUtils.getThumbnailPath(image_url), imageAware, options, new SimpleImageLoadingListener() {
+
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        viewHolder.progressBar.setProgress(0);
+                        viewHolder.progressBar.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view,
+                                                FailReason failReason) {
+                        Log.w(TAG, failReason.toString());
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri,
+                                                  View view, Bitmap loadedImage) {
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                    }
+                }, new ImageLoadingProgressListener() {
+                    @Override
+                    public void onProgressUpdate(String imageUri, View view, int current, int total) {
+                        viewHolder.progressBar.setProgress(Math.round(100.0f * current / total));
+                    }
+                }
+        );
     }
 
     private String getTimeWithFormat(int position) {
@@ -291,8 +273,8 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     }
 
     public interface ImageClickListener {
-        public void onImageViewClicked(String path, String fileName);
+        public void onImageViewClicked(String imageURL);
 
-        public void onImageViewLongClicked(String path, String fileName);
+        public void onImageViewLongClicked(String imageURL);
     }
 }

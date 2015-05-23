@@ -92,7 +92,7 @@ public class HomeStateFragment extends Fragment {
     public void onStart() {
         mStopped = false;
         mHandler.postDelayed(mRunnable, 1000);
-        mWebView.loadUrl("http://192.168.1.111:22222/stream_simple.html");
+        mWebView.loadUrl("http://192.168.1.112:8080/stream_simple.html");
         super.onStart();
     }
 

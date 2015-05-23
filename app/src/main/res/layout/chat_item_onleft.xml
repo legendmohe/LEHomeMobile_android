@@ -62,8 +62,8 @@
 
             <ImageView
                 android:id="@+id/chat_content_imageview"
-                android:layout_width="200dp"
-                android:layout_height="150dp"
+                android:layout_width="192dp"
+                android:layout_height="144dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/chat_left_bg"

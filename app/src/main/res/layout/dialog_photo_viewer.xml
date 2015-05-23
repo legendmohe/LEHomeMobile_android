@@ -26,4 +26,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="150dp"
+        android:layout_height="10dp"
+        android:id="@+id/dialog_image_progressBar"
+        android:layout_gravity="center"
+        android:progressDrawable="@drawable/chat_progressbar"
+        android:visibility="gone"
+        android:layout_margin="10dp"
+        android:layout_centerInParent="true" />
+
 </RelativeLayout>

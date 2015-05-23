@@ -16,15 +16,24 @@ package my.home.lehome.view;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import my.home.lehome.R;
@@ -38,6 +47,8 @@ public class PhotoViewerDialog extends Dialog {
 
     private String mImageUrl = "";
     private String mImageName = "";
+    private ProgressBar mProgressBar;
+    private final DisplayImageOptions options;
 
     private final WeakReference<Activity> mContextActivity;
 
@@ -48,6 +59,13 @@ public class PhotoViewerDialog extends Dialog {
         setContentView(contentView);
 
         mContextActivity = new WeakReference<>(context);
+        mProgressBar = (ProgressBar) contentView.findViewById(R.id.dialog_image_progressBar);
+        options = new DisplayImageOptions.Builder()
+                .resetViewBeforeLoading(true)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .build();
     }
 
     @Override
@@ -60,6 +78,8 @@ public class PhotoViewerDialog extends Dialog {
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        if (TextUtils.isEmpty(mImageUrl) || TextUtils.isEmpty(mImageName))
+            return true;
         new SaveCaptureAsyncTask(getContext()).execute(mImageUrl, mImageName);
         return super.onMenuItemSelected(featureId, item);
     }
@@ -76,15 +96,58 @@ public class PhotoViewerDialog extends Dialog {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setTarget(String path, String fileName) {
-        mImageUrl = path;
-        mImageName = fileName;
-        if (!TextUtils.isEmpty(mImageUrl)) {
+    public void setTarget(String imageURL) {
+        File imageFile = ImageLoader.getInstance().getDiskCache().get(imageURL);
+        if (imageFile != null) {
+            mImageUrl = imageFile.getAbsolutePath();
+            mImageName = new File(imageURL).getName();
+        }
+        if (imageFile != null) {
             SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
             imageView.setImage(ImageSource.uri(mImageUrl));
+        } else {
+            ImageLoader.getInstance().loadImage(imageURL, null, options, new SimpleImageLoadingListener() {
+
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+                    mProgressBar.setProgress(0);
+                    mProgressBar.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view,
+                                            FailReason failReason) {
+                    Log.w(TAG, failReason.toString());
+                    mProgressBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri,
+                                              View view, Bitmap loadedImage) {
+                    mProgressBar.setVisibility(View.GONE);
+                    SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
+                    imageView.setImage(ImageSource.bitmap(loadedImage));
+
+                    File imageFile = ImageLoader.getInstance().getDiskCache().get(imageUri);
+                    if (imageFile != null) {
+                        mImageUrl = imageFile.getAbsolutePath();
+                        mImageName = new File(imageUri).getName();
+                    }
+                }
+            }, new ImageLoadingProgressListener() {
+                @Override
+                public void onProgressUpdate(String imageUri, View view, int current, int total) {
+                    mProgressBar.setProgress(Math.round(100.0f * current / total));
+                }
+            });
         }
 
         if (getActionBar() != null)
             getActionBar().setTitle(mImageName);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }

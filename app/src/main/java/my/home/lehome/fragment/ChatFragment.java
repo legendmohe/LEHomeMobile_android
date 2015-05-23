@@ -205,19 +205,15 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     }
 
     @Override
-    public void onImageViewClicked(String path, String fileName) {
+    public void onImageViewClicked(String imageURL) {
         if (mPhotoDialog != null) {
-            mPhotoDialog.setTarget(path, fileName);
+            mPhotoDialog.setTarget(imageURL);
             mPhotoDialog.show();
         }
     }
 
     @Override
-    public void onImageViewLongClicked(String path, String fileName) {
-        if (mPhotoDialog != null) {
-            mPhotoDialog.setTarget(path, fileName);
-            mPhotoDialog.show();
-        }
+    public void onImageViewLongClicked(String imageURL) {
     }
 
     private static class MyHandler extends Handler {
