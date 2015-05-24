@@ -83,7 +83,8 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .considerExifParams(true)
-                .displayer(new RoundedBitmapDisplayer(10)).build();
+                .displayer(new RoundedBitmapDisplayer(10))
+                .build();
     }
 
     @Override

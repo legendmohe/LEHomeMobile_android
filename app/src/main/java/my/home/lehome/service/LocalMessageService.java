@@ -36,6 +36,7 @@ import org.zeromq.ZMQException;
 import my.home.lehome.R;
 import my.home.lehome.receiver.LocalMessageReceiver;
 import my.home.lehome.receiver.ScreenStateReceiver;
+import zmq.ZError;
 
 /**
  * Created by legendmohe on 15/3/9.
@@ -277,6 +278,8 @@ public class LocalMessageService extends Service {
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.error_connect_local_server),
                         Toast.LENGTH_SHORT).show();
+            } catch (ZError.IOException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             } catch (Exception e) {
                 Log.e(TAG, Log.getStackTraceString(e));
             } finally {

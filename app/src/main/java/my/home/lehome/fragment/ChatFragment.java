@@ -37,7 +37,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -254,7 +253,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                                 fragment.getCmdListView().postDelayed(mToastRunnable, 500);
                             } else {
                                 fragment.setNewMsgNum(0);
-                                fragment.scrollMyListViewToBottom();
+                                fragment.scrollToBottom();
                             }
                         }
                         break;
@@ -310,7 +309,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         setRetainInstance(true);
         // for user experience
         if (getArguments() != null && getArguments().getBoolean(BUNDLE_KEY_SCROLL_TO_BOTTOM)) {
-            scrollMyListViewToBottom();
+            scrollToBottom();
             getArguments().clear();
         }
         return rootView;
@@ -326,12 +325,17 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (mKeyboard_open && scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-                    InputMethodManager inputManager =
-                            (InputMethodManager) getActivity().
-                                    getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(
-                            getActivity().getCurrentFocus().getWindowToken(),
-                            InputMethodManager.HIDE_NOT_ALWAYS);
+                    mSendCmdEdittext.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputMethodManager inputManager =
+                                    (InputMethodManager) getActivity().
+                                            getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.hideSoftInputFromWindow(
+                                    getActivity().getCurrentFocus().getWindowToken(),
+                                    InputMethodManager.HIDE_NOT_ALWAYS);
+                        }
+                    }, 300);
                 } else if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                     if (topVisibleIndex == 0
                             && mAdapter.getItem(0).getId() > Constants.CHATITEM_LOWEST_INDEX) {
@@ -361,39 +365,39 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 }
             }
         });
-        mCmdListview.setOnTouchListener(new OnTouchListener() {
-
-            private final GestureDetector gestureDetector = new GestureDetector(
-                    getContext(), new GestureDetector.SimpleOnGestureListener() {
-
-                private final float _SHOW_KEYBOARD_Y = 140.0f;
-
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    if (distanceY > _SHOW_KEYBOARD_Y) {
-                        mSendCmdEdittext.requestFocus();
-                        mSendCmdEdittext.postDelayed(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                InputMethodManager keyboard = (InputMethodManager)
-                                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                keyboard.showSoftInput(mSendCmdEdittext, 0);
-                            }
-                        }, 200);
-                    }
-                    return false;
-                }
-            });
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (mScrollViewInButtom) {
-                    return gestureDetector.onTouchEvent(event);
-                }
-                return false;
-            }
-        });
+//        mCmdListview.setOnTouchListener(new OnTouchListener() {
+//
+//            private final GestureDetector gestureDetector = new GestureDetector(
+//                    getContext(), new GestureDetector.SimpleOnGestureListener() {
+//
+//                private final float _SHOW_KEYBOARD_Y = 140.0f;
+//
+//                @Override
+//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+//                    if (distanceY > _SHOW_KEYBOARD_Y) {
+//                        mSendCmdEdittext.requestFocus();
+//                        mSendCmdEdittext.post(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                InputMethodManager keyboard = (InputMethodManager)
+//                                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                keyboard.showSoftInput(mSendCmdEdittext, 0);
+//                            }
+//                        });
+//                    }
+//                    return false;
+//                }
+//            });
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if (mScrollViewInButtom) {
+//                    return gestureDetector.onTouchEvent(event);
+//                }
+//                return false;
+//            }
+//        });
 
         mSuggestionButton = (Button) rootView.findViewById(R.id.cmd_suggestion_button);
         mSuggestionButton.setOnClickListener(new OnClickListener() {
@@ -571,10 +575,10 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             public void onGlobalLayout() {
                 int heightDiff = getView().getRootView().getHeight() - getView().getHeight();
                 Log.v(TAG, "height" + String.valueOf(heightDiff));
-                if (heightDiff > 200) { // if more than 100 pixels, its probably a keyboard...
+                if (heightDiff > 250) { // if more than 100 pixels, its probably a keyboard...
                     Log.v(TAG, "keyboard show.");
                     if (!mKeyboard_open) {
-                        ChatFragment.this.scrollMyListViewToBottom();
+                        ChatFragment.this.scrollToBottom();
                     }
                     mKeyboard_open = true;
                 } else if (mKeyboard_open) {
@@ -611,11 +615,16 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 //                    mSendCmdLayout.startAnimation(animation);
 
                     if (mKeyboard_open) {
-                        InputMethodManager inputManager = (InputMethodManager) getActivity().
-                                getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.hideSoftInputFromWindow(
-                                getActivity().getCurrentFocus().getWindowToken(),
-                                InputMethodManager.HIDE_NOT_ALWAYS);
+                        mSendCmdEdittext.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                InputMethodManager inputManager = (InputMethodManager) getActivity().
+                                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputManager.hideSoftInputFromWindow(
+                                        getActivity().getCurrentFocus().getWindowToken(),
+                                        InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                        });
                     }
                 } else {
                     Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
@@ -832,15 +841,21 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         }
     }
 
-    public void scrollMyListViewToBottom() {
-//        mCmdListview.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-                // Select the last row so it will scroll into view...
-                mCmdListview.setSelection(mAdapter.getCount() - 1);
-//                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
-//            }
-//        }, 300);
+    public void scrollToBottom() {
+        mCmdListview.clearFocus();
+        mCmdListview.setSelection(mAdapter.getCount() - 1);
+        // another scroll runnable for sroll to 'real' buttom
+        mCmdListview.post(new Runnable() {
+            @Override
+            public void run() {
+                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
+            }
+        });
+    }
+
+    public void scrollToBottomAnimate() {
+        mCmdListview.clearFocus();
+        mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
     }
 
     public ChatItemArrayAdapter getAdapter() {
@@ -994,7 +1009,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         } else {
             getAdapter().add(reqItem);
             getAdapter().notifyDataSetChanged();
-            scrollMyListViewToBottom();
+            scrollToBottomAnimate();
         }
     }
 
@@ -1005,7 +1020,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         } else {
             getAdapter().add(repItem);
             updateRequestChatItemState(getAdapter(), reqID, reqState);
-            scrollMyListViewToBottom();
+            scrollToBottomAnimate();
         }
     }
 
