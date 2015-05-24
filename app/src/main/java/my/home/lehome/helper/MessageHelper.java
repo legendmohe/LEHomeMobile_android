@@ -39,6 +39,7 @@ import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
+import my.home.lehome.util.CommonUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.ChatItemConstants;
@@ -75,10 +76,10 @@ public class MessageHelper {
             MESSAGE_BEGIN = mySharedPreferences.getString("pref_message_begin", "");
             MESSAGE_END = mySharedPreferences.getString("pref_message_end", "");
             if (MESSAGE_BEGIN.endsWith("/")) {
-                MESSAGE_BEGIN = CommonHelper.removeLastChar(MESSAGE_BEGIN);
+                MESSAGE_BEGIN = CommonUtils.removeLastChar(MESSAGE_BEGIN);
             }
             if (MESSAGE_END.endsWith("/")) {
-                MESSAGE_END = CommonHelper.removeLastChar(MESSAGE_END);
+                MESSAGE_END = CommonUtils.removeLastChar(MESSAGE_END);
             }
         } else {
             MESSAGE_BEGIN = "";

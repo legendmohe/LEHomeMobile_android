@@ -16,6 +16,8 @@ package my.home.lehome.view;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,10 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -55,6 +55,8 @@ public class PhotoViewerDialog extends Dialog {
     private final DisplayImageOptions options;
 
     private final WeakReference<Activity> mContextActivity;
+    private Intent mExtraIntent;
+    private String mExtraTitle;
 
     public PhotoViewerDialog(Activity context) {
         super(context, R.style.PhotoViewerAcvitity);
@@ -75,44 +77,6 @@ public class PhotoViewerDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LocationClient locationClient = null;
-        BDLocationListener myListener = new MyLocationListener();
-
-        locationClient = new LocationClient(mContextActivity.get().getApplicationContext());     //声明LocationClient类
-        locationClient.registerLocationListener(myListener);    //注册监听函数
-        locationClient.start();
-        locationClient.requestLocation();
-    }
-
-
-    public static class MyLocationListener implements BDLocationListener {
-        @Override
-        public void onReceiveLocation(BDLocation location) {
-            if (location == null)
-                return;
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time : ");
-            sb.append(location.getTime());
-            sb.append("\nerror code : ");
-            sb.append(location.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
-            if (location.getLocType() == BDLocation.TypeGpsLocation) {
-                sb.append("\nspeed : ");
-                sb.append(location.getSpeed());
-                sb.append("\nsatellite : ");
-                sb.append(location.getSatelliteNumber());
-            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-            }
-
-            Log.d(TAG, sb.toString());
-        }
     }
 
     @Override
@@ -120,36 +84,60 @@ public class PhotoViewerDialog extends Dialog {
         if (mContextActivity.get() != null) {
             mContextActivity.get().getMenuInflater().inflate(R.menu.menu_photo_viewer, menu);
         }
+        if (mExtraIntent != null) {
+            menu.getItem(1).setTitle(mExtraTitle);
+            menu.getItem(1).setVisible(true);
+        }
         return true;
     }
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        if (TextUtils.isEmpty(mImageUrl) || TextUtils.isEmpty(mImageName))
+        int id = item.getItemId();
+        if (id == R.id.action_save_photo && mContextActivity.get() != null) {
+            if (TextUtils.isEmpty(mImageUrl) || TextUtils.isEmpty(mImageName)) {
+                return super.onMenuItemSelected(featureId, item);
+            }
+            new SaveCaptureAsyncTask(mContextActivity.get().getApplicationContext()).execute(mImageUrl, mImageName);
             return true;
-        new SaveCaptureAsyncTask(getContext()).execute(mImageUrl, mImageName);
+        } else if (id == R.id.action_photo_extra_intent && mContextActivity.get() != null) {
+            try {
+                mContextActivity.get().startActivity(mExtraIntent);
+            } catch (ActivityNotFoundException exception) {
+                Toast.makeText(getContext(), R.string.toast_no_such_app, Toast.LENGTH_SHORT).show();
+            }
+        }
         return super.onMenuItemSelected(featureId, item);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_save_photo && mContextActivity.get() != null) {
+//            if (TextUtils.isEmpty(mImageUrl) || TextUtils.isEmpty(mImageName)) {
+//                return super.onOptionsItemSelected(item);
+//            }
+//            new SaveCaptureAsyncTask(mContextActivity.get().getApplicationContext()).execute(mImageUrl, mImageName);
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
-        if (id == R.id.action_save_photo && mContextActivity.get() != null) {
-            new SaveCaptureAsyncTask(mContextActivity.get().getApplicationContext()).execute(mImageUrl, mImageName);
-            return true;
+    public void setTarget(String imageURL, Intent extraIntent, String extraTitle) {
+        if (extraIntent != null) {
+            mExtraIntent = extraIntent;
+            mExtraTitle = extraTitle;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void setTarget(String imageURL) {
         File imageFile = ImageLoader.getInstance().getDiskCache().get(imageURL);
         if (imageFile != null) {
             mImageUrl = imageFile.getAbsolutePath();
             mImageName = new File(imageURL).getName();
         }
+        final View contentImageView = findViewById(R.id.scale_imageView);
         if (imageFile != null) {
+            contentImageView.setVisibility(View.VISIBLE);
             SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
             imageView.setImage(ImageSource.uri(mImageUrl));
         } else {
@@ -172,6 +160,7 @@ public class PhotoViewerDialog extends Dialog {
                 public void onLoadingComplete(String imageUri,
                                               View view, Bitmap loadedImage) {
                     mProgressBar.setVisibility(View.GONE);
+                    contentImageView.setVisibility(View.VISIBLE);
                     SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
                     imageView.setImage(ImageSource.bitmap(loadedImage));
 

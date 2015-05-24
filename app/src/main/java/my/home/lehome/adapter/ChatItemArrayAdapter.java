@@ -16,6 +16,7 @@ package my.home.lehome.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,6 +112,13 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                     break;
                 case ChatItemConstants.TYPE_SERVER_LOC:
                     convertView = inflater.inflate(R.layout.chat_item_server_loc, parent, false);
+//                    RelativeLayout layout = (RelativeLayout) convertView.findViewById(R.id.chat_loc_image_wrapper);
+//                    layout.setOnLongClickListener(new View.OnLongClickListener() {
+//                        @Override
+//                        public boolean onLongClick(View v) {
+//                            return false;
+//                        }
+//                    });
                     break;
             }
             final ViewHolder viewHolder = new ViewHolder();
@@ -127,6 +135,14 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                     return false;
                 }
             });
+            if (viewHolder.imageView != null) {
+                viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        return false;
+                    }
+                });
+            }
             convertView.setTag(viewHolder);
         }
 
@@ -157,35 +173,33 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     private void handlerServerLocItem(ChatItem chatItem, final ViewHolder viewHolder) {
         Context context = getContext();
         String src = chatItem.getContent();
-        String[] location = src.split("\\|");
-        if (location.length != 4) {
-            viewHolder.chatTextView.setText(location[0]);
-            return;
-        }
-
-        String summary = context.getString(R.string.loc_current_addr, location[0], location[1]);
-        viewHolder.chatTextView.setText(summary);
-
+        final String[] location = LocationHelper.parseLocationFromSrc(src);
         final String latitude = location[2];
         final String longitude = location[3];
-        final String mapUrl = LocationHelper.baiduStaticMapImgUrl(
+        final String mapUrl = LocationHelper.getBaiduStaticMapImgUrl(
                 longitude,
                 latitude,
                 viewHolder.imageView.getWidth(),
                 viewHolder.imageView.getHeight(),
                 18);
+        final String menuTitle = context.getString(R.string.loc_open_in_browser);
+        String summary = context.getString(R.string.loc_current_addr, location[0], location[1]);
+
+        viewHolder.chatTextView.setText(summary);
         viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mImageClickListener != null) {
-                    mImageClickListener.onImageViewClicked(mapUrl);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("imageURL", mapUrl);
+                    bundle.putString("extraTitle", menuTitle);
+                    bundle.putParcelable("extraIntent", LocationHelper.getBaiduMapUrlIntent(
+                            longitude, latitude,
+                            location[0], location[1],
+                            "lehome", "lehome"
+                    ));
+                    mImageClickListener.onImageViewClicked(bundle);
                 }
-            }
-        });
-        viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return false;
             }
         });
 
@@ -260,14 +274,10 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             @Override
             public void onClick(View v) {
                 if (mImageClickListener != null) {
-                    mImageClickListener.onImageViewClicked(image_url);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("imageURL", image_url);
+                    mImageClickListener.onImageViewClicked(bundle);
                 }
-            }
-        });
-        viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return false;
             }
         });
 
@@ -344,7 +354,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     }
 
     public interface ImageClickListener {
-        public void onImageViewClicked(String imageURL);
+        public void onImageViewClicked(Bundle bundle);
 
         public void onImageViewLongClicked(String imageURL);
     }

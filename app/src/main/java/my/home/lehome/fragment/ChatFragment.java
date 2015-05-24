@@ -18,10 +18,9 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -86,6 +85,7 @@ import my.home.lehome.mvp.presenters.ChatFragmentPresenter;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
+import my.home.lehome.util.CommonUtils;
 import my.home.lehome.util.Constants;
 import my.home.lehome.view.DelayAutoCompleteTextView;
 import my.home.lehome.view.OnSwipeTouchListener;
@@ -205,9 +205,12 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     }
 
     @Override
-    public void onImageViewClicked(String imageURL) {
+    public void onImageViewClicked(Bundle bundle) {
         if (mPhotoDialog != null) {
-            mPhotoDialog.setTarget(imageURL);
+            String imageURL = bundle.getString("imageURL");
+            String extraTitle = bundle.getString("extraTitle");
+            Intent intent = bundle.getParcelable("extraIntent");
+            mPhotoDialog.setTarget(imageURL, intent, extraTitle);
             mPhotoDialog.show();
         }
     }
@@ -657,6 +660,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 inflater.inflate(R.menu.chat_item_not_me, menu);
             } else if (chatItem.isServerImageItem()) {
                 inflater.inflate(R.menu.chat_item_server_image, menu);
+            } else if (chatItem.isServerLocItem()) {
+                inflater.inflate(R.menu.chat_item_server_loc, menu);
             }
         }
     }
@@ -694,9 +699,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 mChatFragmentPresenter.markAndSendCurrentInput(selectedString, shouldUseLocalMsg());
                 return true;
             case R.id.copy_item:
-                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText(getString(R.string.app_name), selectedString);
-                clipboard.setPrimaryClip(clip);
+                CommonUtils.copyStringToClipboard(getActivity(), getString(R.string.app_name), selectedString);
+                this.showTip(getString(R.string.msg_copyed_to_clipboard));
                 return true;
             case R.id.copy_to_input:
                 if (!TextUtils.isEmpty(selectedString)) {
@@ -718,6 +722,16 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 return true;
             case R.id.save_item:
                 mChatFragmentPresenter.saveImageItem(mAdapter.getItem(info.position));
+                return true;
+            case R.id.copy_loc_item_info:
+                mChatFragmentPresenter.copyLocationInfo(
+                        mAdapter.getItem(info.position),
+                        getString(R.string.app_name)
+                );
+                this.showTip(getString(R.string.msg_copyed_to_clipboard));
+                return true;
+            case R.id.action_photo_extra_intent:
+                mChatFragmentPresenter.openLocationInBrowser(mAdapter.getItem(info.position));
                 return true;
             default:
                 return super.onContextItemSelected(item);

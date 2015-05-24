@@ -34,11 +34,13 @@ import my.home.domain.events.DSaveAutoCompleteLocalHistoryEvent;
 import my.home.domain.events.DShowCmdSuggestionEvent;
 import my.home.domain.usecase.MarkCurrentInputUsecaseImpl;
 import my.home.lehome.asynctask.SaveCaptureAsyncTask;
+import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.mvp.views.ChatItemListView;
 import my.home.lehome.mvp.views.ChatSuggestionView;
 import my.home.lehome.mvp.views.SaveLocalHistoryView;
 import my.home.lehome.service.SendMsgIntentService;
+import my.home.lehome.util.CommonUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.AutoCompleteItem;
 import my.home.model.entities.ChatItem;
@@ -239,4 +241,30 @@ public class ChatFragmentPresenter extends MVPPresenter {
         String fileName = new File(image_url).getName();
         new SaveCaptureAsyncTask(mChatItemListView.get().getContext()).execute(path, fileName);
     }
+
+    public void openLocationInBrowser(ChatItem item) {
+        if (mChatItemListView.get() == null)
+            return;
+        String src = item.getContent();
+        final String[] location = LocationHelper.parseLocationFromSrc(src);
+        final String latitude = location[2];
+        final String longitude = location[3];
+        Intent openIntent = LocationHelper.getBaiduMapUrlIntent(
+                longitude, latitude,
+                location[0], location[1],
+                "lehome", "lehome"
+        );
+        mChatItemListView.get().getContext().startActivity(openIntent);
+    }
+
+    public void copyLocationInfo(ChatItem item, String label) {
+        if (mChatItemListView.get() == null)
+            return;
+
+        Context context = mChatItemListView.get().getContext();
+        String src = item.getContent();
+        final String[] location = LocationHelper.parseLocationFromSrc(src);
+        CommonUtils.copyStringToClipboard(context, label, location[1]);
+    }
+
 }

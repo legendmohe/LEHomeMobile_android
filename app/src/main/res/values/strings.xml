@@ -124,7 +124,7 @@
     <string name="find_my_tag_select_beacon">选择测量目标</string>
     <string name="find_my_tag_bt_turning_on">正在打开蓝牙</string>
     <string name="find_my_tag_bt_off">蓝牙已关闭</string>
-    <string name="save_capture_to_sdcard">保存图片到手机</string>
+    <string name="save_capture_to_sdcard">保存图片</string>
     <string name="noti_bref_new_capture">图片消息，点击查看</string>
     <string name="toast_saving_capture">正在保存</string>
     <string name="toast_saving_capture_success">已保存</string>
@@ -137,4 +137,9 @@
     <string name="loc_no_addr">%1$s不知道在哪里...</string>
     <string name="loc_sending_loc">定位成功，正在发送位置到服务器...</string>
     <string name="loc_send_error">上传地址失败</string>
+    <string name="action_open_in_other_app">用其他应用打开</string>
+    <string name="loc_open_in_browser">在浏览器中打开</string>
+    <string name="toast_no_such_app">没有安装该应用程序</string>
+    <string name="loc_copy_location">复制地址</string>
+    <string name="msg_copyed_to_clipboard">已复制到剪切板</string>
 </resources>

@@ -16,7 +16,6 @@ package my.home.lehome.application;
 
 import android.app.Application;
 
-import com.baidu.mapapi.SDKInitializer;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -37,8 +36,6 @@ public class LEHomeApplication extends Application {
                 .diskCacheSize(10 * 1024 * 1024).build();
 
         ImageLoader.getInstance().init(config);
-
-        SDKInitializer.initialize(getApplicationContext());
     }
 
 }

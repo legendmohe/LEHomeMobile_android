@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -12,16 +12,14 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="my.home.lehome.activity.PhotoViewerActivity">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
-        android:id="@+id/action_save_photo"
-        android:title="@string/save_capture_to_sdcard"
+        android:id="@+id/copy_loc_item_info"
+        android:title="@string/loc_copy_location"
         android:orderInCategory="100" />
     <item
         android:id="@+id/action_photo_extra_intent"
         android:title="@string/action_open_in_other_app"
-        android:orderInCategory="100"
-        android:visible="false" />
+        android:orderInCategory="100" />
 </menu>

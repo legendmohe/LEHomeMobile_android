@@ -24,7 +24,8 @@
         ssiv:tileBackgroundColor="#000000"
         android:id="@+id/scale_imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
