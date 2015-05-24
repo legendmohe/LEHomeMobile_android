@@ -223,7 +223,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                     public void onLoadingComplete(String imageUri,
                                                   View view, Bitmap loadedImage) {
                         viewHolder.progressBar.setVisibility(View.GONE);
-                        viewHolder.imageView.setVisibility(View.VISIBLE);
                     }
                 }, new ImageLoadingProgressListener() {
                     @Override

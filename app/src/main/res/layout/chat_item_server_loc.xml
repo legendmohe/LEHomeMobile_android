@@ -90,8 +90,7 @@
                     android:scaleType="centerInside"
                     android:adjustViewBounds="false"
                     android:layout_gravity="center_vertical"
-                    android:layout_alignParentLeft="true"
-                    android:visibility="gone" />
+                    android:layout_alignParentLeft="true" />
 
                 <ProgressBar
                     style="?android:attr/progressBarStyleHorizontal"
