@@ -16,25 +16,44 @@ package my.home.lehome.helper;
 
 import android.content.Context;
 
+import com.tencent.android.tpush.XGIOperateCallback;
 import com.tencent.android.tpush.XGPushManager;
+
+import my.home.common.PrefUtil;
 
 /**
  * Created by legendmohe on 15/4/16.
  */
 public class PushSDKManager {
-    public static boolean PushSDKEnable = false;
+    public static void stopPushSDKService(final Context context) {
+        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
+        if (enable) {
+            XGPushManager.unregisterPush(context, new XGIOperateCallback() {
+                @Override
+                public void onSuccess(Object o, int i) {
+                    PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
+                }
 
-    public static void stopPushSDKService(Context context) {
-        if (PushSDKEnable) {
-            XGPushManager.unregisterPush(context);
-            PushSDKEnable = false;
+                @Override
+                public void onFail(Object o, int i, String s) {
+                }
+            });
         }
     }
 
-    public static void startPushSDKService(Context context) {
-        if (!PushSDKEnable) {
-            XGPushManager.registerPush(context);
-            PushSDKEnable = true;
+    public static void startPushSDKService(final Context context) {
+        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
+        if (!enable) {
+            XGPushManager.registerPush(context, new XGIOperateCallback() {
+                @Override
+                public void onSuccess(Object o, int i) {
+                    PrefUtil.setBooleanValue(context, "PushSDKManager.enable", true);
+                }
+
+                @Override
+                public void onFail(Object o, int i, String s) {
+                }
+            });
         }
     }
 }

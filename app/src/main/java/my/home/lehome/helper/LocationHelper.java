@@ -43,7 +43,7 @@ public class LocationHelper {
     }
 
     public static String getBaiduStaticMapImgUrl(String lng, String lat, int width, int height, int zoom) {
-        String format = "http://api.map.baidu.com/staticimage?scale=1&width=%d&height=%d&center=%s,%s&zoom=%d&markers=%s,%s&markerStyles=m,";
+        String format = "http://api.map.baidu.com/staticimage?scale=1&width=%d&height=%d&center=%s,%s&zoom=%d&markers=%s,%s&markerStyles=l,";
         return String.format(format, width, height, lng, lat, zoom, lng, lat);
     }
 

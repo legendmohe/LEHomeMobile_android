@@ -180,8 +180,8 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         final String mapUrl = LocationHelper.getBaiduStaticMapImgUrl(
                 longitude,
                 latitude,
-                viewHolder.imageView.getWidth(),
-                viewHolder.imageView.getHeight(),
+                viewHolder.imageView.getLayoutParams().width,
+                viewHolder.imageView.getLayoutParams().height,
                 18);
         final String menuTitle = context.getString(R.string.loc_open_in_browser);
         String summary = context.getString(R.string.loc_current_addr, location[0], location[1]);

@@ -17,8 +17,8 @@ package my.home.lehome.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.NetworkInfo;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import my.home.common.NetworkUtil;
@@ -49,7 +49,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 String ssid = NetworkUtil.getFormatSSID(context);
                 String prefSSID = LocalMsgHelper.getLocalSSID(context);
                 if (ssid.equals(prefSSID)) {
-                    Log.d(TAG, "start " + "LocalMessageService " + LocalMsgHelper.startLocalMsgService(context));
+                    Log.d(TAG, "start " + "LocalMessageService");
                     if (LocalMsgHelper.startLocalMsgService(context)) {
                         Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
                         context.sendBroadcast(startIntent);

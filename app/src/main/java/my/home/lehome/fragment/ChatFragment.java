@@ -229,6 +229,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                     fragment.setNewMsgNum(++newNum);
                     fragment.showTip(newNum + " new message");
                     fragment.setNeedShowUnread(true);
+                } else {
+                    fragment.setNewMsgNum(0);
+                    fragment.scrollToBottom();
                 }
             }
         };
@@ -324,7 +327,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (mKeyboard_open && scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                if (mKeyboard_open && scrollState == SCROLL_STATE_TOUCH_SCROLL && !isScrollViewInButtom()) {
                     mSendCmdEdittext.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -359,6 +362,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                         mNeedShowUnread = false;
                     }
                 } else {
+                    Log.d(TAG, "leave buttom");
                     if (mScrollViewInButtom == true) {
                         mScrollViewInButtom = false;
                     }
@@ -853,10 +857,17 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         });
     }
 
-    public void scrollToBottomAnimate() {
-        mCmdListview.clearFocus();
-        mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
-    }
+//    public void scrollToBottomAnimate() {
+//        mCmdListview.clearFocus();
+////        mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
+//        mCmdListview.setSelection(mAdapter.getCount() - 1);
+//        mCmdListview.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCmdListview.smoothScrollToPosition(mAdapter.getCount() - 1);
+//            }
+//        });
+//    }
 
     public ChatItemArrayAdapter getAdapter() {
         return mAdapter;
@@ -1009,7 +1020,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         } else {
             getAdapter().add(reqItem);
             getAdapter().notifyDataSetChanged();
-            scrollToBottomAnimate();
+            scrollToBottom();
         }
     }
 
@@ -1020,7 +1031,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
         } else {
             getAdapter().add(repItem);
             updateRequestChatItemState(getAdapter(), reqID, reqState);
-            scrollToBottomAnimate();
+            scrollToBottom();
         }
     }
 

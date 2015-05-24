@@ -21,9 +21,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import my.home.common.NetworkUtil;
-import my.home.common.PrefUtil;
 import my.home.lehome.helper.LocalMsgHelper;
-import my.home.lehome.util.Constants;
 
 /**
  * Created by legendmohe on 15/3/11.
@@ -42,7 +40,10 @@ public class ScreenStateReceiver extends BroadcastReceiver {
                 String prefSSID = LocalMsgHelper.getLocalSSID(context);
                 if (ssid.equals(prefSSID)) {
                     Log.d(TAG, "start " + TAG);
-                    LocalMsgHelper.startLocalMsgService(context);
+                    if (LocalMsgHelper.startLocalMsgService(context)) {
+                        Intent startIntent = new Intent(NetworkStateReceiver.VALUE_INTENT_START_LOCAL_SERVER);
+                        context.sendBroadcast(startIntent);
+                    }
                 }
             }
         }
