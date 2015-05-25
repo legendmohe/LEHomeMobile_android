@@ -17,14 +17,27 @@ package my.home.lehome.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+
+import my.home.common.PrefUtil;
+import my.home.lehome.helper.PushSDKManager;
+import my.home.lehome.mvp.presenters.MainActivityPresenter;
 
 /**
  * Created by legendmohe on 15/4/1.
  */
 public class BootCompleteReceiver extends BroadcastReceiver {
+    private final static String TAG = "BootCompleteReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (PrefUtil.getbooleanValue(context, MainActivityPresenter.APP_EXIT_KEY, false)) {
+            Log.d(TAG, "app set exit. ignore boot complete state change.");
+            return;
+        }
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            Log.d(TAG, "start PushSDK.");
+            PushSDKManager.startPushSDKService(context);
         }
     }
 }

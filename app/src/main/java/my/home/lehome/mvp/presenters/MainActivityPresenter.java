@@ -33,6 +33,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.lang.ref.WeakReference;
 
 import my.home.common.BusProvider;
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;
@@ -47,6 +48,7 @@ import my.home.lehome.service.LocalMessageService;
 public class MainActivityPresenter extends MVPActivityPresenter {
 
     public static final String TAG = "MainActivityPresenter";
+    public static final String APP_EXIT_KEY = "APP_EXIT_KEY";
 
     private WeakReference<MainActivityView> mMainActivityView;
     private Messenger mLocalMsgService = null;
@@ -85,6 +87,9 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             return;
         }
         Context context = mMainActivityView.get().getContext();
+
+        PrefUtil.setBooleanValue(context, APP_EXIT_KEY, false);
+
         MessageHelper.loadPref(context);
         if (!initLocalMessageService()) {
             PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
@@ -183,10 +188,9 @@ public class MainActivityPresenter extends MVPActivityPresenter {
 
     public boolean onAppExit() {
         Context context = mMainActivityView.get().getContext();
-//        PushManager.stopWork(mMainActivityView.get().getContext());
+        PrefUtil.setBooleanValue(context, APP_EXIT_KEY, true);
         PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
         if (mBinded) {
-//            context.unbindService(mConnection);
 //            LocalMsgHelper.stopLocalMsgService(context);
             Message msg = Message.obtain();
             msg.what = LocalMessageService.MSG_STOP_SERVICE;
@@ -195,6 +199,9 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             } catch (RemoteException e) {
                 e.printStackTrace();
                 return false;
+            } finally {
+//                context.unbindService(mConnection);
+//                mBinded = false;
             }
         }
         return true;

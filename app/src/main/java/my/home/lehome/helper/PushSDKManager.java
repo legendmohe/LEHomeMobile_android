@@ -15,9 +15,14 @@
 package my.home.lehome.helper;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 
 import com.tencent.android.tpush.XGIOperateCallback;
 import com.tencent.android.tpush.XGPushManager;
+
+import java.lang.ref.WeakReference;
 
 import my.home.common.PrefUtil;
 
@@ -25,35 +30,97 @@ import my.home.common.PrefUtil;
  * Created by legendmohe on 15/4/16.
  */
 public class PushSDKManager {
-    public static void stopPushSDKService(final Context context) {
-        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
-        if (enable) {
-            XGPushManager.unregisterPush(context, new XGIOperateCallback() {
-                @Override
-                public void onSuccess(Object o, int i) {
-                    PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
-                }
+    public final static String TAG = "PushSDKManager";
 
-                @Override
-                public void onFail(Object o, int i, String s) {
-                }
-            });
+    public final static int MSG_START_SDK = 0;
+    public final static int MSG_STOP_SDK = 1;
+
+    private static WeakReference<Context> CURRENT_CONTEXT;
+
+    private static int MAX_RETRY_TIME = 10;
+    private static int START_RETRY_TIME = 0;
+    private static int STOP_RETRY_TIME = 0;
+
+    private static final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            final Context context = CURRENT_CONTEXT.get();
+            if (context == null) {
+                Log.d(TAG, "null context.");
+                return;
+            }
+            if (msg.what == PushSDKManager.MSG_START_SDK) {
+                Log.d(TAG, "try start sdk.");
+                XGPushManager.registerPush(context, new XGIOperateCallback() {
+                    @Override
+                    public void onSuccess(Object o, int i) {
+                        Log.d(TAG, "start sdk succeed." + context.hashCode());
+                        PrefUtil.setBooleanValue(context, "PushSDKManager.enable", true);
+                    }
+
+                    @Override
+                    public void onFail(Object o, int i, String s) {
+                        Log.d(TAG, "start sdk faild.");
+                        START_RETRY_TIME++;
+                        if (START_RETRY_TIME <= MAX_RETRY_TIME) {
+                            Message msg = Message.obtain();
+                            msg.what = MSG_START_SDK;
+                            handler.sendMessageDelayed(msg, 300);
+                        }
+                    }
+                });
+            } else if (msg.what == PushSDKManager.MSG_STOP_SDK) {
+                Log.d(TAG, "try stop sdk.");
+                XGPushManager.unregisterPush(context, new XGIOperateCallback() {
+                    @Override
+                    public void onSuccess(Object o, int i) {
+                        Log.d(TAG, "stop sdk succeed:" + context.hashCode());
+                        PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
+                    }
+
+                    @Override
+                    public void onFail(Object o, int i, String s) {
+                        Log.d(TAG, "stop sdk faild.");
+                        STOP_RETRY_TIME++;
+                        if (STOP_RETRY_TIME <= MAX_RETRY_TIME) {
+                            Message msg = Message.obtain();
+                            msg.what = MSG_STOP_SDK;
+                            handler.sendMessageDelayed(msg, 300);
+                        }
+                    }
+                });
+
+            }
         }
-    }
+    };
 
     public static void startPushSDKService(final Context context) {
         boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
         if (!enable) {
-            XGPushManager.registerPush(context, new XGIOperateCallback() {
-                @Override
-                public void onSuccess(Object o, int i) {
-                    PrefUtil.setBooleanValue(context, "PushSDKManager.enable", true);
-                }
+            Log.d(TAG, "start context: " + context.hashCode());
+            if (!handler.hasMessages(MSG_START_SDK)) {
+                CURRENT_CONTEXT = new WeakReference<>(context);
+                Message msg = Message.obtain();
+                msg.what = MSG_START_SDK;
+                handler.sendMessage(msg);
+            }
+        } else {
+            Log.d(TAG, "skip startPushSDKService");
+        }
+    }
 
-                @Override
-                public void onFail(Object o, int i, String s) {
-                }
-            });
+    public static void stopPushSDKService(Context context) {
+        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
+        if (enable) {
+            Log.d(TAG, "stop context: " + context.hashCode());
+            if (!handler.hasMessages(MSG_STOP_SDK)) {
+                CURRENT_CONTEXT = new WeakReference<>(context);
+                Message msg = Message.obtain();
+                msg.what = MSG_STOP_SDK;
+                handler.sendMessage(msg);
+            }
+        } else {
+            Log.d(TAG, "skip stopPushSDKService");
         }
     }
 }

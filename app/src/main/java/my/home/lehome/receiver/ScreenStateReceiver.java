@@ -21,7 +21,9 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import my.home.common.NetworkUtil;
+import my.home.common.PrefUtil;
 import my.home.lehome.helper.LocalMsgHelper;
+import my.home.lehome.mvp.presenters.MainActivityPresenter;
 
 /**
  * Created by legendmohe on 15/3/11.
@@ -32,6 +34,10 @@ public class ScreenStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (PrefUtil.getbooleanValue(context, MainActivityPresenter.APP_EXIT_KEY, false)) {
+            Log.d(TAG, "app set exit. ignore screen state change.");
+            return;
+        }
         if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             NetworkInfo wifiNetworkInfo = NetworkUtil.getWifiNetworkInfo(context);
             if (wifiNetworkInfo.isConnected()) {
