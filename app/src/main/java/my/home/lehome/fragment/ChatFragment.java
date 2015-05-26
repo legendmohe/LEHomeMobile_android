@@ -356,13 +356,13 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 int vH = view.getHeight();
                 View childView = view.getChildAt(visibleItemCount - 1);
                 if (firstVisibleItem + visibleItemCount == totalItemCount && vH >= childView.getBottom()) {
-                    Log.d(TAG, "reach buttom");
+//                    Log.d(TAG, "reach buttom");
                     mScrollViewInButtom = true;
                     if (mNeedShowUnread) {
                         mNeedShowUnread = false;
                     }
                 } else {
-                    Log.d(TAG, "leave buttom");
+//                    Log.d(TAG, "leave buttom");
                     if (mScrollViewInButtom == true) {
                         mScrollViewInButtom = false;
                     }

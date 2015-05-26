@@ -28,9 +28,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.mvp.presenters.MainActivityPresenter;
 
 
 public class PushMessageReceiver extends XGPushBaseReceiver {
@@ -39,6 +41,10 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
             .getSimpleName();
 
     public void onMessage(Context context, String message) {
+        if (PrefUtil.getbooleanValue(context, MainActivityPresenter.APP_EXIT_KEY, false)) {
+            Log.d(TAG, "app set exit. ignore network state change.");
+            return;
+        }
 
         JSONTokener jsonParser = new JSONTokener(message);
         String type = "";

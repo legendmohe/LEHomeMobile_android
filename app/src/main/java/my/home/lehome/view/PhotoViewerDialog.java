@@ -42,6 +42,7 @@ import java.lang.ref.WeakReference;
 
 import my.home.lehome.R;
 import my.home.lehome.asynctask.SaveCaptureAsyncTask;
+import my.home.lehome.util.CommonUtils;
 
 /**
  * Created by legendmohe on 15/5/10.
@@ -50,7 +51,6 @@ public class PhotoViewerDialog extends Dialog {
     public static final String TAG = "PhotoViewerDialog";
 
     private String mImageUrl = "";
-    private String mImageName = "";
     private ProgressBar mProgressBar;
     private final DisplayImageOptions options;
 
@@ -95,10 +95,11 @@ public class PhotoViewerDialog extends Dialog {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save_photo && mContextActivity.get() != null) {
-            if (TextUtils.isEmpty(mImageUrl) || TextUtils.isEmpty(mImageName)) {
+            if (TextUtils.isEmpty(mImageUrl)) {
                 return super.onMenuItemSelected(featureId, item);
             }
-            new SaveCaptureAsyncTask(mContextActivity.get().getApplicationContext()).execute(mImageUrl, mImageName);
+            String fileName = CommonUtils.getDateFormatString("yyyy-MM-dd_hh-mm-ss") + ".jpg";
+            new SaveCaptureAsyncTask(mContextActivity.get().getApplicationContext()).execute(mImageUrl, fileName);
             return true;
         } else if (id == R.id.action_photo_extra_intent && mContextActivity.get() != null) {
             try {
@@ -133,7 +134,6 @@ public class PhotoViewerDialog extends Dialog {
         File imageFile = ImageLoader.getInstance().getDiskCache().get(imageURL);
         if (imageFile != null) {
             mImageUrl = imageFile.getAbsolutePath();
-            mImageName = new File(imageURL).getName();
         }
         final View contentImageView = findViewById(R.id.scale_imageView);
         if (imageFile != null) {
@@ -167,7 +167,6 @@ public class PhotoViewerDialog extends Dialog {
                     File imageFile = ImageLoader.getInstance().getDiskCache().get(imageUri);
                     if (imageFile != null) {
                         mImageUrl = imageFile.getAbsolutePath();
-                        mImageName = new File(imageUri).getName();
                     }
                 }
             }, new ImageLoadingProgressListener() {
@@ -177,9 +176,6 @@ public class PhotoViewerDialog extends Dialog {
                 }
             });
         }
-
-        if (getActionBar() != null)
-            getActionBar().setTitle(mImageName);
     }
 
     @Override

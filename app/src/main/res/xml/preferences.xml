@@ -75,6 +75,11 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference
+            android:key="pref_save_power_mode"
+            android:title="@string/pref_save_power_mode"
+            android:summary="@string/pref_save_power_mode_sum"
+            android:defaultValue="true" />
+        <CheckBoxPreference
             android:key="pref_auto_connect_sco"
             android:title="@string/pref_auto_connect_sco"
             android:defaultValue="true" />

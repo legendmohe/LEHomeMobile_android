@@ -189,9 +189,11 @@ public class MessageHelper {
             int len = content.length();
             if (len >= MessageHelper.maxNotiLen) {
                 content = context.getString(R.string.noti_bref_msg, content.substring(0, maxNotiLen));
-            }
-            if (newItem.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
+            } else if (newItem.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
                 content = context.getString(R.string.noti_bref_new_capture);
+            } else if (newItem.getType() == ChatItemConstants.TYPE_SERVER_LOC) {
+                String[] formatLoc = LocationHelper.parseLocationFromSrc(newItem.getContent());
+                content = context.getString(R.string.loc_current_addr, formatLoc[0], formatLoc[1]);
             }
             if (unreadMsgCount <= 1) {
                 addNotification(

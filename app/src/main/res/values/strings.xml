@@ -142,4 +142,7 @@
     <string name="toast_no_such_app">没有安装该应用程序</string>
     <string name="loc_copy_location">复制地址</string>
     <string name="msg_copyed_to_clipboard">已复制到剪切板</string>
+    <string name="pref_save_power_mode">省电模式</string>
+    <string name="pref_save_power_mode_sum">省电模式下，消息到达率可能会有所下降</string>
+    <string name="pref_save_power_mode_set">退出应用后生效</string>
 </resources>

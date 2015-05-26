@@ -90,6 +90,8 @@ public class PushSDKManager {
                     }
                 });
 
+                // don't stop sdk
+//                PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
             }
         }
     };

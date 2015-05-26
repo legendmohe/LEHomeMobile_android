@@ -25,6 +25,7 @@ import java.lang.ref.WeakReference;
 
 import my.home.lehome.R;
 import my.home.lehome.asynctask.SaveCaptureAsyncTask;
+import my.home.lehome.util.CommonUtils;
 
 /**
  * Created by legendmohe on 15/5/10.
@@ -56,7 +57,8 @@ public class AddPattenDialog extends Dialog {
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        new SaveCaptureAsyncTask(getContext()).execute(mImageUrl, mImageName);
+        String fileName = CommonUtils.getDateFormatString("yyyy-MM-dd_hh-mm-ss") + ".jpg";
+        new SaveCaptureAsyncTask(getContext()).execute(mImageUrl, fileName);
         return super.onMenuItemSelected(featureId, item);
     }
 

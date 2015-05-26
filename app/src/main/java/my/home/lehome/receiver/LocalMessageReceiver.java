@@ -24,9 +24,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.mvp.presenters.MainActivityPresenter;
 
 /**
  * Created by legendmohe on 15/3/11.
@@ -40,6 +42,10 @@ public class LocalMessageReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(LOCAL_MSG_RECEIVER_ACTION)) {
+            if (PrefUtil.getbooleanValue(context, MainActivityPresenter.APP_EXIT_KEY, false)) {
+                Log.d(TAG, "app set exit. ignore network state change.");
+                return;
+            }
             String lm = intent.getStringExtra(LOCAL_MSG_REP_KEY);
             Log.d(TAG, "receive local msg: " + lm);
             if (lm != null) {

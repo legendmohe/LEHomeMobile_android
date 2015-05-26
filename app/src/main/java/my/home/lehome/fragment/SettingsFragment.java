@@ -73,6 +73,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         CheckBoxPreference btSCOPreference = (CheckBoxPreference) findPreference("pref_auto_connect_sco");
         boolean auto_sco = sharedPreferences.getBoolean("pref_auto_connect_sco", true);
         btSCOPreference.setChecked(auto_sco);
+        CheckBoxPreference savePowerPreference = (CheckBoxPreference) findPreference("pref_save_power_mode");
+        boolean savePowerOn = sharedPreferences.getBoolean("pref_save_power_mode", true);
+        savePowerPreference.setChecked(savePowerOn);
 
         CheckBoxPreference volumeKeyPreference = (CheckBoxPreference) findPreference("pref_volume_key_control_speech");
         boolean volume_key_speech = sharedPreferences.getBoolean("pref_volume_key_control_speech", true);
@@ -255,6 +258,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         } else if (key.equals("pref_local_msg_subscribe_address")) {
             EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_subscribe_address");
             addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
+        } else if (key.equals("pref_save_power_mode")) {
+            Toast.makeText(getActivity(), R.string.pref_save_power_mode_set, Toast.LENGTH_SHORT).show();
         }
     }
 }

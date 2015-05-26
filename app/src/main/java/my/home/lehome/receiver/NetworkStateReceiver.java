@@ -59,7 +59,9 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                     if (LocalMsgHelper.startLocalMsgService(context)) {
                         Intent startIntent = new Intent(VALUE_INTENT_START_LOCAL_SERVER);
                         context.sendBroadcast(startIntent);
-                        PushSDKManager.stopPushSDKService(context);
+                        if (PrefUtil.getbooleanValue(context, "pref_save_power_mode", true)) {
+                            PushSDKManager.stopPushSDKService(context);
+                        }
                     }
                 } else {
                     Log.d(TAG, "stop " + "LocalMessageService. type: WIFI. reason: miss SSID");

@@ -268,6 +268,7 @@ public class SendMsgIntentService extends IntentService {
                 responseString = repObject.toString();
             }
         } catch (ClientProtocolException e) {
+            Log.d(TAG, "ClientProtocolException: " + e.toString());
             try {
                 repObject.put("code", 400);
                 repObject.put("desc", context.getString(R.string.chat_error_protocol_error));
@@ -275,6 +276,7 @@ public class SendMsgIntentService extends IntentService {
             }
             responseString = repObject.toString();
         } catch (IOException e) {
+            Log.d(TAG, "IOException: " + e.toString());
             try {
                 repObject.put("code", 400);
                 repObject.put("desc", context.getString(R.string.chat_error_http_error));

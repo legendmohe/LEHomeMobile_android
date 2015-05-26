@@ -24,7 +24,6 @@ import android.os.Messenger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.otto.Subscribe;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
@@ -238,7 +237,8 @@ public class ChatFragmentPresenter extends MVPPresenter {
             return;
         String image_url = item.getContent();
         String path = ImageLoader.getInstance().getDiskCache().get(image_url).getAbsolutePath();
-        String fileName = new File(image_url).getName();
+//        String fileName = new File(image_url).getName();
+        String fileName = CommonUtils.getDateFormatString("yyyy-MM-dd_hh-mm-ss") + ".jpg";
         new SaveCaptureAsyncTask(mChatItemListView.get().getContext()).execute(path, fileName);
     }
 

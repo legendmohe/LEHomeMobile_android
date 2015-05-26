@@ -93,13 +93,14 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         MessageHelper.loadPref(context);
         if (!initLocalMessageService()) {
             PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
-//            PushManager.startWork(context,
-//                    PushConstants.LOGIN_TYPE_API_KEY,
-//                    PushUtils.getMetaValue(context, "api_key"));
         } else {
-//            PushManager.stopWork(context);
-            PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
             LocalMsgHelper.stopLocalMsgService(context);
+            if (PrefUtil.getbooleanValue(mMainActivityView.get().getContext(), "pref_save_power_mode", true)) {
+                PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
+            }
+        }
+        if (!PrefUtil.getbooleanValue(mMainActivityView.get().getContext(), "pref_save_power_mode", true)) {
+            PushSDKManager.startPushSDKService(mMainActivityView.get().getApplicationContext());
         }
     }
 
@@ -157,7 +158,9 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                             + ")"
             );
 //            PushManager.stopWork(context);
-            PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
+            if (PrefUtil.getbooleanValue(mMainActivityView.get().getContext(), "pref_save_power_mode", true)) {
+                PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
