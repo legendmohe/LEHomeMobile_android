@@ -77,9 +77,7 @@ public class LocalMessageReceiver extends BroadcastReceiver {
                 if (type.equals("req_loc")) {
                     LocationHelper.enqueueLocationRequest(context, seq, type, msg);
                     return;
-                }
-
-                if (type.equals("normal") || type.equals("capture")) {
+                } else if (type.equals("normal") || type.equals("capture") || type.equals("long_msg")) {
                     MessageHelper.inNormalState = true;
                 } else if (type.equals("toast")) {
                     MessageHelper.sendToast(msg);

@@ -97,8 +97,12 @@ public class PushSDKManager {
     };
 
     public static void startPushSDKService(final Context context) {
+        startPushSDKService(context, false);
+    }
+
+    public static void startPushSDKService(final Context context, boolean force) {
         boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
-        if (!enable) {
+        if (!enable || force) {
             Log.d(TAG, "start context: " + context.hashCode());
             if (!handler.hasMessages(MSG_START_SDK)) {
                 CURRENT_CONTEXT = new WeakReference<>(context);

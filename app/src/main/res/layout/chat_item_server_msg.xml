@@ -60,6 +60,25 @@
             android:gravity="left"
             android:id="@+id/content_layout">
 
+            <ImageView
+                android:id="@+id/chat_content_imageview"
+                android:layout_width="192dp"
+                android:layout_height="144dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/chat_left_bg"
+                android:scaleType="centerInside"
+                android:visibility="gone" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="150dp"
+                android:layout_height="10dp"
+                android:id="@+id/load_image_progressBar"
+                android:layout_gravity="center"
+                android:progressDrawable="@drawable/chat_progressbar"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/chat_content_textview"
                 android:layout_width="wrap_content"

@@ -100,8 +100,8 @@ public class ChatItem implements Parcelable {
         this.date = date;
     }
 
-    public boolean isMe() {
-        if (this.getType() == ChatItemConstants.TYPE_ME) {
+    public boolean isClient() {
+        if (this.getType() == ChatItemConstants.TYPE_CLIENT) {
             return true;
         }
         return false;
@@ -113,13 +113,6 @@ public class ChatItem implements Parcelable {
         }
         return false;
     }
-//
-//    public boolean isMeImageItem() {
-//        if (this.getType() == ChatItemConstants.TYPE_ME_IMAGE) {
-//            return true;
-//        }
-//        return false;
-//    }
 
     public boolean isServerImageItem() {
         if (this.getType() == ChatItemConstants.TYPE_SERVER_IMAGE) {
@@ -135,18 +128,18 @@ public class ChatItem implements Parcelable {
         return false;
     }
 
+    public boolean isServerLongMsgItem() {
+        if (this.getType() == ChatItemConstants.TYPE_SERVER_LONG_MSG) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
-    /*
-        private String content;
-        private boolean isMe;
-        private int state;
-        private int seq;
-        private java.util.Date date;
-     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);

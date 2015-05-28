@@ -135,7 +135,7 @@ public class SendMsgIntentService extends IntentService {
         if (item == null) {
             item = new ChatItem();
             item.setContent(intent.getStringExtra("cmd"));
-            item.setType(ChatItemConstants.TYPE_ME);
+            item.setType(ChatItemConstants.TYPE_CLIENT);
             item.setState(Constants.CHATITEM_STATE_ERROR); // set ERROR
             item.setDate(new Date());
             DBStaticManager.addChatItem(getApplicationContext(), item);
@@ -336,7 +336,7 @@ public class SendMsgIntentService extends IntentService {
             if (rep_code != 200) {
                 newItem = new ChatItem();
                 newItem.setContent(getString(R.string.loc_send_error));
-                newItem.setType(ChatItemConstants.TYPE_ME);
+                newItem.setType(ChatItemConstants.TYPE_CLIENT);
                 newItem.setState(Constants.CHATITEM_STATE_SUCCESS); // always set true
                 newItem.setDate(new Date());
                 DBStaticManager.addChatItem(context, newItem);

@@ -89,7 +89,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
     @Override
     public int getViewTypeCount() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             switch (chatItem.getType()) {
-                case ChatItemConstants.TYPE_ME:
+                case ChatItemConstants.TYPE_CLIENT:
                     convertView = inflater.inflate(R.layout.chat_item_client, parent, false);
                     break;
                 case ChatItemConstants.TYPE_SERVER:
@@ -113,13 +113,9 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                     break;
                 case ChatItemConstants.TYPE_SERVER_LOC:
                     convertView = inflater.inflate(R.layout.chat_item_server_loc, parent, false);
-//                    RelativeLayout layout = (RelativeLayout) convertView.findViewById(R.id.chat_loc_image_wrapper);
-//                    layout.setOnLongClickListener(new View.OnLongClickListener() {
-//                        @Override
-//                        public boolean onLongClick(View v) {
-//                            return false;
-//                        }
-//                    });
+                    break;
+                case ChatItemConstants.TYPE_SERVER_LONG_MSG:
+                    convertView = inflater.inflate(R.layout.chat_item_server_msg, parent, false);
                     break;
             }
             final ViewHolder viewHolder = new ViewHolder();
@@ -149,7 +145,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
         final ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 
-        if (chatItem.isMe()) {
+        if (chatItem.isClient()) {
             handleMeItem(position, chatItem, viewHolder);
         } else if (chatItem.isServerImageItem()) {
             handlerServerImageItem(chatItem, viewHolder);
@@ -157,6 +153,8 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             handleServerItem(chatItem, viewHolder);
         } else if (chatItem.isServerLocItem()) {
             handlerServerLocItem(chatItem, viewHolder);
+        } else if (chatItem.isServerLongMsgItem()) {
+            handlerServerLongMsgItem(position, chatItem, viewHolder);
         }
 
         String dateString = getTimeWithFormat(position);
@@ -169,6 +167,10 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
 
         return convertView;
+    }
+
+    private void handlerServerLongMsgItem(int position, ChatItem chatItem, ViewHolder viewHolder) {
+
     }
 
     private void handlerServerLocItem(ChatItem chatItem, final ViewHolder viewHolder) {
@@ -237,7 +239,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     private void handleMeItem(int position, ChatItem chatItem, ViewHolder viewHolder) {
         viewHolder.rippleBackground.startRippleAnimation();
         if (chatItem.getState() == Constants.CHATITEM_STATE_SUCCESS
-                || !chatItem.isMe()) {
+                || !chatItem.isClient()) {
             viewHolder.errorButton.setVisibility(View.GONE);
             viewHolder.rippleBackground.stopRippleAnimation();
         } else if (chatItem.getState() == Constants.CHATITEM_STATE_PENDING) {
@@ -260,7 +262,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
     }
 
     private void handleServerItem(ChatItem chatItem, ViewHolder viewHolder) {
-        viewHolder.imageView.setVisibility(View.GONE);
+//        viewHolder.imageView.setVisibility(View.GONE);
         viewHolder.chatTextView.setVisibility(View.VISIBLE);
         viewHolder.chatTextView.setText(chatItem.getContent());
     }

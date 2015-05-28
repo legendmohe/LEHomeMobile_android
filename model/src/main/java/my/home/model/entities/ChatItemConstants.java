@@ -18,8 +18,9 @@ package my.home.model.entities;
  * Created by legendmohe on 15/5/4.
  */
 public class ChatItemConstants {
-    public static final int TYPE_ME = 0;
+    public static final int TYPE_CLIENT = 0;
     public static final int TYPE_SERVER = 1;
     public static final int TYPE_SERVER_IMAGE = 2;
     public static final int TYPE_SERVER_LOC = 3;
+    public static final int TYPE_SERVER_LONG_MSG = 4;
 }

@@ -74,8 +74,7 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
         if (type.equals("req_loc")) {
             LocationHelper.enqueueLocationRequest(context, seq, type, msg);
             return;
-        } else if (type.equals("bc_loc")) {
-        } else if (type.equals("normal") || type.equals("capture")) {
+        } else if (type.equals("normal") || type.equals("capture") || type.equals("long_msg")) {
             MessageHelper.inNormalState = true;
         } else if (type.equals("toast")) {
             MessageHelper.sendToast(msg);
@@ -104,7 +103,7 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
             // 在这里拿token
 //            String token = message.getToken();
         } else {
-            text = message + "注册失败，错误码：" + errorCode;
+            text = "注册失败，错误码：" + errorCode;
         }
         Log.d(TAG, text);
         updateContent(context, text);

@@ -176,7 +176,9 @@ public class MessageHelper {
         } else if (type.equals("bc_loc")) {
             newItem.setType(ChatItemConstants.TYPE_SERVER_LOC);
         } else if (type.equals("client")) {
-            newItem.setType(ChatItemConstants.TYPE_ME);
+            newItem.setType(ChatItemConstants.TYPE_CLIENT);
+        } else if (type.equals("long_msg")) {
+            newItem.setType(ChatItemConstants.TYPE_SERVER_LONG_MSG);
         } else {
             newItem.setType(ChatItemConstants.TYPE_SERVER);
         }
