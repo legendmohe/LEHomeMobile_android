@@ -135,9 +135,8 @@ public class PhotoViewerDialog extends Dialog {
         if (imageFile != null) {
             mImageUrl = imageFile.getAbsolutePath();
         }
-        final View contentImageView = findViewById(R.id.scale_imageView);
         if (imageFile != null) {
-            SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) contentImageView;
+            SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
             imageView.setImage(ImageSource.uri(mImageUrl));
             imageView.setVisibility(View.VISIBLE);
         } else {
@@ -160,9 +159,9 @@ public class PhotoViewerDialog extends Dialog {
                 public void onLoadingComplete(String imageUri,
                                               View view, Bitmap loadedImage) {
                     mProgressBar.setVisibility(View.GONE);
-                    contentImageView.setVisibility(View.VISIBLE);
                     SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
                     imageView.setImage(ImageSource.bitmap(loadedImage));
+                    imageView.setVisibility(View.VISIBLE);
 
                     File imageFile = ImageLoader.getInstance().getDiskCache().get(imageUri);
                     if (imageFile != null) {
