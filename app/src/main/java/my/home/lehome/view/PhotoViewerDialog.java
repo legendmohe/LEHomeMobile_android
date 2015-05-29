@@ -137,9 +137,9 @@ public class PhotoViewerDialog extends Dialog {
         }
         final View contentImageView = findViewById(R.id.scale_imageView);
         if (imageFile != null) {
-            contentImageView.setVisibility(View.VISIBLE);
-            SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
+            SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) contentImageView;
             imageView.setImage(ImageSource.uri(mImageUrl));
+            imageView.setVisibility(View.VISIBLE);
         } else {
             ImageLoader.getInstance().loadImage(imageURL, null, options, new SimpleImageLoadingListener() {
 
