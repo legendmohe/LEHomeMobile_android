@@ -22,36 +22,36 @@ import android.preference.PreferenceManager;
  * Created by legendmohe on 15/3/8.
  */
 public class PrefUtil {
-    public static String getStringValue(Context context, String key, String def) {
+    public synchronized static String getStringValue(Context context, String key, String def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString(key, def);
     }
 
-    public static void setStringValue(Context context, String key, String val) {
+    public synchronized static void setStringValue(Context context, String key, String val) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putString(key, val);
         prefEditor.apply();
     }
 
-    public static int getIntValue(Context context, String key, int def) {
+    public synchronized static int getIntValue(Context context, String key, int def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getInt(key, def);
     }
 
-    public static void setIntValue(Context context, String key, int val) {
+    public synchronized static void setIntValue(Context context, String key, int val) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putInt(key, val);
         prefEditor.apply();
     }
 
-    public static boolean getbooleanValue(Context context, String key, boolean def) {
+    public synchronized static boolean getbooleanValue(Context context, String key, boolean def) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(key, def);
     }
 
-    public static void setBooleanValue(Context context, String key, boolean val) {
+    public synchronized static void setBooleanValue(Context context, String key, boolean val) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putBoolean(key, val);

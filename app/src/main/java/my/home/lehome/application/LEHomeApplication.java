@@ -32,6 +32,8 @@ public class LEHomeApplication extends Application {
         super.onCreate();
 //        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.enable", false);
         XGPushConfig.enableDebug(getApplicationContext(), false);
+        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.stopping", false);
+        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.starting", false);
         if (!PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
             PushSDKManager.startPushSDKService(getApplicationContext(), true);
         }
