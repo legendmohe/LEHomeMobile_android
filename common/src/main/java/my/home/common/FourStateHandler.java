@@ -62,29 +62,28 @@ public class FourStateHandler extends Handler {
             case MSG_START:
                 if (mOldState == STATE_IDLE || mOldState == STATE_SUCCESS || mOldState == STATE_FAIL) {
                     mNewState = STATE_PENDING;
-                    mStateCallback.get().onStatePending(mOldState, mNewState, msg.what);
+                    mStateCallback.get().onStatePending(mOldState, mNewState, mWhat);
                     mOldState = mNewState;
                 }
                 return;
             case MSG_CANCEL:
                 if (mOldState == STATE_PENDING) {
                     mNewState = STATE_IDLE;
-                    mStateCallback.get().onStateIdle(mOldState, mNewState, msg.what);
+                    mStateCallback.get().onStateIdle(mOldState, mNewState, mWhat);
                     mOldState = mNewState;
                 }
-                mStateCallback.get().onStatePending(mOldState, mNewState, msg.what);
                 return;
             case MSG_SUCCESS:
                 if (mOldState == STATE_PENDING) {
                     mNewState = STATE_SUCCESS;
-                    mStateCallback.get().onStateSuccess(mOldState, mNewState, msg.what);
+                    mStateCallback.get().onStateSuccess(mOldState, mNewState, mWhat);
                     mOldState = mNewState;
                 }
                 return;
             case MSG_FAIL:
                 if (mOldState == STATE_PENDING) {
                     mNewState = STATE_FAIL;
-                    mStateCallback.get().onStatefaid(mOldState, mNewState, msg.what);
+                    mStateCallback.get().onStatefaid(mOldState, mNewState, mWhat);
                     mOldState = mNewState;
                 }
                 return;
@@ -98,12 +97,10 @@ public class FourStateHandler extends Handler {
 
     public void cancel() {
         sendEmptyMessage(MSG_CANCEL);
-
     }
 
     public void complete(boolean success) {
         sendEmptyMessage(success ? MSG_SUCCESS : MSG_FAIL);
-
     }
 
     public int getCurrentState() {
