@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -100,6 +101,7 @@ import my.home.model.manager.DBStaticManager;
 public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogListener
         , ResendButtonClickListener
         , ChatItemArrayAdapter.ImageClickListener
+        , ChatItemArrayAdapter.LongMsgListener
         , AutoCompleteAdapter.onLoadConfListener
         , SaveLocalHistoryView
         , ChatItemListView
@@ -161,6 +163,12 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     public static final int MSG_TYPE_CHATITEM = 1;
     public static final int MSG_TYPE_TOAST = 2;
     public static final int MSG_TYPE_VOICE_CMD = 3;
+    private static final int SCROLL_DIR_DOWN = 1;
+    private static final int SCROLL_DIR_UP = -1;
+    private static final int SCROLL_DIR_RIGHT = 1;
+    private static final int SCROLL_DIR_LEFT = -1;
+    private int mScrollYDirection = 0;
+    private int mScrollXDirection = 0;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -171,6 +179,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             mAdapter = new ChatItemArrayAdapter(this.getActivity(), R.layout.chat_item_client);
             mAdapter.setResendButtonClickListener(this);
             mAdapter.setImageClickListener(this);
+            mAdapter.setLongMsgListener(this);
         }
         PublicHandler = new MyHandler(this);
         mChatFragmentPresenter = new ChatFragmentPresenter(this, this, this);
@@ -216,6 +225,24 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
     @Override
     public void onImageViewLongClicked(String imageURL) {
+    }
+
+    @Override
+    public void onLongMsgSuccess(int oldState, int newState, Bundle what) {
+        this.scrollToBottom();
+    }
+
+    @Override
+    public void onLongMsgFail(int oldState, int newState, Bundle what) {
+        this.scrollToBottom();
+    }
+
+    @Override
+    public void onLongMsgPending(int oldState, int newState, Bundle what) {
+    }
+
+    @Override
+    public void onLongMsgIdle(int oldState, int newState, Bundle what) {
     }
 
     private static class MyHandler extends Handler {
@@ -327,7 +354,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (mKeyboard_open && scrollState == SCROLL_STATE_TOUCH_SCROLL && !isScrollViewInButtom()) {
+                if (mKeyboard_open
+                        && scrollState == SCROLL_STATE_TOUCH_SCROLL
+                        && mScrollYDirection == SCROLL_DIR_DOWN) {
                     mSendCmdEdittext.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -338,7 +367,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                                     getActivity().getCurrentFocus().getWindowToken(),
                                     InputMethodManager.HIDE_NOT_ALWAYS);
                         }
-                    }, 300);
+                    }, 100);
                 } else if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                     if (topVisibleIndex == 0
                             && mAdapter.getItem(0).getId() > Constants.CHATITEM_LOWEST_INDEX) {
@@ -369,39 +398,27 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 }
             }
         });
-//        mCmdListview.setOnTouchListener(new OnTouchListener() {
-//
-//            private final GestureDetector gestureDetector = new GestureDetector(
-//                    getContext(), new GestureDetector.SimpleOnGestureListener() {
-//
-//                private final float _SHOW_KEYBOARD_Y = 140.0f;
-//
-//                @Override
-//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//                    if (distanceY > _SHOW_KEYBOARD_Y) {
-//                        mSendCmdEdittext.requestFocus();
-//                        mSendCmdEdittext.post(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                InputMethodManager keyboard = (InputMethodManager)
-//                                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                                keyboard.showSoftInput(mSendCmdEdittext, 0);
-//                            }
-//                        });
-//                    }
-//                    return false;
-//                }
-//            });
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if (mScrollViewInButtom) {
-//                    return gestureDetector.onTouchEvent(event);
-//                }
-//                return false;
-//            }
-//        });
+        mCmdListview.setOnTouchListener(new OnTouchListener() {
+
+            private final GestureDetector gestureDetector = new GestureDetector(
+                    getContext(), new GestureDetector.SimpleOnGestureListener() {
+
+                @Override
+                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                    mScrollYDirection = distanceY >= 0 ? SCROLL_DIR_UP : SCROLL_DIR_DOWN;
+                    mScrollXDirection = distanceX >= 0 ? SCROLL_DIR_RIGHT : SCROLL_DIR_LEFT;
+                    return false;
+                }
+            });
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mScrollViewInButtom) {
+                    return gestureDetector.onTouchEvent(event);
+                }
+                return false;
+            }
+        });
 
         mSuggestionButton = (Button) rootView.findViewById(R.id.cmd_suggestion_button);
         mSuggestionButton.setOnClickListener(new OnClickListener() {

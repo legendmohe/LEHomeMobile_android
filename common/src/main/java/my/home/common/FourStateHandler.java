@@ -14,6 +14,7 @@
 
 package my.home.common;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -37,17 +38,17 @@ public class FourStateHandler extends Handler {
     public static final int STATE_FAIL = 3;
     private final WeakReference<StateCallback> mStateCallback;
 
-    private int mOldState = -1;
+    private int mOldState = STATE_IDLE;
     private int mNewState = -1;
-    private int mWhat = -1;
+    private Bundle mWhat = new Bundle();
 
-    public FourStateHandler(int what, StateCallback callback) {
+    public FourStateHandler(Bundle what, StateCallback callback) {
         super();
         setWhat(what);
         mStateCallback = new WeakReference<>(callback);
     }
 
-    public FourStateHandler(int what, StateCallback callback, Looper looper) {
+    public FourStateHandler(Bundle what, StateCallback callback, Looper looper) {
         super(looper);
         setWhat(what);
         mStateCallback = new WeakReference<>(callback);
@@ -83,12 +84,12 @@ public class FourStateHandler extends Handler {
             case MSG_FAIL:
                 if (mOldState == STATE_PENDING) {
                     mNewState = STATE_FAIL;
-                    mStateCallback.get().onStatefaid(mOldState, mNewState, mWhat);
+                    mStateCallback.get().onStatefail(mOldState, mNewState, mWhat);
                     mOldState = mNewState;
                 }
                 return;
         }
-        mStateCallback.get().onUnhandleState(mOldState, msg.what);
+        mStateCallback.get().onUnhandleState(mOldState, mWhat);
     }
 
     public void start() {
@@ -107,23 +108,23 @@ public class FourStateHandler extends Handler {
         return mOldState;
     }
 
-    public int getWhat() {
+    public Bundle getWhat() {
         return mWhat;
     }
 
-    public void setWhat(int mWhat) {
-        this.mWhat = mWhat;
+    public void setWhat(Bundle what) {
+        this.mWhat = what;
     }
 
     public interface StateCallback {
-        void onStateIdle(int oldState, int newState, int what);
+        void onStateIdle(int oldState, int newState, Bundle what);
 
-        void onStatePending(int oldState, int newState, int what);
+        void onStatePending(int oldState, int newState, Bundle what);
 
-        void onStateSuccess(int oldState, int newState, int what);
+        void onStateSuccess(int oldState, int newState, Bundle what);
 
-        void onStatefaid(int oldState, int newState, int what);
+        void onStatefail(int oldState, int newState, Bundle what);
 
-        void onUnhandleState(int oldState, int what);
+        void onUnhandleState(int oldState, Bundle what);
     }
 }

@@ -135,6 +135,8 @@ public class PhotoViewerDialog extends Dialog {
         if (imageFile != null) {
             mImageUrl = imageFile.getAbsolutePath();
         }
+
+        findViewById(R.id.scale_imageView).setVisibility(View.INVISIBLE);
         if (imageFile != null) {
             SubsamplingScaleImageView imageView = (SubsamplingScaleImageView) findViewById(R.id.scale_imageView);
             imageView.setImage(ImageSource.uri(mImageUrl));
@@ -153,6 +155,7 @@ public class PhotoViewerDialog extends Dialog {
                                             FailReason failReason) {
                     Log.w(TAG, failReason.toString());
                     mProgressBar.setVisibility(View.GONE);
+                    findViewById(R.id.scale_imageView).setVisibility(View.VISIBLE);
                 }
 
                 @Override

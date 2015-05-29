@@ -37,24 +37,35 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListe
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.skyfishjy.library.RippleBackground;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import my.home.common.FourStateHandler;
 import my.home.lehome.R;
+import my.home.lehome.asynctask.LoadLongMsgAsyncTask;
 import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.util.ChatItemUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.ChatItemConstants;
+import my.home.model.manager.DBStaticManager;
 
-public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
+public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements FourStateHandler.StateCallback {
     public static final String TAG = ChatItemArrayAdapter.class.getSimpleName();
 
     private ResendButtonClickListener mResendButtonClickListener;
     private ImageClickListener mImageClickListener;
+    private WeakReference<LongMsgListener> mLongMsgListener;
     private TextView chatTextView;
 
     private DisplayImageOptions options;
+    private Map<Integer, ViewHolder> mViewHolders;
+    private Set<Integer> mLoadingItems;
 
     @Override
     public void add(ChatItem object) {
@@ -85,6 +96,9 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
                 .considerExifParams(true)
                 .displayer(new RoundedBitmapDisplayer(10))
                 .build();
+
+        mViewHolders = new HashMap<>();
+        mLoadingItems = new HashSet<>();
     }
 
     @Override
@@ -124,7 +138,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
             viewHolder.dateTextView = (TextView) convertView.findViewById(R.id.date_textview);
             viewHolder.chatTextView = (TextView) convertView.findViewById(R.id.chat_content_textview);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.chat_content_imageview);
-            viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.load_image_progressBar);
+            viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.chat_pending_progressBar);
             // 先使textview捕获longpress事件
             viewHolder.chatTextView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -144,6 +158,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         }
 
         final ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+        mViewHolders.put(position, viewHolder);
 
         if (chatItem.isClient()) {
             handleMeItem(position, chatItem, viewHolder);
@@ -167,10 +182,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
 
 
         return convertView;
-    }
-
-    private void handlerServerLongMsgItem(int position, ChatItem chatItem, ViewHolder viewHolder) {
-
     }
 
     private void handlerServerLocItem(ChatItem chatItem, final ViewHolder viewHolder) {
@@ -313,6 +324,19 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         );
     }
 
+    private void handlerServerLongMsgItem(int position, ChatItem chatItem, ViewHolder viewHolder) {
+        if (!mLoadingItems.contains(position)) {
+            mLoadingItems.add(position);
+
+            viewHolder.chatTextView.setText("");
+
+            Bundle bundle = new Bundle();
+            bundle.putInt("pos", position);
+            FourStateHandler handler = new FourStateHandler(bundle, this);
+            new LoadLongMsgAsyncTask(handler, getContext()).execute(chatItem.getContent());
+        }
+    }
+
     private String getTimeWithFormat(int position) {
         ChatItem chatItem = getItem(position);
         String formatString = "MM月dd日 hh时mm分";
@@ -333,6 +357,68 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         this.mImageClickListener = mImageClickListener;
     }
 
+    /*
+        for server long msg items.
+     */
+
+    @Override
+    public void onStateIdle(int oldState, int newState, Bundle what) {
+        int pos = what.getInt("pos");
+        ViewHolder viewHolder = mViewHolders.get(pos);
+        viewHolder.progressBar.setVisibility(View.INVISIBLE);
+        if (mLongMsgListener.get() != null) {
+            mLongMsgListener.get().onLongMsgIdle(oldState, newState, what);
+        }
+    }
+
+    @Override
+    public void onStatePending(int oldState, int newState, Bundle what) {
+        ViewHolder viewHolder = mViewHolders.get(what.getInt("pos"));
+        viewHolder.progressBar.setVisibility(View.VISIBLE);
+        if (mLongMsgListener.get() != null) {
+            mLongMsgListener.get().onLongMsgPending(oldState, newState, what);
+        }
+    }
+
+    @Override
+    public void onStateSuccess(int oldState, int newState, Bundle what) {
+        int pos = what.getInt("pos");
+        ChatItem item = getItem(pos);
+        item.setType(ChatItemConstants.TYPE_SERVER);
+        item.setContent(what.getString("response"));
+        DBStaticManager.updateChatItem(getContext(), item);
+
+        ViewHolder viewHolder = mViewHolders.get(pos);
+        viewHolder.progressBar.setVisibility(View.INVISIBLE);
+        viewHolder.chatTextView.setVisibility(View.VISIBLE);
+        viewHolder.chatTextView.setText(item.getContent());
+        mLoadingItems.remove(what.getInt("pos"));
+
+        notifyDataSetChanged();
+
+        if (mLongMsgListener.get() != null) {
+            mLongMsgListener.get().onLongMsgSuccess(oldState, newState, what);
+        }
+    }
+
+    @Override
+    public void onStatefail(int oldState, int newState, Bundle what) {
+        int pos = what.getInt("pos");
+        ViewHolder viewHolder = mViewHolders.get(pos);
+        viewHolder.chatTextView.setVisibility(View.VISIBLE);
+        viewHolder.chatTextView.setText(what.getString("err_msg"));
+        mLoadingItems.remove(what.getInt("pos"));
+
+        if (mLongMsgListener.get() != null) {
+            mLongMsgListener.get().onLongMsgFail(oldState, newState, what);
+        }
+    }
+
+    @Override
+    public void onUnhandleState(int oldState, Bundle what) {
+        Log.d(TAG, "unhandlerState: " + oldState + " what:" + what);
+    }
+
     static class ViewHolder {
         ImageView imageView;
         TextView chatTextView;
@@ -351,13 +437,28 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> {
         this.mResendButtonClickListener = mResendButtonClickListener;
     }
 
+    public void setLongMsgListener(LongMsgListener listener) {
+        this.mLongMsgListener = new WeakReference<LongMsgListener>(listener);
+
+    }
+
     public interface ResendButtonClickListener {
-        public void onResendButtonClicked(int pos);
+        void onResendButtonClicked(int pos);
     }
 
     public interface ImageClickListener {
-        public void onImageViewClicked(Bundle bundle);
+        void onImageViewClicked(Bundle bundle);
 
-        public void onImageViewLongClicked(String imageURL);
+        void onImageViewLongClicked(String imageURL);
+    }
+
+    public interface LongMsgListener {
+        void onLongMsgSuccess(int oldState, int newState, Bundle what);
+
+        void onLongMsgFail(int oldState, int newState, Bundle what);
+
+        void onLongMsgPending(int oldState, int newState, Bundle what);
+
+        void onLongMsgIdle(int oldState, int newState, Bundle what);
     }
 }

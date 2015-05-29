@@ -41,6 +41,9 @@ public class PushSDKManager {
     private static int START_RETRY_TIME = 0;
     private static int STOP_RETRY_TIME = 0;
 
+    private static boolean starting = false;
+    private static boolean stopping = false;
+
     private static final Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -56,6 +59,7 @@ public class PushSDKManager {
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "start sdk succeed." + context.hashCode());
                         PrefUtil.setBooleanValue(context, "PushSDKManager.enable", true);
+                        starting = false;
                     }
 
                     @Override
@@ -76,6 +80,7 @@ public class PushSDKManager {
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "stop sdk succeed:" + context.hashCode());
                         PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
+                        stopping = false;
                     }
 
                     @Override
@@ -104,7 +109,8 @@ public class PushSDKManager {
         boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
         if (!enable || force) {
             Log.d(TAG, "start context: " + context.hashCode());
-            if (!handler.hasMessages(MSG_START_SDK)) {
+            if (!starting) {
+                starting = true;
                 CURRENT_CONTEXT = new WeakReference<>(context);
                 Message msg = Message.obtain();
                 msg.what = MSG_START_SDK;
@@ -119,7 +125,8 @@ public class PushSDKManager {
         boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
         if (enable) {
             Log.d(TAG, "stop context: " + context.hashCode());
-            if (!handler.hasMessages(MSG_STOP_SDK)) {
+            if (!stopping) {
+                stopping = true;
                 CURRENT_CONTEXT = new WeakReference<>(context);
                 Message msg = Message.obtain();
                 msg.what = MSG_STOP_SDK;

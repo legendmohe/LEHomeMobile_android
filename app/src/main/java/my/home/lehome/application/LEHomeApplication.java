@@ -33,7 +33,7 @@ public class LEHomeApplication extends Application {
 //        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.enable", false);
         XGPushConfig.enableDebug(getApplicationContext(), false);
         if (!PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
-            PushSDKManager.startPushSDKService(getApplicationContext());
+            PushSDKManager.startPushSDKService(getApplicationContext(), true);
         }
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
