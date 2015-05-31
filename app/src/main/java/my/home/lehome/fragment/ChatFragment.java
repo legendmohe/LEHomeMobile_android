@@ -252,9 +252,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             public void run() {
                 ChatFragment fragment = mFragment.get();
                 if (!fragment.isScrollViewInButtom()) {
-                    int newNum = fragment.getNewMsgNum();
-                    fragment.setNewMsgNum(++newNum);
-                    fragment.showTip(newNum + " new message");
+                    fragment.showTip(fragment.getString(
+                            R.string.chat_new_message, fragment.getNewMsgNum()
+                    ));
                     fragment.setNeedShowUnread(true);
                 } else {
                     fragment.setNewMsgNum(0);
@@ -279,8 +279,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                             fragment.getAdapter().add(newItem);
                             fragment.getAdapter().notifyDataSetChanged();
                             if (!fragment.isScrollViewInButtom()) {
+                                fragment.setNewMsgNum(fragment.getNewMsgNum() + 1);
                                 fragment.getCmdListView().removeCallbacks(mToastRunnable);
-                                fragment.getCmdListView().postDelayed(mToastRunnable, 500);
+                                fragment.getCmdListView().postDelayed(mToastRunnable, 200);
                             } else {
                                 fragment.setNewMsgNum(0);
                                 fragment.scrollToBottom();

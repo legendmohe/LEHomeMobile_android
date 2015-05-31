@@ -75,13 +75,24 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <CheckBoxPreference
+            android:key="pref_loc_me_enable"
+            android:title="@string/pref_loc_me_enable"
+            android:summary="@string/pref_loc_me_enable_sum"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_load_img_wifi"
+            android:title="@string/pref_load_img_wifi"
+            android:summary="@string/pref_load_img_wifi_sum"
+            android:defaultValue="false" />
+        <CheckBoxPreference
             android:key="pref_save_power_mode"
             android:title="@string/pref_save_power_mode"
             android:summary="@string/pref_save_power_mode_sum"
-            android:defaultValue="true" />
+            android:defaultValue="false" />
         <CheckBoxPreference
             android:key="pref_auto_connect_sco"
             android:title="@string/pref_auto_connect_sco"
+            android:summary="@string/pref_auto_connect_sco_sum"
             android:defaultValue="true" />
         <CheckBoxPreference
             android:key="pref_volume_key_control_speech"

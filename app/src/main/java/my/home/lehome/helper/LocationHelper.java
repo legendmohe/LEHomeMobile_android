@@ -34,6 +34,10 @@ public class LocationHelper {
         Log.d(TAG, "enqueu location request for: " + clientId);
         String clientName = PrefUtil.getStringValue(context, "pref_client_id", "");
         if (clientName.equals(clientId)) {
+            if (!PrefUtil.getbooleanValue(context, "pref_loc_me_enable", true)) {
+                Log.d(TAG, "location disable. reject loc request.");
+                return;
+            }
             Intent serviceIntent = new Intent(context, LocationIntentService.class);
             serviceIntent.putExtra("seq", seq);
             serviceIntent.putExtra("type", type);

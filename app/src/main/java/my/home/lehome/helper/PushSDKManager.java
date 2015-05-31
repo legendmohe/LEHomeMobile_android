@@ -35,6 +35,10 @@ public class PushSDKManager {
     public final static int MSG_START_SDK = 0;
     public final static int MSG_STOP_SDK = 1;
 
+    private static final String PREF_KEY_ENABLE = "PushSDKManager.enable";
+    private static final String PREF_KEY_STARTING = "PushSDKManager.starting";
+    private static final String PREF_KEY_STOPPING = "PushSDKManager.stopping";
+
     private static WeakReference<Context> CURRENT_CONTEXT;
 
     private static int MAX_RETRY_TIME = 10;
@@ -55,8 +59,8 @@ public class PushSDKManager {
                     @Override
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "start sdk succeed." + context.hashCode());
-                        PrefUtil.setBooleanValue(context, "PushSDKManager.enable", true);
-                        PrefUtil.setBooleanValue(context, "PushSDKManager.starting", false);
+                        PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, true);
+                        PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
                     }
 
                     @Override
@@ -68,7 +72,7 @@ public class PushSDKManager {
                             msg.what = MSG_START_SDK;
                             handler.sendMessageDelayed(msg, 300);
                         } else {
-                            PrefUtil.setBooleanValue(context, "PushSDKManager.starting", false);
+                            PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
                         }
                     }
                 });
@@ -78,8 +82,8 @@ public class PushSDKManager {
                     @Override
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "stop sdk succeed:" + context.hashCode());
-                        PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
-                        PrefUtil.setBooleanValue(context, "PushSDKManager.stopping", false);
+                        PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, false);
+                        PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
                     }
 
                     @Override
@@ -91,7 +95,7 @@ public class PushSDKManager {
                             msg.what = MSG_STOP_SDK;
                             handler.sendMessageDelayed(msg, 300);
                         } else {
-                            PrefUtil.setBooleanValue(context, "PushSDKManager.stopping", false);
+                            PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
                         }
                     }
                 });
@@ -106,13 +110,13 @@ public class PushSDKManager {
         startPushSDKService(context, false);
     }
 
-    public static void startPushSDKService(final Context context, boolean force) {
-        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
+    synchronized public static void startPushSDKService(Context context, boolean force) {
+        boolean enable = PrefUtil.getbooleanValue(context, PREF_KEY_ENABLE, false);
         if (!enable || force) {
-            Log.d(TAG, "start context: " + context.hashCode());
-            boolean starting = PrefUtil.getbooleanValue(context, "PushSDKManager.starting", false);
+            boolean starting = PrefUtil.getbooleanValue(context, PREF_KEY_STARTING, false);
+            Log.d(TAG, "start context: " + context.hashCode() + " enable:" + enable + " force:" + force + " starting:" + starting);
             if (!starting) {
-                PrefUtil.setBooleanValue(context, "PushSDKManager.starting", true);
+                PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, true);
                 CURRENT_CONTEXT = new WeakReference<>(context);
                 Message msg = Message.obtain();
                 msg.what = MSG_START_SDK;
@@ -123,13 +127,13 @@ public class PushSDKManager {
         }
     }
 
-    public static void stopPushSDKService(Context context) {
-        boolean enable = PrefUtil.getbooleanValue(context, "PushSDKManager.enable", false);
+    synchronized public static void stopPushSDKService(Context context) {
+        boolean enable = PrefUtil.getbooleanValue(context, PREF_KEY_ENABLE, false);
         if (enable) {
             Log.d(TAG, "stop context: " + context.hashCode());
-            boolean stopping = PrefUtil.getbooleanValue(context, "PushSDKManager.stopping", false);
+            boolean stopping = PrefUtil.getbooleanValue(context, PREF_KEY_STOPPING, false);
             if (!stopping) {
-                PrefUtil.setBooleanValue(context, "PushSDKManager.stopping", true);
+                PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, true);
                 CURRENT_CONTEXT = new WeakReference<>(context);
                 Message msg = Message.obtain();
                 msg.what = MSG_STOP_SDK;

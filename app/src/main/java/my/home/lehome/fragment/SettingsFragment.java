@@ -76,68 +76,17 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         CheckBoxPreference savePowerPreference = (CheckBoxPreference) findPreference("pref_save_power_mode");
         boolean savePowerOn = sharedPreferences.getBoolean("pref_save_power_mode", true);
         savePowerPreference.setChecked(savePowerOn);
+        CheckBoxPreference wifiImgPreference = (CheckBoxPreference) findPreference("pref_load_img_wifi");
+        boolean wifiLoadOn = sharedPreferences.getBoolean("pref_load_img_wifi", false);
+        wifiImgPreference.setChecked(wifiLoadOn);
+        CheckBoxPreference locEnablePreference = (CheckBoxPreference) findPreference("pref_loc_me_enable");
+        boolean locEnable = sharedPreferences.getBoolean("pref_loc_me_enable", true);
+        locEnablePreference.setChecked(locEnable);
 
         CheckBoxPreference volumeKeyPreference = (CheckBoxPreference) findPreference("pref_volume_key_control_speech");
         boolean volume_key_speech = sharedPreferences.getBoolean("pref_volume_key_control_speech", true);
         volumeKeyPreference.setChecked(volume_key_speech);
 
-//        Preference button = (Preference) findPreference("homescreen_shortcut");
-//        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//            @Override
-//            public boolean onPreferenceClick(Preference arg0) {
-//                Intent shortcutIntent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
-//                shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//
-//                Intent addIntent = new Intent();
-//                addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-//                addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, R.string.app_name);
-//                addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(getActivity().getApplicationContext(), R.drawable.ic_launcher));
-//
-//                addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
-//                getActivity().sendBroadcast(addIntent);
-//                addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-//                getActivity().sendBroadcast(addIntent);
-//
-////                        	ShortcutIconResource icon =
-////                        		    Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_launcher);
-////
-////                    		Intent intent = new Intent();
-////
-////                    		Intent launchIntent = new Intent(getActivity(), MainActivity.class);
-////
-////                    		intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launchIntent);
-////                    		intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, R.string.app_name);
-////                    		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
-////
-////							getActivity().setResult(Activity.RESULT_OK, intent);
-//
-//                Toast.makeText(
-//                        getActivity()
-//                        , R.string.pref_homescreen_shortcut_smy
-//                        , Toast.LENGTH_SHORT)
-//                        .show();
-//                return true;
-//            }
-//        });
-//        Preference button = (Preference) findPreference("clean_cmd_history");
-//        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//            @Override
-//            public boolean onPreferenceClick(Preference arg0) {
-//                Context context = getActivity().getApplicationContext();
-//                SharedPreferences pref = context.getSharedPreferences(Constants.PREF_NAME, 0);
-//                SharedPreferences.Editor editor = pref.edit();
-//                editor.putStringSet(Constants.CMD_HISTORY_PREF_NAME, new HashSet<String>());
-//                editor.commit();
-//
-//                Toast.makeText(
-//                        getActivity()
-//                        , R.string.pref_clean_cmd_history
-//                        , Toast.LENGTH_SHORT)
-//                        .show();
-//                return true;
-//            }
-//        });
         mDeviceId = sharedPreferences.getString("pref_bind_device", "");
         mServerAddress = sharedPreferences.getString("pref_server_address", "");
         Preference button = findPreference("load_auto_item");

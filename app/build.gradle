@@ -14,14 +14,43 @@
 
 apply plugin: 'com.android.application'
 
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+def gitVersion() {
+    def process = "git rev-list master --first-parent --count".execute()
+    return process.text.toInteger()
+}
 
-    defaultConfig {
-        applicationId "my.home.lehome"
-        minSdkVersion 17
-        targetSdkVersion 21
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    def versionPropsFile = file('version.properties')
+
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        def majorVersion = versionProps['MAJOR_VERSION'].toInteger()
+        def minorVersion = versionProps['MINOR_VERSION'].toInteger()
+        def pointVersion = gitVersion()
+
+        versionProps['POINT_VERSION'] = pointVersion.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+
+        def name = "${majorVersion}.${minorVersion}.${pointVersion}"
+        def code = gitVersion()
+        println "version name: " + name
+        println "version code: " + code
+
+        defaultConfig {
+            applicationId "my.home.lehome"
+            minSdkVersion 17
+            targetSdkVersion 22
+            versionCode code
+            versionName name
+        }
+    } else {
+        throw new GradleException("Could not read version.properties!")
     }
 
     buildTypes {
@@ -30,6 +59,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
 }
 
 dependencies {

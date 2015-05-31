@@ -44,7 +44,7 @@
     <string name="pref_speech_cmd_need_confirm">语音命令后弹出确认窗口</string>
     <string name="pref_cmd_need_correct">开启模糊命令</string>
     <string name="pref_homescreen_shortcut">添加到homescreen</string>
-    <string name="pref_auto_connect_sco">自动连接蓝牙麦克风</string>
+    <string name="pref_auto_connect_sco">使用蓝牙耳机</string>
     <string name="pref_others_profile">其他功能</string>
     <string name="pref_homescreen_shortcut_smy">在homescreen添加快捷方式</string>
     <string name="pref_clean_cmd_history">清空输入历史</string>
@@ -147,4 +147,10 @@
     <string name="pref_save_power_mode_set">退出应用后生效</string>
     <string name="long_msg_http_exception">获取数据失败</string>
     <string name="long_msg_parse_exception">数据解析失败</string>
+    <string name="chat_new_message">%1$s条新消息</string>
+    <string name="pref_load_img_wifi">wifi环境下自动载入图片</string>
+    <string name="pref_load_img_wifi_sum">非wifi环境下需点击载入图片</string>
+    <string name="pref_auto_connect_sco_sum">手机连接蓝牙耳机时，通过蓝牙耳机进行语音输入</string>
+    <string name="pref_loc_me_enable">启用定位功能</string>
+    <string name="pref_loc_me_enable_sum">开启后其他用户可定位本机</string>
 </resources>

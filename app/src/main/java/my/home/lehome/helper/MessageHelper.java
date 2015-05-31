@@ -57,6 +57,8 @@ public class MessageHelper {
     public final static int NOTIFICATION_ID = 1;
     public final static String NOTIFICATION_INTENT_ACTION = "my.home.lehome.helper.MessagerHelper:noti_intent";
 
+    public final static String[] NORMAIL_FILTER_TAG_LIST = {"normal", "capture", "long_msg", "bc_loc"};
+
     public static void setPushTag(Context context, String tagText) {
 //        List<String> tags = PushUtils.getTagsList(tagText);
 //        PushManager.setTags(context, tags);

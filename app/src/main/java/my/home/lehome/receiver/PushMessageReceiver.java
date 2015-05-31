@@ -28,6 +28,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.util.Arrays;
+
 import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocationHelper;
@@ -74,7 +76,7 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
         if (type.equals("req_loc")) {
             LocationHelper.enqueueLocationRequest(context, seq, type, msg);
             return;
-        } else if (type.equals("normal") || type.equals("capture") || type.equals("long_msg")) {
+        } else if (Arrays.asList(MessageHelper.NORMAIL_FILTER_TAG_LIST).contains(type)) {
             MessageHelper.inNormalState = true;
         } else if (type.equals("toast")) {
             MessageHelper.sendToast(msg);

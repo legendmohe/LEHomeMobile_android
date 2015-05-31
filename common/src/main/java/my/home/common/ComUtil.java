@@ -56,7 +56,7 @@ public class ComUtil {
         return false;
     }
 
-    public boolean isScreenOn(Context context) {
+    public static boolean isScreenOn(Context context) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             DisplayManager dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
             boolean screenOn = false;
@@ -71,5 +71,18 @@ public class ComUtil {
             //noinspection deprecation
             return pm.isScreenOn();
         }
+    }
+
+    public static String getProcessName(Context context) {
+        String currentProcName = "";
+        int pid = android.os.Process.myPid();
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+            if (processInfo.pid == pid) {
+                currentProcName = processInfo.processName;
+                break;
+            }
+        }
+        return currentProcName;
     }
 }
