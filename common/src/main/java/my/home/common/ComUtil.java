@@ -21,6 +21,8 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.view.Display;
 
+import java.util.List;
+
 public class ComUtil {
     public static String readFileContent(String fileName) {
         return null;
@@ -84,5 +86,18 @@ public class ComUtil {
             }
         }
         return currentProcName;
+    }
+
+    public static boolean isMainProcess(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String mainProcessName = context.getPackageName();
+        int myPid = android.os.Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

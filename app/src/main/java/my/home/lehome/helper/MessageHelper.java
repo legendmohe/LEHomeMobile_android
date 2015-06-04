@@ -25,8 +25,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
-import com.tencent.android.tpush.XGPushManager;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -39,6 +37,7 @@ import my.home.common.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;
+import my.home.lehome.service.SendMsgIntentService;
 import my.home.lehome.util.CommonUtils;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
@@ -58,18 +57,6 @@ public class MessageHelper {
     public final static String NOTIFICATION_INTENT_ACTION = "my.home.lehome.helper.MessagerHelper:noti_intent";
 
     public final static String[] NORMAIL_FILTER_TAG_LIST = {"normal", "capture", "long_msg", "bc_loc"};
-
-    public static void setPushTag(Context context, String tagText) {
-//        List<String> tags = PushUtils.getTagsList(tagText);
-//        PushManager.setTags(context, tags);
-        XGPushManager.setTag(context, tagText);
-    }
-
-    public static void delPushTag(Context context, String tagText) {
-//        List<String> tags = PushUtils.getTagsList(tagText);
-//        PushManager.delTags(context, tags);
-        XGPushManager.deleteTag(context, tagText);
-    }
 
     public static void loadPref(Context context) {
         SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -165,6 +152,38 @@ public class MessageHelper {
         msg.what = ChatFragment.MSG_TYPE_TOAST;
         msg.obj = content;
         ChatFragment.sendMessage(msg);
+    }
+
+    public static void sendBackgroundMsgToServer(Context context, String msg) {
+        MessageHelper.sendMsgToServer(context, msg, false, true, true);
+    }
+
+    public static void sendMsgToServer(Context context, String msg) {
+        MessageHelper.sendMsgToServer(context, msg, true, false, false);
+    }
+
+    public static void sendMsgToServer(Context context, String msg, boolean autoFill, boolean passthrough, boolean background) {
+        String message;
+        String serverURL;
+        boolean isLocal = MessageHelper.isLocalMsgPrefEnable(context)
+                && LocalMsgHelper.inLocalWifiNetwork(context);
+        if (isLocal) {
+            message = autoFill ? MessageHelper.getFormatLocalMessage(msg) : msg;
+            serverURL = MessageHelper.getLocalServerURL(context);
+        } else {
+            message = autoFill ? MessageHelper.getFormatMessage(context, msg) : msg;
+            if (!message.startsWith("*") && passthrough)
+                message = "*" + message;
+            serverURL = MessageHelper.getServerURL(context, message);
+        }
+        Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
+        serviceIntent.putExtra("bg", background);
+        serviceIntent.putExtra("local", isLocal);
+        serviceIntent.putExtra("cmdString", message);
+        serviceIntent.putExtra("cmd", msg);
+        serviceIntent.putExtra("serverUrl", serverURL);
+        serviceIntent.putExtra("deviceID", MessageHelper.getDeviceID(context));
+        context.startService(serviceIntent);
     }
 
     public static void sendServerMsgToList(int seq, String type, String content, Context context) {

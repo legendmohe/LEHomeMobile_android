@@ -247,6 +247,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
     private static class MyHandler extends Handler {
         private final WeakReference<ChatFragment> mFragment;
+        private final WeakReference<Context> mAppplicationContext;
+
         private Runnable mToastRunnable = new Runnable() {
             @Override
             public void run() {
@@ -265,6 +267,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
         public MyHandler(ChatFragment fragment) {
             mFragment = new WeakReference<>(fragment);
+            mAppplicationContext = new WeakReference<>(fragment.getActivity().getApplicationContext());
         }
 
         @Override
@@ -289,8 +292,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                         }
                         break;
                     case MSG_TYPE_TOAST:
-                        if (fragment.getActivity() != null) {
-                            Context context = fragment.getActivity().getApplicationContext();
+                        if (mAppplicationContext.get() != null) {
+                            Context context = mAppplicationContext.get();
                             if (context != null) {
                                 Toast.makeText(
                                         context

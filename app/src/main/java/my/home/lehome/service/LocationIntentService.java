@@ -15,7 +15,6 @@
 package my.home.lehome.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,7 +25,6 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
 import my.home.lehome.R;
-import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;
 
 /**
@@ -56,7 +54,7 @@ public class LocationIntentService extends IntentService {
         Log.d(TAG, "initLocationClient");
 
         LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Battery_Saving);//设置定位模式
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);//设置定位模式
         option.setCoorType("bd09ll");//返回的定位结果是百度经纬度,默认值gcj02
         option.setIsNeedAddress(true);
         option.setOpenGps(true);
@@ -101,26 +99,7 @@ public class LocationIntentService extends IntentService {
     }
 
     private void sendResultToServer(String broadcast) {
-        String message;
-        String serverURL;
-        Context context = getApplicationContext();
-        boolean local = MessageHelper.isLocalMsgPrefEnable(context)
-                && LocalMsgHelper.isLMSSID(context);
-        if (local) {
-            message = broadcast;
-            serverURL = MessageHelper.getLocalServerURL(context);
-        } else {
-            message = "*" + broadcast;
-            serverURL = MessageHelper.getServerURL(context, message);
-        }
-        Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
-        serviceIntent.putExtra("bg", true);
-        serviceIntent.putExtra("local", local);
-        serviceIntent.putExtra("cmdString", message);
-        serviceIntent.putExtra("cmd", broadcast);
-        serviceIntent.putExtra("serverUrl", serverURL);
-        serviceIntent.putExtra("deviceID", MessageHelper.getDeviceID(context));
-        context.startService(serviceIntent);
+        MessageHelper.sendBackgroundMsgToServer(getApplicationContext(), broadcast);
     }
 
     private String formatResponse(String id) {

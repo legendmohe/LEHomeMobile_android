@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import my.home.lehome.R;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
+import my.home.lehome.helper.MessageHelper;
 import my.home.model.entities.Shortcut;
 import my.home.model.manager.DBStaticManager;
 
@@ -120,6 +121,7 @@ public class ShortcutFragment extends ListFragment {
                 Toast.makeText(getActivity(),
                         getResources().getString(R.string.com_exec) + ":" + shortcut.getContent(),
                         Toast.LENGTH_SHORT).show();
+                MessageHelper.sendMsgToServer(getActivity(), shortcut.getContent());
             }
         });
         alert.setNegativeButton(R.string.com_cancel, null);

@@ -52,14 +52,11 @@ public class LocationHelper {
     }
 
     public static Intent getBaiduMapUrlIntent(String lng, String lat, String title, String content, String comName, String appName) {
-//        String format = "intent://map/marker?location=%s,%s&title=%s&content=%s&src=%s|%s#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end";
-//        return new Intent(String.format(format, lng, lat, title, content, comName, appName));
         String format = "http://api.map.baidu.com/marker?location=%s,%s&title=%s&content=%s&output=html&src=%s|%s";
         String url = String.format(format, lat, lng, title, content, comName, appName);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         return i;
-//        return new Intent("intent://map/line?coordtype=&zoom=&region=abd&name=28&src=yourCompanyName|yourAppName#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end");
     }
 
     public static String[] parseLocationFromSrc(String src) {

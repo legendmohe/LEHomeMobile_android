@@ -70,7 +70,7 @@ public class PushSDKManager {
                         if (START_RETRY_TIME <= MAX_RETRY_TIME) {
                             Message msg = Message.obtain();
                             msg.what = MSG_START_SDK;
-                            handler.sendMessageDelayed(msg, 300);
+                            handler.sendMessageDelayed(msg, 1000);
                         } else {
                             PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
                         }
@@ -93,7 +93,7 @@ public class PushSDKManager {
                         if (STOP_RETRY_TIME <= MAX_RETRY_TIME) {
                             Message msg = Message.obtain();
                             msg.what = MSG_STOP_SDK;
-                            handler.sendMessageDelayed(msg, 300);
+                            handler.sendMessageDelayed(msg, 1000);
                         } else {
                             PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
                         }
@@ -143,4 +143,13 @@ public class PushSDKManager {
             Log.d(TAG, "skip stopPushSDKService");
         }
     }
+
+    public static void setPushTag(Context context, String tagText) {
+        XGPushManager.setTag(context, tagText);
+    }
+
+    public static void delPushTag(Context context, String tagText) {
+        XGPushManager.deleteTag(context, tagText);
+    }
+
 }

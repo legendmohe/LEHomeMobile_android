@@ -43,7 +43,7 @@ public class LocalMsgHelper {
         return;
     }
 
-    public static boolean isLMSSID(Context context) {
+    public static boolean inLocalWifiNetwork(Context context) {
         NetworkInfo wifiNetworkInfo = NetworkUtil.getWifiNetworkInfo(context);
         if (wifiNetworkInfo.isConnected()) {
             String ssid = NetworkUtil.getFormatSSID(context);

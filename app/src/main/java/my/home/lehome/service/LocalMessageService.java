@@ -257,10 +257,12 @@ public class LocalMessageService extends Service {
         public void run() {
             zmqContext = ZMQ.context(1);
             subscriber = zmqContext.socket(ZMQ.SUB);
-            ZMQ.Poller poller = new ZMQ.Poller(1);
-            poller.register(subscriber, ZMQ.Poller.POLLIN);
+            ZMQ.Poller poller = null;
 
             try {
+                poller = new ZMQ.Poller(1);
+                poller.register(subscriber, ZMQ.Poller.POLLIN);
+
                 subscriber.connect(serverAddress);
                 subscriber.subscribe("".getBytes());
                 while (!Thread.currentThread().isInterrupted() && !isGoingStop) {
@@ -284,6 +286,9 @@ public class LocalMessageService extends Service {
                 Log.e(TAG, Log.getStackTraceString(e));
             } finally {
                 if (!Thread.currentThread().isInterrupted()) {
+                    if (poller != null) {
+                        poller.unregister(subscriber);
+                    }
                     subscriber.close();
                     zmqContext.term();
                 }

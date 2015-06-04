@@ -134,7 +134,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             return false;
         }
         Context context = mMainActivityView.get().getContext();
-        boolean ret = LocalMsgHelper.isLMSSID(context);
+        boolean ret = LocalMsgHelper.inLocalWifiNetwork(context);
         if (ret) {
             return LocalMsgHelper.startLocalMsgService(context);
         }
@@ -219,8 +219,8 @@ public class MainActivityPresenter extends MVPActivityPresenter {
 
         MessageHelper.loadPref(context);
         if (old_device_id != null && !old_device_id.equals(MessageHelper.getDeviceID(context))) {
-            MessageHelper.delPushTag(context, old_device_id);
-            MessageHelper.setPushTag(context, MessageHelper.getDeviceID(context));
+            PushSDKManager.delPushTag(context, old_device_id);
+            PushSDKManager.setPushTag(context, MessageHelper.getDeviceID(context));
         }
         if (mBinded && MessageHelper.isLocalMsgPrefEnable(context)
                 && !TextUtils.isEmpty(MessageHelper.getLocalServerSubscribeURL(context))) {
@@ -238,7 +238,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         }
 
         if (MessageHelper.isLocalMsgPrefEnable(context)) {
-            if (LocalMsgHelper.isLMSSID(context)) {
+            if (LocalMsgHelper.inLocalWifiNetwork(context)) {
                 if (!old_local_msg_state
                         || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
                     Intent i = new Intent("my.home.lehome.service.LocalMessageService");
@@ -267,8 +267,8 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     public void onActivityCreate() {
         Context context = mMainActivityView.get().getContext();
         // bind service if needed.
-        if (LocalMsgHelper.isLMSSID(context) && MessageHelper.isLocalMsgPrefEnable(context)) {
-            Intent i = new Intent("my.home.lehome.service.LocalMessageService");
+        if (LocalMsgHelper.inLocalWifiNetwork(context) && MessageHelper.isLocalMsgPrefEnable(context)) {
+            Intent i = new Intent(context, LocalMessageService.class);
             context.bindService(i, mConnection, context.BIND_AUTO_CREATE);
         }
         IntentFilter stateIntentFilter = new IntentFilter();
@@ -300,7 +300,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                 }
             } else if (intent.getAction() == NetworkStateReceiver.VALUE_INTENT_START_LOCAL_SERVER) {
                 if (!mBinded) {
-                    Intent i = new Intent("my.home.lehome.service.LocalMessageService");
+                    Intent i = new Intent(context, LocalMessageService.class);
                     context.bindService(i, mConnection, context.BIND_AUTO_CREATE);
                 }
             }

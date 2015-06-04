@@ -15,11 +15,11 @@
 package my.home.lehome.application;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.tencent.android.tpush.XGPushConfig;
 
 import my.home.common.ComUtil;
 import my.home.common.PrefUtil;
@@ -31,12 +31,12 @@ public class LEHomeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        XGPushConfig.enableDebug(getApplicationContext(), false);
+//        XGPushConfig.enableDebug(getApplicationContext(), false);
         PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.stopping", false);
         PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.starting", false);
-        if (ComUtil.getProcessName(getApplicationContext()).equals("my.home.lehome")
+        if (ComUtil.isMainProcess(getApplicationContext())
                 && !PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
-//            Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));
+            Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));
             PushSDKManager.startPushSDKService(getApplicationContext(), true);
         }
 
