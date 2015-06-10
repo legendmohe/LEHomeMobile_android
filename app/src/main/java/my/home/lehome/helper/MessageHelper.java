@@ -144,7 +144,7 @@ public class MessageHelper {
     }
 
     public static boolean hasUnread() {
-        return unreadMsgCount > 0 ? true : false;
+        return unreadMsgCount > 0;
     }
 
     public static void sendToast(String content) {
@@ -165,6 +165,9 @@ public class MessageHelper {
     public static void sendMsgToServer(Context context, String msg, boolean autoFill, boolean passthrough, boolean background) {
         String message;
         String serverURL;
+        if (!TextUtils.isEmpty(msg)) {
+            msg = msg.trim();
+        }
         boolean isLocal = MessageHelper.isLocalMsgPrefEnable(context)
                 && LocalMsgHelper.inLocalWifiNetwork(context);
         if (isLocal) {
