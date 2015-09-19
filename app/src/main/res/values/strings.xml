@@ -103,6 +103,8 @@
     <string name="error_stop_local_msg_service">本地消息服务退出失败</string>
     <string name="error_bind_local_msg_service">绑定本地消息服务失败</string>
     <string name="error_unbind_local_msg_service">解除本地消息绑定失败</string>
+    <string name="error_unknown">未知错误</string>
+    <string name="error_internal">内部错误</string>
     <string name="pref_enable_local_msg">自动切换本地消息服务</string>
     <string name="pref_local_msg_server_address">本地消息服务器地址</string>
     <string name="msg_local_saddress_not_set">本地消息服务器地址未设置</string>
@@ -153,4 +155,5 @@
     <string name="pref_auto_connect_sco_sum">手机连接蓝牙耳机时，通过蓝牙耳机进行语音输入</string>
     <string name="pref_loc_me_enable">启用定位功能</string>
     <string name="pref_loc_me_enable_sum">开启后其他用户可定位本机</string>
+    <string name="chat_error_no_connection_error">网络连接断开</string>
 </resources>

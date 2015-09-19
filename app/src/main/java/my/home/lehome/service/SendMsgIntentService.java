@@ -25,30 +25,24 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import my.home.lehome.R;
+import my.home.lehome.service.net.CommandRequest;
 import my.home.lehome.util.Constants;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.ChatItemConstants;
@@ -65,6 +59,7 @@ public class SendMsgIntentService extends IntentService {
     public final static String TAG = "SendMsgIntentService";
 
     private PowerManager.WakeLock mWakeLock;
+    private RequestQueue mRequestQueue;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -75,13 +70,16 @@ public class SendMsgIntentService extends IntentService {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         if (mWakeLock == null) {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
             mWakeLock.acquire();
             Log.d(TAG, "acquire wakelock");
         }
-        super.onCreate();
+
+        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
     }
 
     @Override
@@ -102,13 +100,7 @@ public class SendMsgIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String cmd = intent.getStringExtra("cmdString");
-        String servelURL = intent.getStringExtra("serverUrl");
-        String deviceID = intent.getStringExtra("deviceID");
-        boolean useLocal = intent.getBooleanExtra("local", false);
-
-        String resultString = dispatchAndGetResponse(servelURL, deviceID, cmd, useLocal);
-        saveAndNotify(intent, resultString);
+        dispatchCommand(intent);
     }
 
     private void preparePengindCommand(Intent intent) {
@@ -151,136 +143,92 @@ public class SendMsgIntentService extends IntentService {
         intent.putExtra("pass_item", item);
     }
 
-    private String dispatchAndGetResponse(String servelURL, String deviceID, String cmd, boolean local) {
-//        Log.d(TAG, "sending: " + mCurrentItem.getContent() + " use local: " + mLocalMsg);
+    private void dispatchCommand(final Intent intent) {
+        String cmd = intent.getStringExtra("cmdString");
+        String servelURL = intent.getStringExtra("serverUrl");
+        String deviceID = intent.getStringExtra("deviceID");
+        boolean local = intent.getBooleanExtra("local", false);
+
+        final Context context = getApplicationContext();
         if (local) {
-            if (TextUtils.isEmpty(servelURL))
-                return getErrorJsonString(
-                        400,
-                        getApplicationContext().getResources().getString(R.string.msg_local_saddress_not_set)
-                );
-            return sendToLocalServer(servelURL, cmd);
+            if (TextUtils.isEmpty(servelURL)) {
+                saveAndNotify(intent,
+                        CommandRequest.getJsonStringResponse(
+                                400,
+                                context.getString(R.string.msg_local_saddress_not_set)
+                        ));
+            }
         } else {
             if (TextUtils.isEmpty(deviceID)) {
-                return getErrorJsonString(
-                        400,
-                        getApplicationContext().getResources().getString(R.string.msg_no_deviceid)
-                );
+                saveAndNotify(intent,
+                        CommandRequest.getJsonStringResponse(
+                                400,
+                                context.getString(R.string.msg_no_deviceid)
+                        ));
             }
-            if (TextUtils.isEmpty(servelURL))
-                return getErrorJsonString(
-                        400,
-                        getApplicationContext().getResources().getString(R.string.msg_saddress_not_set)
-                );
-            return sendToServer(servelURL);
+            if (TextUtils.isEmpty(servelURL)) {
+                saveAndNotify(intent,
+                        CommandRequest.getJsonStringResponse(
+                                400,
+                                context.getString(R.string.msg_saddress_not_set)
+                        ));
+            }
         }
-    }
-
-    private String sendToServer(String cmdURL) {
-        Context context = getApplicationContext();
-
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response;
-        String responseString = null;
-        JSONObject repObject = new JSONObject();
+        RequestFuture<String> future = RequestFuture.newFuture();
+        CommandRequest request = new CommandRequest(
+                local ? Request.Method.POST : Request.Method.GET, // diff
+                servelURL,
+                cmd,
+                future,
+                future
+        );
+        mRequestQueue.add(request);
         try {
-            response = httpclient.execute(new HttpGet(cmdURL));
-            StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                response.getEntity().writeTo(out);
-                out.close();
-                responseString = out.toString();
-            } else {
-                //Closes the connection.
-                response.getEntity().getContent().close();
-                try {
-                    repObject.put("code", 400);
-                    repObject.put("desc", context.getString(R.string.chat_error_conn));
-                } catch (JSONException je) {
-                }
-                responseString = repObject.toString();
+            String response = future.get(request.getTimeoutMs() + 5000, TimeUnit.MILLISECONDS);
+            Log.d(TAG, "get cmd response:" + response);
+            saveAndNotify(intent,
+                    CommandRequest.getJsonStringResponse(
+                            200,
+                            response
+                    ));
+        } catch (ExecutionException e) {
+            Throwable error = e.getCause();
+            Log.d(TAG, "get cmd error:" + error.toString());
+
+            String errorString = context.getString(R.string.error_unknown);
+            int errorCode = 400;
+            if (error instanceof ServerError) {
+                errorString = context.getString(R.string.chat_error_conn);
+                errorCode = 400;
+            } else if (error instanceof TimeoutError) {
+                errorString = context.getString(R.string.chat_error_http_error);
+                errorCode = 400;
+            } else if (error instanceof ParseError) {
+                errorString = context.getString(R.string.chat_error_http_error);
+                errorCode = 400;
+            } else if (error instanceof NoConnectionError) {
+                errorString = context.getString(R.string.chat_error_no_connection_error);
+                errorCode = 400;
             }
-        } catch (ClientProtocolException e) {
-            try {
-                repObject.put("code", 400);
-                repObject.put("desc", context.getString(R.string.chat_error_protocol_error));
-            } catch (JSONException je) {
-            }
-            responseString = repObject.toString();
-        } catch (IOException e) {
-            try {
-                repObject.put("code", 400);
-                repObject.put("desc", context.getString(R.string.chat_error_http_error));
-            } catch (JSONException je) {
-            }
-            responseString = repObject.toString();
+            saveAndNotify(intent,
+                    CommandRequest.getJsonStringResponse(
+                            errorCode,
+                            errorString
+                    ));
+        } catch (Exception e) {
+            future.cancel(true);
+            e.printStackTrace();
+//            saveAndNotify(intent,
+//                    CommandRequest.getJsonStringResponse(
+//                            400,
+//                            context.getString(R.string.error_internal)
+//                    ));
         }
-        return responseString;
-    }
-
-    private String sendToLocalServer(String serverAddress, String cmd) {
-        Context context = getApplicationContext();
-
-        HttpParams httpParameters = new BasicHttpParams();
-        int timeoutConnection = 3000;
-        HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-        int timeoutSocket = 5000;
-        HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-
-        HttpClient httpclient = new DefaultHttpClient(httpParameters);
-        HttpResponse response;
-        String responseString = null;
-        JSONObject repObject = new JSONObject();
-        try {
-            List<NameValuePair> pairList = new ArrayList<>();
-            pairList.add(new BasicNameValuePair("cmd", cmd));
-            HttpPost httpPost = new HttpPost(serverAddress);
-            httpPost.setEntity(new UrlEncodedFormEntity(pairList, "utf-8"));
-
-            response = httpclient.execute(httpPost);
-            StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                response.getEntity().writeTo(out);
-                out.close();
-                try {
-                    repObject.put("code", 200);
-                    repObject.put("desc", out.toString());
-                } catch (JSONException je) {
-                }
-                responseString = repObject.toString();
-            } else {
-                //Closes the connection.
-                response.getEntity().getContent().close();
-                try {
-                    repObject.put("code", 400);
-                    repObject.put("desc", context.getString(R.string.chat_error_conn));
-                } catch (JSONException je) {
-                }
-                responseString = repObject.toString();
-            }
-        } catch (ClientProtocolException e) {
-            Log.d(TAG, "ClientProtocolException: " + e.toString());
-            try {
-                repObject.put("code", 400);
-                repObject.put("desc", context.getString(R.string.chat_error_protocol_error));
-            } catch (JSONException je) {
-            }
-            responseString = repObject.toString();
-        } catch (IOException e) {
-            Log.d(TAG, "IOException: " + e.toString());
-            try {
-                repObject.put("code", 400);
-                repObject.put("desc", context.getString(R.string.chat_error_http_error));
-            } catch (JSONException je) {
-            }
-            responseString = repObject.toString();
-        }
-        return responseString;
     }
 
     private void saveAndNotify(Intent intent, String result) {
+        Log.d(TAG, "saveAndNotify:\n" + result);
+
         Context context = getApplicationContext();
         int rep_code = -1;
         String desc;
@@ -350,9 +298,5 @@ public class SendMsgIntentService extends IntentService {
                 e.printStackTrace();
             }
         }
-    }
-
-    private String getErrorJsonString(int code, String error) {
-        return "{\"code\":" + code + ",\"desc\":\"" + error + "\"}";
     }
 }
