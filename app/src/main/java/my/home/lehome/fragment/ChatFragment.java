@@ -169,6 +169,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
     private static final int SCROLL_DIR_LEFT = -1;
     private int mScrollYDirection = 0;
     private int mScrollXDirection = 0;
+    private boolean mSuggestionButtonShown;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -575,6 +576,24 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 }
             }
         });
+        mSendCmdEdittext.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSendCmdEdittext.getText() != null && mSendCmdEdittext.getText().length() != 0) {
+                    mSendCmdEdittext.performFiltering(mSendCmdEdittext.getText());
+                }
+            }
+        });
+        mSendCmdEdittext.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus
+                        && mSendCmdEdittext.getText() != null
+                        && mSendCmdEdittext.getText().length() != 0) {
+                    mSendCmdEdittext.performFiltering(mSendCmdEdittext.getText());
+                }
+            }
+        });
         mSendCmdEdittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -626,9 +645,11 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 if (!mInSpeechMode) {
                     Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
                     switch_btn.setBackgroundResource(R.drawable.chatting_setmode_voice_btn);
-//                    switch_btn.setBackgroundResource(android.R.drawable.ic_menu_edit);
                     getView().findViewById(R.id.speech_button).setVisibility(View.VISIBLE);
-                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.INVISIBLE);
+                    mSendCmdEdittext.setVisibility(View.INVISIBLE);
+                    if (mSuggestionButtonShown) {
+                        mSuggestionButton.setVisibility(View.INVISIBLE);
+                    }
                     mInSpeechMode = true;
 //                    AnimatorSet animatorSet = UIUtils.getDismissViewScaleAnimatorSet(toolButton);
 //                    toolButton.setVisibility(View.GONE);
@@ -654,9 +675,11 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 } else {
                     Button switch_btn = (Button) getView().findViewById(R.id.switch_input_button);
                     switch_btn.setBackgroundResource(R.drawable.chatting_setmode_msg_btn);
-//                    switch_btn.setBackgroundResource(android.R.drawable.ic_btn_speak_now);
                     getView().findViewById(R.id.speech_button).setVisibility(View.INVISIBLE);
-                    getView().findViewById(R.id.send_cmd_edittext).setVisibility(View.VISIBLE);
+                    mSendCmdEdittext.setVisibility(View.VISIBLE);
+                    if (mSuggestionButtonShown) {
+                        mSuggestionButton.setVisibility(View.VISIBLE);
+                    }
 
 //                    Animation animation = new ResizeHeightAnim(mSendCmdLayout, mSendCmdLayout.getHeight()/2);
 //                    animation.setDuration(300);
@@ -1213,6 +1236,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             }
             // disable autocomplete dropdown
             mSuggestionButton.setTag(null);
+            mSuggestionButtonShown = true;
         } else if (!mSendCmdEdittext.isCanShowDropdown()) {
             if (mSuggestionButton.getVisibility() != View.VISIBLE) {
                 AnimatorSet animatorSet = UIUtil.getShowViewScaleAnimatorSet(mSuggestionButton, 200);
@@ -1221,6 +1245,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             }
             mSuggestionButton.setTag(item);
             mSuggestionButton.setText(item.getContent());
+            mSuggestionButtonShown = true;
         }
     }
 

@@ -63,17 +63,8 @@ public class SendMsgIntentService extends IntentService {
     public static final int MSG_BEGIN_SENDING = 1;
 
     public final static String TAG = "SendMsgIntentService";
-    public final static String SEND_MSG_INTENT_SERVICE_ACTION = "my.home.lehome.receiver.SendMsgServiceReceiver";
 
     private PowerManager.WakeLock mWakeLock;
-
-//    private boolean mLocalMsg = false;
-//    private ChatItem mCurrentItem;
-//    private String mFmtCmd;
-//    private String mOriCmd;
-//    private String mServerURL;
-//    private String mDeviceID;
-//    private Messenger mCurMessager;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -88,6 +79,7 @@ public class SendMsgIntentService extends IntentService {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
             mWakeLock.acquire();
+            Log.d(TAG, "acquire wakelock");
         }
         super.onCreate();
     }
@@ -98,12 +90,13 @@ public class SendMsgIntentService extends IntentService {
         if (mWakeLock != null) {
             mWakeLock.release();
             mWakeLock = null;
+            Log.d(TAG, "release wakelock");
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        BeforeSending(intent);
+        preparePengindCommand(intent);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -114,11 +107,11 @@ public class SendMsgIntentService extends IntentService {
         String deviceID = intent.getStringExtra("deviceID");
         boolean useLocal = intent.getBooleanExtra("local", false);
 
-        String resultString = dispatchSendingTask(servelURL, deviceID, cmd, useLocal);
-        AfterSending(intent, resultString);
+        String resultString = dispatchAndGetResponse(servelURL, deviceID, cmd, useLocal);
+        saveAndNotify(intent, resultString);
     }
 
-    private void BeforeSending(Intent intent) {
+    private void preparePengindCommand(Intent intent) {
         Messenger messenger;
         if (intent.hasExtra("messenger"))
             messenger = (Messenger) intent.getExtras().get("messenger");
@@ -158,7 +151,7 @@ public class SendMsgIntentService extends IntentService {
         intent.putExtra("pass_item", item);
     }
 
-    private String dispatchSendingTask(String servelURL, String deviceID, String cmd, boolean local) {
+    private String dispatchAndGetResponse(String servelURL, String deviceID, String cmd, boolean local) {
 //        Log.d(TAG, "sending: " + mCurrentItem.getContent() + " use local: " + mLocalMsg);
         if (local) {
             if (TextUtils.isEmpty(servelURL))
@@ -287,7 +280,7 @@ public class SendMsgIntentService extends IntentService {
         return responseString;
     }
 
-    private void AfterSending(Intent intent, String result) {
+    private void saveAndNotify(Intent intent, String result) {
         Context context = getApplicationContext();
         int rep_code = -1;
         String desc;
