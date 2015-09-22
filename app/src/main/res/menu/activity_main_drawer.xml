@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/nav_category_functions">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_control"
+                    android:icon="@android:drawable/ic_menu_camera"
+                    android:title="@string/nav_item_control" />
+                <item
+                    android:id="@+id/nav_favour"
+                    android:icon="@android:drawable/ic_menu_gallery"
+                    android:title="@string/nav_item_favour" />
+                <item
+                    android:id="@+id/nav_locator"
+                    android:icon="@android:drawable/ic_menu_slideshow"
+                    android:title="@string/nav_item_locator" />
+                <item
+                    android:id="@+id/nav_camera"
+                    android:icon="@android:drawable/ic_menu_agenda"
+                    android:title="@string/nav_item_camera" />
+            </group>
+        </menu>
+    </item>
+
+    <item android:title="@string/nav_category_others">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@android:drawable/ic_menu_manage"
+                android:title="@string/nav_item_settings" />
+            <item
+                android:id="@+id/nav_exit"
+                android:icon="@android:drawable/ic_menu_send"
+                android:title="@string/nav_item_exit" />
+        </menu>
+    </item>
+
+</menu>

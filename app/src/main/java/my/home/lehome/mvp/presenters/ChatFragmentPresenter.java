@@ -187,6 +187,8 @@ public class ChatFragmentPresenter extends MVPPresenter {
     }
 
     public void showPreCmdSuggestion(List<AutoCompleteItem> results, AutoCompleteItem item) {
+        if (item == null)
+            return;
         for (int i = 1; i < results.size(); i++) {
             if (results.get(i).equals(item)) {
                 item = results.get(i - 1);

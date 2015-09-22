@@ -13,14 +13,19 @@
   -->
 
 <resources>
-    <color name="text_color">#333333</color>
-    <color name="chat_left_focus">#ffafafaf</color>
-    <color name="chat_left_pressed">#ffafafaf</color>
-    <color name="chat_left_normal">#ffbfbfbf</color>
+    <color name="chat_item_client_textcolor">#333333</color>
+    <color name="chat_item_server_textcolor">#2d2d2d</color>
+    <color name="chat_left_focus">#acacac</color>
+    <color name="chat_left_pressed">#acacac</color>
+    <color name="chat_left_normal">#cccccc</color>
     <color name="chat_right_focus">#ffc5c5c5</color>
     <color name="chat_right_pressed">#ffc5c5c5</color>
     <color name="chat_right_normal">#ffe5e5e5</color>
     <color name="chat_suggestion_focus">#fff0f0f0</color>
     <color name="chat_suggestion_pressed">#ffc5c5c5</color>
     <color name="chat_suggestion_normal">#fff0f0f0</color>
+
+    <color name="colorPrimary">#2b2b2b</color>
+    <color name="colorPrimaryDark">#282828</color>
+    <color name="colorAccent">#454545</color>
 </resources>

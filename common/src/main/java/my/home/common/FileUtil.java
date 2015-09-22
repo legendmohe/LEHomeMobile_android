@@ -14,6 +14,9 @@
 
 package my.home.common;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -22,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by legendmohe on 15/5/7.
@@ -58,5 +63,24 @@ public class FileUtil {
                 destination.close();
             }
         }
+    }
+
+    public static String getUniquePrefix(String src, String suffix) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String timeStamp = dateFormat.format(new Date());
+        return src + "_" + timeStamp + "." + suffix;
+    }
+
+    public static String getPathFromUri(Context context, Uri uri) {
+        String filePath;
+        if (uri != null && "content".equals(uri.getScheme())) {
+            Cursor cursor = context.getContentResolver().query(uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
+            cursor.moveToFirst();
+            filePath = cursor.getString(0);
+            cursor.close();
+        } else {
+            filePath = uri.getPath();
+        }
+        return filePath;
     }
 }

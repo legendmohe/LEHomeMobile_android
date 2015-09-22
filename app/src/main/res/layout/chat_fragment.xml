@@ -56,9 +56,9 @@
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="false"
         android:layout_centerVertical="false"
-        android:background="@drawable/chat_footer_bg"
         android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/colorPrimary">
 
         <Button
             android:id="@+id/switch_input_button"
@@ -95,10 +95,10 @@
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="5dp"
                 android:text="@string/button_speech"
-                android:textColor="#eeeeee"
+                android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:background="#ff2e2e2e"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:background="@drawable/chat_suggestion_bg" />
 
             <Button
                 android:id="@+id/cmd_suggestion_button"
@@ -129,7 +129,8 @@
                 android:layout_toStartOf="@+id/cmd_suggestion_button"
                 android:ems="10"
                 android:layout_alignParentRight="false"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:textColorHint="#60eeeeee" />
 
         </RelativeLayout>
 

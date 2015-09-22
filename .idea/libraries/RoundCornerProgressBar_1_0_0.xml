@@ -5,6 +5,8 @@
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.akexorcist/RoundCornerProgressBar/1.0.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.akexorcist/RoundCornerProgressBar/1.0.0/668ee05f7a62fa724595916f1f13861046502da1/RoundCornerProgressBar-1.0.0-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

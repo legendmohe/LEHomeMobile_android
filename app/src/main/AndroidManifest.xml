@@ -75,7 +75,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:persistent="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"
@@ -92,9 +92,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".activity.MainActivity"
             android:label="@string/title_activity_settings" />
+
         <activity
             android:name=".activity.WakeupActivity"
             android:label="@string/title_activity_wakeup"

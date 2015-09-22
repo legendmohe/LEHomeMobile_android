@@ -15,12 +15,15 @@
 package my.home.lehome.mvp.views;
 
 import android.content.Context;
+import android.net.Uri;
 
 /**
  * Created by legendmohe on 15/3/15.
  */
 public interface MainActivityView extends MVPView {
-    public void setActionBarTitle(String title);
+    public void showServerStateIndicator(boolean isLocal);
 
     public Context getApplicationContext();
+
+    public void changeNavHeaderBgImage(Uri selectedImageUri);
 }

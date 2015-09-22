@@ -5,6 +5,8 @@
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.skyfishjy.ripplebackground/library/1.0.1/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.skyfishjy.ripplebackground/library/1.0.1/5dcc73905021c28c8bdf030c243f5d5543988e0e/library-1.0.1-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

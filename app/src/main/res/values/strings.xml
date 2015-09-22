@@ -156,4 +156,13 @@
     <string name="pref_loc_me_enable">启用定位功能</string>
     <string name="pref_loc_me_enable_sum">开启后其他用户可定位本机</string>
     <string name="chat_error_no_connection_error">网络连接断开</string>
+    <string name="nav_category_others">其他</string>
+    <string name="nav_item_settings">设置</string>
+    <string name="nav_item_exit">退出</string>
+    <string name="nav_item_control">控制</string>
+    <string name="nav_item_favour">收藏</string>
+    <string name="nav_item_locator">定位</string>
+    <string name="nav_item_camera">摄像头</string>
+    <string name="nav_category_functions">功能</string>
+    <string name="title_remote_msg_mode">远程模式</string>
 </resources>

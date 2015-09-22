@@ -86,7 +86,7 @@
                 android:layout_marginRight="10dp"
                 android:background="@drawable/chat_left_bg"
                 android:lineSpacingExtra="2dp"
-                android:textColor="#ff2f2f2f"
+                android:textColor="@color/chat_item_server_textcolor"
                 android:textSize="@dimen/font_size"
                 android:text="asdasdasdasdasdasdasf"
                 android:autoLink="web"

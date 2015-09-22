@@ -14,16 +14,16 @@
 
 package my.home.lehome.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import my.home.lehome.R;
 
-public class WakeupActivity extends Activity {
+public class WakeupActivity extends AppCompatActivity {
 
     public static final String TAG = WakeupActivity.class.getName();
 

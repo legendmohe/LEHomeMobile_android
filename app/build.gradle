@@ -20,8 +20,8 @@ def gitVersion() {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
 
     def versionPropsFile = file('version.properties')
 
@@ -72,6 +72,8 @@ dependencies {
     compile('com.doomonafireball.betterpickers:library:1.5.3') {
         exclude group: 'com.android.support', module: 'support-v4'
     }
+    compile 'com.android.support:design:22.2.1'
+
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'

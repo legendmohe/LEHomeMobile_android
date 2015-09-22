@@ -20,21 +20,30 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import my.home.common.BusProvider;
+import my.home.common.FileUtil;
 import my.home.common.PrefUtil;
-import my.home.lehome.R;
+import my.home.lehome.activity.MainActivity;
 import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.helper.PushSDKManager;
@@ -151,12 +160,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
                 return;
             }
             Context context = mMainActivityView.get().getContext();
-            mMainActivityView.get().setActionBarTitle(
-                    context.getString(R.string.app_name)
-                            + "("
-                            + context.getString(R.string.title_local_msg_mode)
-                            + ")"
-            );
+            mMainActivityView.get().showServerStateIndicator(true);
 //            PushManager.stopWork(context);
             if (PrefUtil.getbooleanValue(mMainActivityView.get().getContext(), "pref_save_power_mode", true)) {
                 PushSDKManager.stopPushSDKService(mMainActivityView.get().getApplicationContext());
@@ -175,9 +179,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         mBinded = false;
 
         Context context = mMainActivityView.get().getContext();
-        mMainActivityView.get().setActionBarTitle(
-                context.getString(R.string.app_name)
-        );
+        mMainActivityView.get().showServerStateIndicator(false);
 
 //        XGPushManager.registerPush(mMainActivityView.get().getApplicationContext());
 //        PushManager.startWork(context,
@@ -309,5 +311,53 @@ public class MainActivityPresenter extends MVPActivityPresenter {
 
     public boolean shouldUseLocalMsg() {
         return MessageHelper.isLocalMsgPrefEnable(mMainActivityView.get().getContext()) && isLocalMessageServiceBinded();
+    }
+
+    public Intent prepareNavHeaderImageChooserIntent() {
+        final File root = FileUtil.getPictureStorageDir("LEHome" + File.separator);
+        final String fileName = FileUtil.getUniquePrefix("profile", "jpg");
+        final File sdImageMainDirectory = new File(root, fileName);
+        final Uri imageFileUri = Uri.fromFile(sdImageMainDirectory);
+
+        // Camera.
+        final List<Intent> cameraIntents = new ArrayList<Intent>();
+        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        final PackageManager packageManager = mMainActivityView.get().getContext().getPackageManager();
+        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            final String packageName = res.activityInfo.packageName;
+            final Intent intent = new Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(packageName);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+            cameraIntents.add(intent);
+        }
+
+        // Filesystem.
+        final Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // Chooser of filesystem options.
+        final Intent chooserIntent = Intent.createChooser(galleryIntent, "Select Source");
+
+        // Add the camera options.
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
+        chooserIntent.putExtra(MainActivity.EXTRA_IMAGE_INTENTS, imageFileUri);
+        return chooserIntent;
+    }
+
+
+    public void onNavHeaderChooserActivityResult(Intent data, Uri preUri) {
+        if (mMainActivityView.get() != null) {
+            Uri uri;
+            if (data != null) {
+                uri = data.getData();
+            } else {
+                uri = preUri;
+            }
+
+            mMainActivityView.get().changeNavHeaderBgImage(uri);
+        }
     }
 }
