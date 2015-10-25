@@ -24,7 +24,9 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
+import my.home.common.PrefUtil;
 import my.home.lehome.R;
+import my.home.lehome.activity.MainActivity;
 import my.home.lehome.helper.MessageHelper;
 
 /**
@@ -93,7 +95,9 @@ public class LocationIntentService extends IntentService {
                 }
             }
         }
-        MessageHelper.sendServerMsgToList(seq, "client", getString(R.string.loc_sending_loc), getApplicationContext());
+        if (MainActivity.VISIBLE || !PrefUtil.getbooleanValue(getApplicationContext(), "pref_loc_me_silent_enable", false)) {
+            MessageHelper.sendServerMsgToList(seq, "client", getString(R.string.loc_sending_loc), getApplicationContext());
+        }
         sendResultToServer(formatResponse(id));
         Log.d(TAG, "LocationIntentService exit intent.");
     }

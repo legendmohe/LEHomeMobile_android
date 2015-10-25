@@ -150,6 +150,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        TextView detailTextView = (TextView) mNavigationView.findViewById(R.id.nav_profile_detail_textview);
+        detailTextView.setText(this.getString(R.string.title_remote_msg_mode));
+
         String profileImagePath = PrefUtil.getStringValue(this, LoadProfileHeaderBgAsyncTask.PREF_KEY_PROFILE_IMAGE, null);
         if (profileImagePath != null) {
             Uri uri = Uri.parse(profileImagePath);
@@ -229,22 +232,6 @@ public class MainActivity extends AppCompatActivity
         outState.putParcelable(MainActivity.EXTRA_IMAGE_INTENTS, mSelectedNavHeaderImageUri);
         super.onSaveInstanceState(outState);
     }
-
-    //    @Override
-//    public void onDrawerOpened(View drawerView) {
-//        InputMethodManager inputManager =
-//                (InputMethodManager) this.
-//                        getSystemService(Context.INPUT_METHOD_SERVICE);
-//        inputManager.hideSoftInputFromWindow(
-//                this.getCurrentFocus().getWindowToken(),
-//                InputMethodManager.HIDE_NOT_ALWAYS);
-////        showActionBar();
-//    }
-
-//    @Override
-//    public void onDrawerClosed(View drawerView) {
-//
-//    }
 
     public void onFragmentAttached(int id) {
         mCurrentNavindex = id;

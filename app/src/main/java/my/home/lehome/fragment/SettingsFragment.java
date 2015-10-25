@@ -79,9 +79,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         CheckBoxPreference wifiImgPreference = (CheckBoxPreference) findPreference("pref_load_img_wifi");
         boolean wifiLoadOn = sharedPreferences.getBoolean("pref_load_img_wifi", false);
         wifiImgPreference.setChecked(wifiLoadOn);
+
         CheckBoxPreference locEnablePreference = (CheckBoxPreference) findPreference("pref_loc_me_enable");
         boolean locEnable = sharedPreferences.getBoolean("pref_loc_me_enable", true);
         locEnablePreference.setChecked(locEnable);
+        CheckBoxPreference silentLocCheckBoxPreference = (CheckBoxPreference) findPreference("pref_loc_me_silent_enable");
+        boolean silent_loc = sharedPreferences.getBoolean("pref_loc_me_silent_enable", false);
+        silentLocCheckBoxPreference.setChecked(silent_loc);
+        silentLocCheckBoxPreference.setEnabled(locEnable);
+
 
         CheckBoxPreference volumeKeyPreference = (CheckBoxPreference) findPreference("pref_volume_key_control_speech");
         boolean volume_key_speech = sharedPreferences.getBoolean("pref_volume_key_control_speech", true);
@@ -130,6 +136,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             subscribeEditTextPreference.setEnabled(false);
             addressEditTextPreference.setEnabled(false);
         }
+
 
         Intent retIntent = new Intent();
         retIntent.putExtra("old_device_id", pubEditTextPreference.getSummary());
@@ -209,6 +216,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
         } else if (key.equals("pref_save_power_mode")) {
             Toast.makeText(getActivity(), R.string.pref_save_power_mode_set, Toast.LENGTH_SHORT).show();
+        } else if (key.equals("pref_loc_me_enable")) {
+            CheckBoxPreference silentLocCheckBoxPreference = (CheckBoxPreference) findPreference("pref_loc_me_silent_enable");
+            silentLocCheckBoxPreference.setEnabled(sharedPreferences.getBoolean("pref_loc_me_silent_enable", false));
         }
     }
 }

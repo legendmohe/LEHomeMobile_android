@@ -243,7 +243,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             if (LocalMsgHelper.inLocalWifiNetwork(context)) {
                 if (!old_local_msg_state
                         || !old_subscribe_address.equals(MessageHelper.getLocalServerSubscribeURL(context))) {
-                    Intent i = new Intent("my.home.lehome.service.LocalMessageService");
+                    Intent i = new Intent(context, LocalMessageService.class);
                     context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
                 }
             } else if (mBinded) {

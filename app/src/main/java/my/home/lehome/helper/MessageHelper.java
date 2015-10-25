@@ -210,7 +210,6 @@ public class MessageHelper {
         DBStaticManager.addChatItem(context, newItem);
 
         if (!MainActivity.VISIBLE) {
-            unreadMsgCount++;
             content = content.replaceAll("\\s?", "");
             int len = content.length();
             if (len >= MessageHelper.maxNotiLen) {
@@ -220,7 +219,12 @@ public class MessageHelper {
             } else if (newItem.getType() == ChatItemConstants.TYPE_SERVER_LOC) {
                 String[] formatLoc = LocationHelper.parseLocationFromSrc(newItem.getContent());
                 content = context.getString(R.string.loc_current_addr, formatLoc[0], formatLoc[1]);
+                if (PrefUtil.getbooleanValue(context, "pref_loc_me_silent_enable", false)) {
+                    return;
+                }
             }
+
+            unreadMsgCount++;
             if (unreadMsgCount <= 1) {
                 addNotification(
                         context.getString(R.string.noti_new_msg)

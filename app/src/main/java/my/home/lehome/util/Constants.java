@@ -29,6 +29,6 @@ public class Constants {
 
     public static final int SETTINGS_ACTIVITY_RESULT_CODE = 100;
 
-    public static final int MESSAGE_SEQ_QUEUE_LIMIT = 45;
+    public static final int MESSAGE_SEQ_QUEUE_LIMIT = 250;
     public static final long VOLUME_KEY_DOWN_DELAY = 500;
 }

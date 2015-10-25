@@ -44,7 +44,7 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
 
     public LoadProfileHeaderBgAsyncTask(Context context, ImageView imageView) {
         this.mContext = new WeakReference<>(context);
-        this.mImageView = new WeakReference<ImageView>(imageView);
+        this.mImageView = new WeakReference<>(imageView);
     }
 
     @Override
