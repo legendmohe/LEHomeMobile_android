@@ -339,7 +339,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
 
     private String getTimeWithFormat(int position) {
         ChatItem chatItem = getItem(position);
-        String formatString = "MM月dd日 hh时mm分";
+        String formatString = "MM月dd日 H时mm分";
         SimpleDateFormat df = new SimpleDateFormat(formatString);
         if (position == 0) {
             return df.format(chatItem.getDate());
