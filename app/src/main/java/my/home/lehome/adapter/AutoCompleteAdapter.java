@@ -103,7 +103,7 @@ public class AutoCompleteAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new Filter.FilterResults();
                 if (constraint != null) {
-                    getAutoCompleteItem(constraint.toString());
+                    getAutoCompleteItem(constraint.toString().trim());
                     // Assign the data to the FilterResults
                     filterResults.values = mResultList;
                     filterResults.count = mResultList.size();
@@ -125,9 +125,11 @@ public class AutoCompleteAdapter extends BaseAdapter implements Filterable {
     }
 
     private void getAutoCompleteItem(String inputSrc) {
-        mAutoCompleteItemUsecase.setMode(AutoCompleteItemUsecase.MODE_GETITEM)
-                .setInputText(inputSrc)
-                .execute();
+        if (inputSrc.trim().length() != 0) {
+            mAutoCompleteItemUsecase.setMode(AutoCompleteItemUsecase.MODE_GETITEM)
+                    .setInputText(inputSrc)
+                    .execute();
+        }
     }
 
     @Subscribe

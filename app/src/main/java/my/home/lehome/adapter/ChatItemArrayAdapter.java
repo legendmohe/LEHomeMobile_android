@@ -61,7 +61,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
     private ResendButtonClickListener mResendButtonClickListener;
     private ImageClickListener mImageClickListener;
     private WeakReference<LongMsgListener> mLongMsgListener;
-    private TextView chatTextView;
 
     private DisplayImageOptions options;
     private Map<Integer, ViewHolder> mViewHolders;

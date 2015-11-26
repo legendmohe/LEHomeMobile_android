@@ -607,7 +607,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
+                if (s.toString().trim().length() == 0) {
                     onShowSuggestion(null);
                     mSendCmdEdittext.setCanShowDropdown(false);
                 }

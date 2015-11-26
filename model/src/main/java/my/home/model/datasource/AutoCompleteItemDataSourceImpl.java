@@ -401,7 +401,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         List<MsgHistoryItem> msgHistoryItems = DBStaticManager.getMsgHistoryItems(context, lastPreMsg, MAX_MSG_HISTORY_NUM);
         for (MsgHistoryItem item : msgHistoryItems) {
             if (item.getMsg().startsWith(unfinishedPart) && !item.getMsg().equals(unfinishedPart)) {
-                result.add(new AutoCompleteItem(curState, 1.0f, item.getMsg(), finishedPart + item.getMsg()));
+                String msg = finishedPart + item.getMsg() + mMessageSeq;
+                result.add(new AutoCompleteItem(curState, 1.0f, item.getMsg(), msg));
             }
         }
     }

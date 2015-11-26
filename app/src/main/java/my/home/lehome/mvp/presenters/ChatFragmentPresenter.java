@@ -101,9 +101,9 @@ public class ChatFragmentPresenter extends MVPPresenter {
     public ChatFragmentPresenter(SaveLocalHistoryView saveLocalHistoryView
             , ChatItemListView chatItemListView
             , ChatSuggestionView chatSuggestionView) {
-        this.mSaveLocalHistoryView = new WeakReference<SaveLocalHistoryView>(saveLocalHistoryView);
-        this.mChatItemListView = new WeakReference<ChatItemListView>(chatItemListView);
-        this.mChatSuggestionView = new WeakReference<ChatSuggestionView>(chatSuggestionView);
+        this.mSaveLocalHistoryView = new WeakReference<>(saveLocalHistoryView);
+        this.mChatItemListView = new WeakReference<>(chatItemListView);
+        this.mChatSuggestionView = new WeakReference<>(chatSuggestionView);
 
         SendMsgHandler = new IntentServiceHandler(chatItemListView);
     }
@@ -125,12 +125,12 @@ public class ChatFragmentPresenter extends MVPPresenter {
         Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
         serviceIntent.putExtra("local", local);
         serviceIntent.putExtra("cmdString", message);
-        serviceIntent.putExtra("cmd", input);
+        serviceIntent.putExtra("cmd", input.trim());
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.getDeviceID(context));
         serviceIntent.putExtra("messenger", new Messenger(ChatFragmentPresenter.SendMsgHandler));
         mChatItemListView.get().getContext().startService(serviceIntent);
-        new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), input).execute();
+        new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), input.trim()).execute();
     }
 
     public void markAndSendCurrentChatItem(ChatItem chatItem, boolean local) {
@@ -151,12 +151,12 @@ public class ChatFragmentPresenter extends MVPPresenter {
         serviceIntent.putExtra("local", local);
         serviceIntent.putExtra("update", chatItem);
         serviceIntent.putExtra("cmdString", message);
-        serviceIntent.putExtra("cmd", chatItem.getContent());
+        serviceIntent.putExtra("cmd", chatItem.getContent().trim());
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.getDeviceID(context));
         serviceIntent.putExtra("messenger", new Messenger(ChatFragmentPresenter.SendMsgHandler));
         mChatItemListView.get().getContext().startService(serviceIntent);
-        new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), chatItem.getContent()).execute();
+        new MarkCurrentInputUsecaseImpl(mSaveLocalHistoryView.get().getContext(), chatItem.getContent().trim()).execute();
 
 //        if (mChatItemListView.get() != null)
 //            mChatItemListView.get().onChatItemRequest(item, true);
