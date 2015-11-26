@@ -59,6 +59,7 @@ public class PushSDKManager {
                     @Override
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "start sdk succeed." + context.hashCode());
+                        START_RETRY_TIME = 0;
                         PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, true);
                         PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
                     }
@@ -82,6 +83,7 @@ public class PushSDKManager {
                     @Override
                     public void onSuccess(Object o, int i) {
                         Log.d(TAG, "stop sdk succeed:" + context.hashCode());
+                        STOP_RETRY_TIME = 0;
                         PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, false);
                         PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
                     }
