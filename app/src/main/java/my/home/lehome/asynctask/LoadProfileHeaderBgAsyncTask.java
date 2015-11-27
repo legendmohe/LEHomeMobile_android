@@ -33,6 +33,7 @@ import my.home.common.PrefUtil;
  * Created by legendmohe on 15/9/22.
  */
 public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap> {
+    public static final String TAG = "LoadProfileHeaderBgAsyncTask";
 
     public static final String PREF_KEY_PROFILE_IMAGE = "PREF_KEY_PROFILE_IMAGE";
     private final WeakReference<Context> mContext;
@@ -70,36 +71,33 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
         InputStream imageStream;
         try {
             imageStream = this.mContext.get().getContentResolver().openInputStream(uri);
+            bitmap = BitmapFactory.decodeStream(imageStream, null, decodeOptions);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
+        } finally {
+            if (imageStream != null) {
+                try {
+                    imageStream.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "could not close imageStream ", e);
+                }
+            }
         }
-        bitmap = BitmapFactory.decodeStream(imageStream, null, decodeOptions);
+        
         String path = FileUtil.getPathFromUri(mContext.get(), uri);
-        Bitmap tmpBitmap = ImageUtil.scaleAndRotateImageFile(
+        Bitmap resultBitmap = ImageUtil.scaleAndRotateImageFile(
                 bitmap,
                 path,
                 this.mWidth,
                 this.mHeight,
                 this.mScaleType
         );
+        Log.d(TAG, "scaled bitmap from "
+                + BitmapCompat.getAllocationByteCount(bitmap) + "byte to "
+                + BitmapCompat.getAllocationByteCount(resultBitmap) + "byte");
         bitmap.recycle();
-//            try {
-//                bitmap = ImageUtil.scaleImageFile(this,
-//                        selectedImageUri, iconImageView.getWidth(),
-//                        iconImageView.getHeight(),
-//                        iconImageView.getScaleType()
-//                );
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-
-//            if (bitmap != null) {
-//                String path = FileUtil.getPathFromUri(this, selectedImageUri);
-//                bitmap = ImageUtil.rotateBitmapToNormal(bitmap, path);
-//            }
-
-        return tmpBitmap;
+        return resultBitmap;
     }
 
     @Override
