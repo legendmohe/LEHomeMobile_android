@@ -215,6 +215,12 @@ public class SendMsgIntentService extends IntentService {
                             errorCode,
                             errorString
                     ));
+        } catch (TimeoutException e) {
+            saveAndNotify(intent,
+                    CommandRequest.getJsonStringResponse(
+                            400,
+                            context.getString(R.string.chat_error_http_error)
+                    ));
         } catch (Exception e) {
             future.cancel(true);
             e.printStackTrace();
