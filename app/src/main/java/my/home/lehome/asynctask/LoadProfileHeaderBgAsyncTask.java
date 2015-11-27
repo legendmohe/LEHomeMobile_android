@@ -106,8 +106,14 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
     protected void onPostExecute(Bitmap bitmap) {
         ImageView imageView = mImageView.get();
         if (imageView != null) {
+            // recycle previous bitmap
+            Drawable drawable = imageView.getDrawable();
+            if (drawable != null && drawable instanceof BitmapDrawable) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                bitmap.recycle();
+            }
             imageView.setImageBitmap(bitmap);
-//            resetNavProfileName();
             PrefUtil.setStringValue(mContext.get(), PREF_KEY_PROFILE_IMAGE, mUri.toString());
         }
     }
