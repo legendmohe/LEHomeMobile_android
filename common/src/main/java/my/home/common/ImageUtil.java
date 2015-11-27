@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -163,5 +164,32 @@ public class ImageUtil {
         matrix.setRotate(rotationAngle, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         return rotatedBitmap;
+    }
+
+    public static boolean saveBitmapToFile(Bitmap srcBitmap,
+                                           String destPath,
+                                           Bitmap.CompressFormat format,
+                                           int quality) throws FileNotFoundException {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(destPath);
+            srcBitmap.compress(format, quality, out); // bmp is your Bitmap instance
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Bitmap loadBitmapFromFile(String path) {
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
+        return bitmap;
     }
 }

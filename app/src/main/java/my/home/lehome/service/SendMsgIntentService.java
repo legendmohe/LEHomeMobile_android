@@ -40,6 +40,7 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import my.home.lehome.R;
 import my.home.lehome.service.net.CommandRequest;
