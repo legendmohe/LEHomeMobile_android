@@ -174,6 +174,16 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         mMainActivityPresenter.stop();
         mMainActivityPresenter.onActivityDestory();
+        
+        // recycle navigator icon
+        ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
+        Drawable drawable = iconImageView.getDrawable();
+        if (drawable != null && drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            bitmap.recycle();
+        }
+        
         super.onDestroy();
     }
 
