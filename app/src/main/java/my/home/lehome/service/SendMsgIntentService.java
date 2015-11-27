@@ -233,8 +233,6 @@ public class SendMsgIntentService extends IntentService {
     }
 
     private void saveAndNotify(Intent intent, String result) {
-        Log.d(TAG, "saveAndNotify:\n" + result);
-
         Context context = getApplicationContext();
         int rep_code = -1;
         String desc;
@@ -246,8 +244,7 @@ public class SendMsgIntentService extends IntentService {
             e.printStackTrace();
             desc = context.getString(R.string.chat_error_json);
         }
-
-        Log.d(TAG, "send cmd finish: " + rep_code + " " + desc);
+        
         Messenger messenger;
         if (intent.hasExtra("messenger"))
             messenger = (Messenger) intent.getExtras().get("messenger");
@@ -290,7 +287,7 @@ public class SendMsgIntentService extends IntentService {
             }
         }
 
-        Log.d(TAG, "dequeue item: \n" + item);
+        Log.d(TAG, "dequeue item: " + item);
         if (messenger != null) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("item", item);
