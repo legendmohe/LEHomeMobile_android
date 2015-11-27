@@ -174,11 +174,11 @@ public class ChatItem implements Parcelable {
 
     @Override
     public String toString() {
-        return "info: " + id + "\n"
-                + "content: " + content + "\n"
-                + "type: " + type + "\n"
-                + "state: " + state + "\n"
-                + "seq: " + seq + "\n"
-                + "date: " + date + "\n";
+        return "[ info:" + id
+                + " content:" + content
+                + " type:" + type
+                + " state:" + state
+                + " seq:" + seq
+                + " date:" + date + " ]";
     }
 }
