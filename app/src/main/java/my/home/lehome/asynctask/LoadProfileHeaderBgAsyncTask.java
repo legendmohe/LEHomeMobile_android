@@ -138,6 +138,7 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
                 Bitmap bitmap = bitmapDrawable.getBitmap();
                 if (bitmap != null)
                     bitmap.recycle();
+                imageView.setImageBitmap(null);
             }
             imageView.setImageBitmap(resultBitmap);
         }

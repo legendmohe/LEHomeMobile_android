@@ -138,27 +138,12 @@ public class MainActivity extends AppCompatActivity
                         MainActivity.this.getCurrentFocus().getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
 
-                String profileImagePath = PrefUtil.getStringValue(MainActivity.this, LoadProfileHeaderBgAsyncTask.PREF_KEY_PROFILE_IMAGE, null);
-                if (profileImagePath != null) {
-                    Uri uri = Uri.parse(profileImagePath);
-                    ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
-                    new LoadProfileHeaderBgAsyncTask(MainActivity.this, iconImageView).execute(uri);
-                }
                 resetNavProfileName();
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                // recycle navigator icon
-                ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
-                Drawable drawable = iconImageView.getDrawable();
-                if (drawable != null && drawable instanceof BitmapDrawable) {
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-                    Bitmap bitmap = bitmapDrawable.getBitmap();
-                    if (bitmap != null)
-                        bitmap.recycle();
-                }
             }
         };
         mDrawer.setDrawerListener(toggle);
@@ -176,6 +161,13 @@ public class MainActivity extends AppCompatActivity
         TextView detailTextView = (TextView) mNavigationView.findViewById(R.id.nav_profile_detail_textview);
         detailTextView.setText(this.getString(R.string.title_remote_msg_mode));
 
+        String profileImagePath = PrefUtil.getStringValue(MainActivity.this, LoadProfileHeaderBgAsyncTask.PREF_KEY_PROFILE_IMAGE, null);
+        if (profileImagePath != null) {
+            Uri uri = Uri.parse(profileImagePath);
+            ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
+            new LoadProfileHeaderBgAsyncTask(MainActivity.this, iconImageView).execute(uri);
+        }
+
         selectNavFragment(PrefUtil.getIntValue(this, PREF_KEY_LAST_OPEN_FRAGMENT_INDEX, 0));
     }
 
@@ -190,6 +182,16 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         mMainActivityPresenter.stop();
         mMainActivityPresenter.onActivityDestory();
+        // recycle navigator icon
+        ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
+        Drawable drawable = iconImageView.getDrawable();
+        if (drawable != null && drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            if (bitmap != null)
+                bitmap.recycle();
+            iconImageView.setImageBitmap(null);
+        }
         super.onDestroy();
     }
 
