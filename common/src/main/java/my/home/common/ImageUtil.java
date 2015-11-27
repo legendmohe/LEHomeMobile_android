@@ -32,7 +32,7 @@ import java.io.InputStream;
 public class ImageUtil {
 
     public static Bitmap scaleAndRotateImageFile(Bitmap bitmap, String path, int maxW, int maxH, ImageView.ScaleType scaleType) {
-        bitmap = rotateBitmap(bitmap, path);
+        bitmap = createRotateBitmap(bitmap, path);
         if (bitmap == null)
             return null;
 
@@ -44,8 +44,9 @@ public class ImageUtil {
         int desiredHeight = getResizedDimension(maxH, maxW,
                 actualHeight, actualWidth, scaleType);
 
-        bitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
-        return bitmap;
+        Bitmap resultBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
+        bitmap.recycle();
+        return resultBitmap;
     }
 
     public static Bitmap scaleImageFile(Context context, Uri uri, int maxW, int maxH, ImageView.ScaleType scaleType) throws FileNotFoundException {
@@ -142,7 +143,7 @@ public class ImageUtil {
         return (int) n;
     }
 
-    public static Bitmap rotateBitmap(Bitmap bitmap, String photoFilePath) {
+    public static Bitmap createRotateBitmap(Bitmap bitmap, String photoFilePath) {
         // Read EXIF Data
         ExifInterface exif;
         try {
