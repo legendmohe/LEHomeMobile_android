@@ -21,6 +21,7 @@
     <string name="title_section2">收藏</string>
     <string name="title_section3">定位器</string>
     <string name="title_section4">运行情况</string>
+    <string name="title_section5">留言</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="voice_input">语音脚本</string>
@@ -161,10 +162,11 @@
     <string name="nav_item_exit">退出</string>
     <string name="nav_item_control">控制</string>
     <string name="nav_item_favour">收藏</string>
-    <string name="nav_item_locator">定位</string>
+    <string name="nav_item_locator">定位器</string>
     <string name="nav_item_camera">摄像头</string>
     <string name="nav_category_functions">功能</string>
     <string name="title_remote_msg_mode">远程模式</string>
     <string name="pref_loc_me_silent_enable">静默定位</string>
     <string name="pref_loc_me_silent_enable_sum">当别人定位自己时，不显示通知</string>
+    <string name="nav_item_message">留言</string>
 </resources>

@@ -52,6 +52,7 @@ import my.home.lehome.asynctask.LoadProfileHeaderBgAsyncTask;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.FindMyTagFragment;
 import my.home.lehome.fragment.HomeStateFragment;
+import my.home.lehome.fragment.MessageFragment;
 import my.home.lehome.fragment.ShortcutFragment;
 import my.home.lehome.mvp.presenters.MainActivityPresenter;
 import my.home.lehome.mvp.views.ActionBarControlView;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private final String SHORTCUT_FRAGMENT_TAG = "SHORTCUT_FRAGMENT_TAG";
     private final String FIND_TAG_FRAGMENT_TAG = "FIND_TAG_FRAGMENT_TAG";
     private final String HOME_STATE_FRAGMENT_TAG = "HOME_STATE_FRAGMENT_TAG";
+    private final String MESSAGE_FRAGMENT_TAG = "MESSAGE_FRAGMENT_TAG";
 
     private static final String PREF_KEY_LAST_OPEN_FRAGMENT_INDEX = "PREF_KEY_LAST_OPEN_FRAGMENT_INDEX";
 
@@ -435,6 +437,9 @@ public class MainActivity extends AppCompatActivity
                 case R.id.nav_camera:
                     selectNavFragment(3);
                     break;
+                case R.id.nav_message:
+                    selectNavFragment(4);
+                    break;
                 default:
                     break;
             }
@@ -493,6 +498,14 @@ public class MainActivity extends AppCompatActivity
             fragment_tag = HOME_STATE_FRAGMENT_TAG;
             fragment = homeStateFragment;
             titleId = R.string.title_section4;
+        } else if (index == 4) {
+            MessageFragment messageFragment = (MessageFragment) fm.findFragmentByTag(MESSAGE_FRAGMENT_TAG);
+            if (messageFragment == null) {
+                messageFragment = MessageFragment.newInstance();
+            }
+            fragment_tag = MESSAGE_FRAGMENT_TAG;
+            fragment = messageFragment;
+            titleId = R.string.title_section5;
         }
 
         this.onFragmentAttached(index);
