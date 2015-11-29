@@ -23,7 +23,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.graphics.BitmapCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,14 +47,16 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
     public static final String PREF_KEY_PROFILE_IMAGE = "PREF_KEY_PROFILE_IMAGE";
     private final WeakReference<Context> mContext;
     WeakReference<ImageView> mImageView;
+    WeakReference<ProgressBar> mProgressBar;
     private Uri mUri;
     private int mWidth;
     private int mHeight;
     private ImageView.ScaleType mScaleType;
 
-    public LoadProfileHeaderBgAsyncTask(Context context, ImageView imageView) {
+    public LoadProfileHeaderBgAsyncTask(Context context, ImageView imageView, ProgressBar progressBar) {
         this.mContext = new WeakReference<>(context);
         this.mImageView = new WeakReference<>(imageView);
+        this.mProgressBar = new WeakReference<>(progressBar);
     }
 
     @Override
@@ -63,6 +67,10 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
             this.mWidth = imageView.getWidth();
             this.mHeight = imageView.getHeight();
             this.mScaleType = imageView.getScaleType();
+        }
+        ProgressBar progressBar = mProgressBar.get();
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -116,7 +124,7 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
                 } else {
                     Log.w(TAG, "isExternalStorageWritable false");
                 }
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException | IllegalStateException e) {
                 e.printStackTrace();
             }
             PrefUtil.setStringValue(mContext.get(), PREF_KEY_PROFILE_IMAGE, saveURL);
@@ -129,6 +137,10 @@ public class LoadProfileHeaderBgAsyncTask extends AsyncTask<Uri, String, Bitmap>
 
     @Override
     protected void onPostExecute(Bitmap resultBitmap) {
+        ProgressBar progressBar = mProgressBar.get();
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
         ImageView imageView = mImageView.get();
         if (imageView != null) {
             // recycle previous bitmap

@@ -43,6 +43,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -163,11 +164,13 @@ public class MainActivity extends AppCompatActivity
         TextView detailTextView = (TextView) mNavigationView.findViewById(R.id.nav_profile_detail_textview);
         detailTextView.setText(this.getString(R.string.title_remote_msg_mode));
 
+
         String profileImagePath = PrefUtil.getStringValue(MainActivity.this, LoadProfileHeaderBgAsyncTask.PREF_KEY_PROFILE_IMAGE, null);
         if (profileImagePath != null) {
             Uri uri = Uri.parse(profileImagePath);
             ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
-            new LoadProfileHeaderBgAsyncTask(MainActivity.this, iconImageView).execute(uri);
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.load_profile_icon_progressBar);
+            new LoadProfileHeaderBgAsyncTask(MainActivity.this, iconImageView, progressBar).execute(uri);
         }
 
         selectNavFragment(PrefUtil.getIntValue(this, PREF_KEY_LAST_OPEN_FRAGMENT_INDEX, 0));
@@ -529,7 +532,8 @@ public class MainActivity extends AppCompatActivity
     public void changeNavHeaderBgImage(Uri selectedImageUri) {
         if (selectedImageUri != null) {
             ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
-            new LoadProfileHeaderBgAsyncTask(this, iconImageView).execute(selectedImageUri);
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.load_profile_icon_progressBar);
+            new LoadProfileHeaderBgAsyncTask(this, iconImageView, progressBar).execute(selectedImageUri);
         }
     }
 }
