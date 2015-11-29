@@ -47,7 +47,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.asynctask.LoadProfileHeaderBgAsyncTask;
 import my.home.lehome.fragment.ChatFragment;

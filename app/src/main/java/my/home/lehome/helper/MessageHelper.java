@@ -33,7 +33,7 @@ import java.util.LinkedList;
 
 import my.home.common.KeyValueStorage;
 import my.home.common.PrefKeyValueStorgeImpl;
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.fragment.ChatFragment;

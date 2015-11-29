@@ -19,7 +19,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.service.LocationIntentService;
 
 /**

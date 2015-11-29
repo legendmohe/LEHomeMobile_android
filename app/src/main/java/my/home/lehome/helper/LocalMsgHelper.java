@@ -18,8 +18,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
 
-import my.home.common.NetworkUtil;
-import my.home.common.PrefUtil;
+import my.home.common.util.NetworkUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.service.LocalMessageService;
 
 /**

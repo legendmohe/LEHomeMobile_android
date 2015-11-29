@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import my.home.common.BusProvider;
-import my.home.common.FileUtil;
-import my.home.common.PrefUtil;
+import my.home.common.util.FileUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;

@@ -12,18 +12,23 @@
  * limitations under the License.
  */
 
-package my.home.common;
+package my.home.common.util;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
+import android.util.Base64OutputStream;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -82,5 +87,33 @@ public class FileUtil {
             filePath = uri.getPath();
         }
         return filePath;
+    }
+
+    public static String FileToBase64(File srcFile) {
+        InputStream inputStream = null;//You can get an inputStream using any IO API
+        try {
+            inputStream = new FileInputStream(srcFile.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Base64OutputStream output64 = new Base64OutputStream(output, Base64.DEFAULT);
+        try {
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                output64.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        try {
+            output64.close();
+        } catch (IOException e) {
+            return null;
+        }
+
+        String outputString = output.toString();
+        return outputString;
     }
 }

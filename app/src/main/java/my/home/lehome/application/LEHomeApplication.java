@@ -21,8 +21,8 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import my.home.common.ComUtil;
-import my.home.common.PrefUtil;
+import my.home.common.util.ComUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.helper.PushSDKManager;
 
 public class LEHomeApplication extends Application {

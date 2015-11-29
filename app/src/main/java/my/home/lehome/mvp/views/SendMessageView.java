@@ -18,5 +18,5 @@ package my.home.lehome.mvp.views;
 /**
  * Created by legendmohe on 15/11/28.
  */
-public interface MessageView extends MVPView {
+public interface SendMessageView extends MVPView {
 }

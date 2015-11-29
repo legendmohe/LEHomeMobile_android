@@ -30,7 +30,7 @@ import org.json.JSONTokener;
 
 import java.util.Arrays;
 
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.helper.LocationHelper;
 import my.home.lehome.helper.MessageHelper;

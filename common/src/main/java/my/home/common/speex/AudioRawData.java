@@ -12,30 +12,17 @@
  * limitations under the License.
  */
 
-package my.home.lehome.mvp.presenters;
-
-import java.lang.ref.WeakReference;
-
-import my.home.lehome.mvp.views.SendMessageView;
+package my.home.common.speex;
 
 /**
- * Created by legendmohe on 15/11/28.
+ * Created by legendmohe on 15/11/13.
  */
-public class SendMessagePresenter extends MVPPresenter {
+public class AudioRawData {
+    public final short[] data;
+    public final int len;
 
-    private WeakReference<SendMessageView> mMessageView;
-
-    public SendMessagePresenter(SendMessageView messageView) {
-        this.mMessageView = new WeakReference<>(messageView);
-    }
-
-    @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void stop() {
-
+    AudioRawData(short[] data, int len) {
+        this.data = data;
+        this.len = len;
     }
 }

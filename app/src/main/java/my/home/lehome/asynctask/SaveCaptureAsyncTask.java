@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import my.home.common.FileUtil;
+import my.home.common.util.FileUtil;
 import my.home.lehome.R;
 
 /**

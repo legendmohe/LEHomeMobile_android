@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.common;
+package my.home.common.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;

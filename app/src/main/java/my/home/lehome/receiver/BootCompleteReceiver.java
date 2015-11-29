@@ -19,7 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 import my.home.lehome.helper.PushSDKManager;
 import my.home.lehome.mvp.presenters.MainActivityPresenter;
 

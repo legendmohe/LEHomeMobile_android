@@ -24,7 +24,7 @@ import com.tencent.android.tpush.XGPushManager;
 
 import java.lang.ref.WeakReference;
 
-import my.home.common.PrefUtil;
+import my.home.common.util.PrefUtil;
 
 /**
  * Created by legendmohe on 15/4/16.
