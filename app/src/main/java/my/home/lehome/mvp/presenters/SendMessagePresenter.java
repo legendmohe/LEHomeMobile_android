@@ -38,4 +38,14 @@ public class SendMessagePresenter extends MVPPresenter {
     public void stop() {
 
     }
+
+    public void startRecording() {
+    }
+
+    public void cancelRecording() {
+    }
+
+    public void finishRecording() {
+
+    }
 }

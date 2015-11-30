@@ -44,11 +44,12 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Send"
+                android:text="@string/message_press_to_speak"
                 android:id="@+id/send_message_btn"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:layout_margin="20dp" />
+                android:layout_margin="20dp"
+                android:textSize="@dimen/abc_text_size_large_material" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

@@ -15,8 +15,15 @@
 package my.home.lehome.mvp.views;
 
 
+import java.io.File;
+
 /**
  * Created by legendmohe on 15/11/28.
  */
 public interface SendMessageView extends MVPView {
+    public void onSending(File file);
+
+    public void onSendFail(File file);
+
+    public void onSendSuccess(File file);
 }
