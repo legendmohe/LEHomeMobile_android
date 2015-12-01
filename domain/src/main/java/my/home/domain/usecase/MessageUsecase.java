@@ -23,7 +23,7 @@ public interface MessageUsecase extends Usecase {
     public static final String TAG = "MessageUsecase";
 
     public enum Mode {
-        START_RECORD, CANCEL_RECORD, STOP_RECORD, SEND_RECORD
+        START_RECORD, CANCEL_RECORD, STOP_RECORD, SEND_MSG
     }
 
     Mode getMode();
