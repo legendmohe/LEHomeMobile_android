@@ -23,7 +23,7 @@ public interface MessageHistoryUsecase extends Usecase {
     public static final String TAG = "MessageHistoryUsecase";
 
     enum Mode {
-        CREATE, DELETE, PLAY, STOP
+        GET_ALL, CREATE, DELETE, PLAY, STOP
     }
 
     Mode getMode();
