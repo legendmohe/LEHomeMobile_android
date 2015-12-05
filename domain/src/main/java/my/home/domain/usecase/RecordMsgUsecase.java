@@ -18,15 +18,23 @@ package my.home.domain.usecase;
 /**
  * Created by legendmohe on 15/12/1.
  */
-public interface MessageUsecase extends Usecase {
+public interface RecordMsgUsecase extends Usecase {
 
-    public static final String TAG = "MessageUsecase";
+    public static final String TAG = "RecordMsgUsecase";
 
-    public enum Mode {
-        START_RECORD, CANCEL_RECORD, STOP_RECORD, SEND_MSG
+    public enum Event {
+        START(0), CANCEL(1), STOP(2);
+
+        private int value;
+
+        Event(int i) {
+            value = i;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
-    Mode getMode();
-
-    MessageUsecase setMode(Mode mode);
+    RecordMsgUsecase setEvent(Event event);
 }

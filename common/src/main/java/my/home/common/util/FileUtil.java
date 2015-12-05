@@ -116,4 +116,23 @@ public class FileUtil {
         String outputString = output.toString();
         return outputString;
     }
+
+    public static boolean isExternalStorageRemovable() {
+        return Environment.isExternalStorageRemovable();
+    }
+
+    public static File getExternalCacheDir(Context context) {
+        return context.getExternalCacheDir();
+    }
+
+    public static String getDiskCacheDir(Context context, String uniqueName) {
+        // Check if media is mounted or storage is built-in, if so, try and use external cache dir
+        // otherwise use internal cache dir
+        final String cachePath =
+                Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
+                        !isExternalStorageRemovable() ? getExternalCacheDir(context).getPath() :
+                        context.getCacheDir().getPath();
+
+        return cachePath + File.separator + uniqueName;
+    }
 }

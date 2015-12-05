@@ -14,72 +14,57 @@
 
 package my.home.lehome.adapter;
 
-import android.support.v7.widget.RecyclerView;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import my.home.lehome.R;
+import my.home.model.entities.MessageItem;
 
 /**
  * Created by legendmohe on 15/11/30.
  */
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
+public class MessageAdapter extends ArrayAdapter<MessageItem> {
 
-    private final List<String> mData;
-    private WeakReference<IMessageItemClickListener> mListener;
-
-    public MessageAdapter(List<String> data, IMessageItemClickListener listener) {
-        this.mListener = new WeakReference<>(listener);
-        this.mData = data;
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.draw_item, viewGroup, false);
-        return new ViewHolder(view, i, mListener.get());
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-//            if (this.mIcons != null && this.mIcons.length != 0) {
-//                viewHolder.mImageView.setImageResource(this.mIcons[i]);
-//            }
-        viewHolder.mTextView.setText("demo");
-        viewHolder.mIndex = i;
-    }
-
-    @Override
-    public int getItemCount() {
-        return this.mData.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        protected TextView mTextView;
-        //            protected ImageView mImageView;
-        protected int mIndex;
-
-        public ViewHolder(View itemView, int index, final IMessageItemClickListener listener) {
-            super(itemView);
-            mTextView = (TextView) itemView.findViewById(R.id.title_textview);
-//                mImageView = (ImageView) itemView.findViewById(R.id.icon_imageview);
-            mIndex = index;
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null)
-                        listener.onDrawerItemClick(mIndex);
-                }
-            });
+    public void setData(List<MessageItem> items) {
+        clear();
+        setNotifyOnChange(false);
+        if (items != null) {
+            for (MessageItem item : items)
+                add(item);
         }
+        setNotifyOnChange(true);
+        notifyDataSetChanged();
     }
 
-    public static interface IMessageItemClickListener {
-        public void onDrawerItemClick(int i);
+    public MessageAdapter(Context context) {
+        super(context, -1);
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.message_item, parent, false);
+
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.titleTextView = (TextView) convertView.findViewById(R.id.message_item);
+            convertView.setTag(viewHolder);
+        }
+
+        MessageItem message = getItem(position);
+        final ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+        viewHolder.titleTextView.setText(message.getContent());
+
+        return convertView;
+    }
+
+    static class ViewHolder {
+        TextView titleTextView;
     }
 }
+

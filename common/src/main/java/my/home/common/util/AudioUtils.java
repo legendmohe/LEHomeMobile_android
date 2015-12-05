@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package my.home.common;
+package my.home.common.util;
 
 /**
  * Created by legendmohe on 15/11/18.

@@ -26,11 +26,13 @@ import my.home.model.datasource.DaoMaster;
 import my.home.model.datasource.DaoMaster.OpenHelper;
 import my.home.model.datasource.DaoSession;
 import my.home.model.datasource.HistoryItemDao;
+import my.home.model.datasource.MessageItemDao;
+import my.home.model.datasource.MsgHistoryItemDao;
 import my.home.model.datasource.ShortcutDao;
 import my.home.model.entities.ChatItem;
 import my.home.model.entities.HistoryItem;
+import my.home.model.entities.MessageItem;
 import my.home.model.entities.MsgHistoryItem;
-import my.home.model.entities.MsgHistoryItemDao;
 import my.home.model.entities.Shortcut;
 
 public class DBStaticManager {
@@ -170,6 +172,24 @@ public class DBStaticManager {
                 .orderDesc(MsgHistoryItemDao.Properties.Id)
                 .limit(limit)
                 .list();
+    }
+
+    public static void addMessageItem(Context context, MessageItem item) {
+        getDaoSession(context).getMessageItemDao().insert(item);
+    }
+
+    public static List<MessageItem> getAllMessageItems(Context context) {
+        return getDaoSession(context).getMessageItemDao().loadAll();
+    }
+
+    public static void updateMessageItem(Context context, MessageItem item) {
+        getDaoSession(context).getMessageItemDao().update(item);
+    }
+
+    public static void deleteMessage(Context context, long Id) {
+        QueryBuilder<MessageItem> qb = getDaoSession(context).getMessageItemDao().queryBuilder();
+        DeleteQuery<MessageItem> bd = qb.where(MessageItemDao.Properties.Id.eq(Id)).buildDelete();
+        bd.executeDeleteWithoutDetachingEntities();
     }
 
     public static void destory() {
