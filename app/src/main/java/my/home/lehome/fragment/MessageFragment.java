@@ -22,19 +22,20 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-
-import java.io.File;
 
 import my.home.lehome.R;
 import my.home.lehome.adapter.MessageAdapter;
 import my.home.lehome.mvp.presenters.SendMessagePresenter;
 import my.home.lehome.mvp.views.SendMessageView;
 import my.home.lehome.util.Constants;
+import my.home.model.entities.MessageItem;
 
 public class MessageFragment extends Fragment implements SendMessageView {
     public static final String TAG = "MessageFragment";
@@ -89,6 +90,28 @@ public class MessageFragment extends Fragment implements SendMessageView {
         return contentView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setHasOptionsMenu(true);
+        registerForContextMenu(mMessagesListView);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.clean_up_messages:
+                mSendMessagePresenter.cleanMessages();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setupData() {
         mSendMessagePresenter = new SendMessagePresenter(this);
         mHandler = new MessageViewHandler();
@@ -116,7 +139,7 @@ public class MessageFragment extends Fragment implements SendMessageView {
                     if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
                         mSendButton.setText(getString(R.string.message_release_to_cancel));
                     } else {
-                        mSendButton.setText(getString(R.string.message_press_to_speak));
+                        mSendButton.setText(getString(R.string.message_release_to_send));
                     }
                     return true;
                 }
@@ -125,8 +148,11 @@ public class MessageFragment extends Fragment implements SendMessageView {
         });
 
         mMessageAdapter = new MessageAdapter(getActivity());
+        mMessageAdapter.addAll(mSendMessagePresenter.getAllMessages());
         mMessagesListView = (ListView) rootView.findViewById(R.id.message_listview);
         mMessagesListView.setAdapter(mMessageAdapter);
+
+        setRetainInstance(true);
     }
 
     @Override
@@ -135,18 +161,14 @@ public class MessageFragment extends Fragment implements SendMessageView {
     }
 
     @Override
-    public void onSending(File file) {
-
+    public void onAddMsgItem(MessageItem msgItem) {
+        mMessageAdapter.add(msgItem);
+        mMessagesListView.smoothScrollToPosition(mMessageAdapter.getCount() - 1);
     }
 
     @Override
-    public void onSendFail(File file) {
-
-    }
-
-    @Override
-    public void onSendSuccess(File file) {
-
+    public void onDeleteAllMessages() {
+        mMessageAdapter.clear();
     }
 
     private class MessageViewHandler extends Handler {

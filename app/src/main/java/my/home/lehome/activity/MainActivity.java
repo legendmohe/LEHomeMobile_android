@@ -272,6 +272,9 @@ public class MainActivity extends AppCompatActivity
             case 2:
                 getMenuInflater().inflate(R.menu.find_my_tag, menu);
                 break;
+            case 4:
+                getMenuInflater().inflate(R.menu.message_option_menu, menu);
+                break;
             default:
                 break;
         }

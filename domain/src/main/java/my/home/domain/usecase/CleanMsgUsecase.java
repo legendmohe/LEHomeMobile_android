@@ -1,3 +1,4 @@
+
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,16 +13,11 @@
  * limitations under the License.
  */
 
-package my.home.lehome.mvp.views;
-
-
-import my.home.model.entities.MessageItem;
+package my.home.domain.usecase;
 
 /**
- * Created by legendmohe on 15/11/28.
+ * Created by legendmohe on 15/12/1.
  */
-public interface SendMessageView extends MVPView {
-    void onAddMsgItem(MessageItem msgItem);
-
-    void onDeleteAllMessages();
+public interface CleanMsgUsecase extends Usecase {
+    String TAG = "CleanMsgUsecase";
 }

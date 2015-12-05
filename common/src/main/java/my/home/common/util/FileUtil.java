@@ -126,6 +126,10 @@ public class FileUtil {
     }
 
     public static String getDiskCacheDir(Context context, String uniqueName) {
+        return getDiskCacheDir(context) + File.separator + uniqueName;
+    }
+
+    public static String getDiskCacheDir(Context context) {
         // Check if media is mounted or storage is built-in, if so, try and use external cache dir
         // otherwise use internal cache dir
         final String cachePath =
@@ -133,6 +137,6 @@ public class FileUtil {
                         !isExternalStorageRemovable() ? getExternalCacheDir(context).getPath() :
                         context.getCacheDir().getPath();
 
-        return cachePath + File.separator + uniqueName;
+        return cachePath;
     }
 }

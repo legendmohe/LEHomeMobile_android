@@ -34,6 +34,7 @@ import my.home.common.speex.ProcessSpeexRunnable;
 import my.home.common.speex.SpeexWriteClient;
 import my.home.common.util.FileUtil;
 import my.home.domain.events.DRecordingMsgEvent;
+import my.home.domain.util.DomainUtil;
 import my.home.model.entities.MessageItem;
 import my.home.model.manager.DBStaticManager;
 
@@ -53,7 +54,7 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
     private Event mEvent;
     private int mLastEvent;
     private String mSaveFilePrefix;
-    private static SimpleDateFormat gDateFormat = new SimpleDateFormat("MMM_dd_hh_mm_a", Locale.CHINA);
+    private static SimpleDateFormat gDateFormat = new SimpleDateFormat("yy年M月d日H时m分s秒", Locale.CHINA);
 
     public RecordMsgUsecaseImpl(Context context, String prefix) {
         this.mSaveFilePrefix = prefix;
@@ -116,12 +117,12 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
         }
     }
 
-    public void postResult(File file) {
+    public void postResult(final File file) {
         Log.d(TAG, "write SpeexOgg file finished.");
         MessageItem msgItem = null;
         if (file != null) {
             msgItem = new MessageItem();
-            msgItem.setContent(file.getName());
+            msgItem.setContent(file.getAbsolutePath());
             msgItem.setTitle(file.getName());
             msgItem.setDate(new Date());
             msgItem.setState(-1);
@@ -130,7 +131,13 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
                 DBStaticManager.addMessageItem(this.mContext.get(), msgItem);
             }
         }
-        BusProvider.getRestBusInstance().post(new DRecordingMsgEvent(file, msgItem));
+        final MessageItem finalMsgItem = msgItem;
+        DomainUtil.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                BusProvider.getUIBusInstance().post(new DRecordingMsgEvent(file, finalMsgItem));
+            }
+        });
     }
 
     @Override

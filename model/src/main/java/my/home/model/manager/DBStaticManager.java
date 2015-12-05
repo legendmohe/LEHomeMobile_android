@@ -192,6 +192,10 @@ public class DBStaticManager {
         bd.executeDeleteWithoutDetachingEntities();
     }
 
+    public static void deleteAllMessages(Context context) {
+        getDaoSession(context).getMessageItemDao().deleteAll();
+    }
+
     public static void destory() {
         if (DAOSESSION != null) {
             DAOSESSION.clear();

@@ -27,29 +27,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/message_listview"
-            android:divider="@color/default_divider_color_dark"
-            android:dividerHeight="1dp"
-            android:drawSelectorOnTop="false"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_above="@+id/send_message_control_layout" />
+            android:layout_above="@+id/send_message_control_layout"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:layout_alignParentLeft="false"
+            android:id="@+id/send_message_control_layout"
             android:layout_alignParentBottom="true"
-            android:id="@+id/send_message_control_layout">
+            android:background="@drawable/top_shadow">
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/message_press_to_speak"
                 android:id="@+id/send_message_btn"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="20dp"
-                android:textSize="@dimen/abc_text_size_large_material" />
+                android:textSize="@dimen/abc_text_size_large_material"
+                android:background="@android:color/holo_blue_dark"
+                android:text="@string/message_press_to_speak"
+                android:textColor="@android:color/white" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

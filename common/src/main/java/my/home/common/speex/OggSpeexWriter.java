@@ -50,8 +50,6 @@
 
 package my.home.common.speex;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -244,7 +242,7 @@ public class OggSpeexWriter extends AudioFileWriter {
      * @exception IOException
      */
     public void writePacket(final byte[] data, final int offset, final int len) throws IOException {
-        Log.d(TAG, "**************************data=" + data.toString() + " len=" + len);
+//        Log.d(TAG, "**************************data=" + data.toString() + " len=" + len);
         if (len <= 0) { // nothing to write
             return;
         }

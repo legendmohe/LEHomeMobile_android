@@ -58,7 +58,7 @@ public class MessageAdapter extends ArrayAdapter<MessageItem> {
 
         MessageItem message = getItem(position);
         final ViewHolder viewHolder = (ViewHolder) convertView.getTag();
-        viewHolder.titleTextView.setText(message.getContent());
+        viewHolder.titleTextView.setText(message.getTitle());
 
         return convertView;
     }

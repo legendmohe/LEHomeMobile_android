@@ -172,4 +172,5 @@
     <string name="message_release_to_send">松开发送</string>
     <string name="message_press_to_speak">按住说话</string>
     <string name="message_release_to_cancel">松开取消</string>
+    <string name="options_clean_up">清空</string>
 </resources>
