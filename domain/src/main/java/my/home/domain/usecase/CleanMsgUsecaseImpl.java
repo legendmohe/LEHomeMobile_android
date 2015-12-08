@@ -26,10 +26,12 @@ import my.home.model.manager.DBStaticManager;
  * Created by legendmohe on 15/12/5.
  */
 public class CleanMsgUsecaseImpl implements CleanMsgUsecase {
+    private String mPrefix;
     private Context mContext;
 
-    public CleanMsgUsecaseImpl(Context context) {
+    public CleanMsgUsecaseImpl(Context context, String prefix) {
         this.mContext = context;
+        this.mPrefix = prefix;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class CleanMsgUsecaseImpl implements CleanMsgUsecase {
                 String[] children = deleteFolder.list();
                 for (int i = 0; i < children.length; i++) {
                     File deleteFile = new File(deleteFolder, children[i]);
-                    if (deleteFile.getName().startsWith("msg_")) {
+                    if (deleteFile.getName().startsWith(this.mPrefix)) {
                         Log.d(TAG, "delete message:" + deleteFile.getName());
                         deleteFile.delete();
                     }

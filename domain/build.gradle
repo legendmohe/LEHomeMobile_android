@@ -37,4 +37,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':model')
     compile project(':common')
+
+    compile 'com.mcxiaoke.volley:library:1.0.19'
 }

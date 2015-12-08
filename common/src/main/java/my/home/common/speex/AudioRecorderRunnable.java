@@ -24,7 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by legendmohe on 15/11/13.
  */
-public class AudioRecorderRunnable implements Runnable {
+public class
+        AudioRecorderRunnable implements Runnable {
     private static final String TAG = "AudioRecorderRunnable";
 
     private boolean mStopped = false;
@@ -63,7 +64,7 @@ public class AudioRecorderRunnable implements Runnable {
                     for (int i = 0; i < numRead; ++i)
                         buffer[i] = (short) Math.min((int) (buffer[i] * gain), (int) Short.MAX_VALUE);
                 }
-                this.mBufferQueue.offer(new AudioRawData(buffer, n));
+                this.mBufferQueue.offer(new AudioRawData(buffer, numRead));
             }
         } catch (Throwable x) {
             Log.w(TAG, "Error reading voice audio", x);

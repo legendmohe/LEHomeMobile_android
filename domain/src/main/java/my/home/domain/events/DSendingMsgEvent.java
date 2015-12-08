@@ -1,4 +1,3 @@
-
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +12,21 @@
  * limitations under the License.
  */
 
-package my.home.domain.usecase;
+package my.home.domain.events;
 
 /**
- * Created by legendmohe on 15/12/1.
+ * Created by legendmohe on 15/12/8.
  */
-public interface RecordMsgUsecase extends Usecase {
-
-    String TAG = "RecordMsgUsecase";
-
-    enum Event {
-        START(0), CANCEL(1), STOP(2);
-
-        private int value;
-
-        Event(int i) {
-            value = i;
-        }
-
-        public int getValue() {
-            return value;
-        }
+public class DSendingMsgEvent {
+    public enum TYPE {
+        BEGIN, SUCCESS, FAIL
     }
 
-    RecordMsgUsecase setEvent(Event event);
+    public TYPE type;
+    public String tag;
 
-    void cleanup();
+    public DSendingMsgEvent(TYPE type, String tag) {
+        this.type = type;
+        this.tag = tag;
+    }
 }

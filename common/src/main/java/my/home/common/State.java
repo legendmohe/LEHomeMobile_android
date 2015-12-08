@@ -23,6 +23,7 @@ import java.util.HashMap;
 public abstract class State {
 
     HashMap<Integer, State> mToStates = new HashMap<>();
+    private StateMachine mStateMachine;
 
     @SuppressWarnings("unused")
     private String mName = "UNKNOWN";
@@ -41,30 +42,26 @@ public abstract class State {
     public void onStart() {
     }
 
-    ;
-
     public void onStop(int cause) {
     }
-
-    ;
 
     public void onReset(int cause) {
     }
 
-    ;
-
-    public void onUnhandleEvent(int event) {
+    public void onUnhandleEvent(int event, Object data) {
     }
 
-    ;
-
-    public void onEnter(State fromState, int event) {
+    public void onEnter(State fromState, int event, Object data) {
     }
 
-    ;
-
-    public void onLeave(State toState, int event) {
+    public void onLeave(State toState, int event, Object data) {
     }
 
-    ;
+    protected StateMachine getStateMachine() {
+        return mStateMachine;
+    }
+
+    protected void setStateMachine(StateMachine stateMachine) {
+        mStateMachine = stateMachine;
+    }
 }

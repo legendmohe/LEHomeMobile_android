@@ -15,15 +15,17 @@
 
 package my.home.domain.usecase;
 
+import java.io.File;
+
 /**
  * Created by legendmohe on 15/12/1.
  */
 public interface SendMsgUsecase extends Usecase {
 
-    public static final String TAG = "SendMsgUsecase";
+    String TAG = "SendMsgUsecase";
 
-    public enum Event {
-        START(0), CANCEL(1);
+    enum Event {
+        START(0), FINISH(1), CANCEL(2), ERROR(3);
 
         private int value;
 
@@ -36,5 +38,11 @@ public interface SendMsgUsecase extends Usecase {
         }
     }
 
+    SendMsgUsecase setTargetFile(File targetFile);
+
     SendMsgUsecase setEvent(Event event);
+
+    void cleanup();
+
+    void cancel(File file);
 }

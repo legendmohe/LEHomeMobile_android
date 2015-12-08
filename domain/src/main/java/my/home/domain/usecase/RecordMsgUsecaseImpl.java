@@ -32,6 +32,7 @@ import my.home.common.speex.AudioRawData;
 import my.home.common.speex.AudioRecorderRunnable;
 import my.home.common.speex.ProcessSpeexRunnable;
 import my.home.common.speex.SpeexWriteClient;
+import my.home.common.util.AudioUtils;
 import my.home.common.util.FileUtil;
 import my.home.domain.events.DRecordingMsgEvent;
 import my.home.domain.util.DomainUtil;
@@ -49,6 +50,7 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
     private LinkedBlockingQueue<AudioRawData> mDataQueue = new LinkedBlockingQueue<>();
 
     private WeakReference<Context> mContext;
+    private WeakReference<RecorderStateListener> mStateListener;
 
     private StateMachine mStateMachine = new StateMachine();
     private Event mEvent;
@@ -74,9 +76,15 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
         mStateMachine.start();
     }
 
+    @Override
     public void cleanup() {
         stopRecording();
+        mStateMachine.stop(0);
         BusProvider.getRestBusInstance().unregister(this);
+    }
+
+    public void setListener(RecorderStateListener listener) {
+        this.mStateListener = new WeakReference<>(listener);
     }
 
     private void startRecording() {
@@ -142,15 +150,21 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
 
     @Override
     public void onPreProcess(short[] notProcessData, int len) {
+        if (mStateListener.get() != null) {
+            final float value = AudioUtils.getAmplitude(notProcessData, len);
+            DomainUtil.runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    mStateListener.get().onGetAmplitude(value);
+                }
+            });
+        }
     }
-
-    ;
 
     @Override
-    public void onProcess(byte[] data, int len) {
-    }
+    public void onProcess(final byte[] data, final int len) {
 
-    ;
+    }
 
     @Override
     public void onProcessFinish(List<byte[]> data) {
@@ -186,7 +200,7 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
         }
 
         @Override
-        public void onEnter(State fromState, int event) {
+        public void onEnter(State fromState, int event, Object data) {
             if (fromState.getClass() == RecordingState.class) {
                 if (event == Event.CANCEL.getValue() || event == Event.STOP.getValue()) {
                     mLastEvent = event;
@@ -203,12 +217,16 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
         }
 
         @Override
-        public void onEnter(State fromState, int event) {
+        public void onEnter(State fromState, int event, Object data) {
             if (fromState.getClass() == IdleState.class) {
                 if (event == Event.START.getValue()) {
                     startRecording();
                 }
             }
         }
+    }
+
+    public interface RecorderStateListener {
+        void onGetAmplitude(float value);
     }
 }

@@ -31,4 +31,6 @@ public class Constants {
 
     public static final int MESSAGE_SEQ_QUEUE_LIMIT = 250;
     public static final long VOLUME_KEY_DOWN_DELAY = 500;
+
+    public static final String MESSAGE_PREFIX = "留言";
 }

@@ -24,4 +24,12 @@ public interface SendMessageView extends MVPView {
     void onAddMsgItem(MessageItem msgItem);
 
     void onDeleteAllMessages();
+
+    void onRecordingAmplitude(float amplitude);
+
+    void onSendingMsgBegin(String tag);
+
+    void onSendingMsgSuccess(String tag);
+
+    void onSendingMsgFail(String tag);
 }

@@ -173,4 +173,7 @@
     <string name="message_press_to_speak">按住说话</string>
     <string name="message_release_to_cancel">松开取消</string>
     <string name="options_clean_up">清空</string>
+    <string name="message_sending">正在发送,点击取消</string>
+    <string name="message_sending_success">发送留言成功</string>
+    <string name="message_sending_fail">发送留言失败</string>
 </resources>

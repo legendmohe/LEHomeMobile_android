@@ -46,6 +46,7 @@ public class StateMachine {
     public void addState(State state) {
         synchronized (this) {
             mStates.add(state);
+            state.setStateMachine(this);
         }
     }
 
@@ -75,7 +76,7 @@ public class StateMachine {
         }
     }
 
-    public void postEvent(int event) {
+    public void postEvent(int event, final Object data) {
         if (mHandler == null) {
             return;
         }
@@ -86,14 +87,18 @@ public class StateMachine {
             public void run() {
                 State nextState = mCurrentState.mToStates.get(ev);
                 if (nextState == null) {
-                    mCurrentState.onUnhandleEvent(ev);
+                    mCurrentState.onUnhandleEvent(ev, data);
                     return;
                 }
-                mCurrentState.onLeave(nextState, ev);
-                nextState.onEnter(mCurrentState, ev);
+                mCurrentState.onLeave(nextState, ev, data);
+                nextState.onEnter(mCurrentState, ev, data);
                 mCurrentState = nextState;
             }
         });
+    }
+
+    public void postEvent(int event) {
+        postEvent(event, null);
     }
 
     public boolean canMoveTo(State toState) {

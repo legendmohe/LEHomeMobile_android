@@ -33,6 +33,14 @@
             android:divider="@null"
             android:dividerHeight="0dp" />
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_state_progressBar"
+            android:layout_alignBottom="@+id/message_listview"
+            android:layout_alignParentStart="false" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="180dp"
@@ -53,5 +61,6 @@
                 android:text="@string/message_press_to_speak"
                 android:textColor="@android:color/white" />
         </RelativeLayout>
+
     </RelativeLayout>
 </RelativeLayout>

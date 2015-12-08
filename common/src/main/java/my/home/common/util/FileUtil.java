@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by legendmohe on 15/5/7.
@@ -71,18 +72,20 @@ public class FileUtil {
     }
 
     public static String getUniquePrefix(String src, String suffix) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.CHINA);
         String timeStamp = dateFormat.format(new Date());
         return src + "_" + timeStamp + "." + suffix;
     }
 
     public static String getPathFromUri(Context context, Uri uri) {
-        String filePath;
+        String filePath = null;
         if (uri != null && "content".equals(uri.getScheme())) {
             Cursor cursor = context.getContentResolver().query(uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
-            cursor.moveToFirst();
-            filePath = cursor.getString(0);
-            cursor.close();
+            if (cursor != null) {
+                cursor.moveToFirst();
+                filePath = cursor.getString(0);
+                cursor.close();
+            }
         } else {
             filePath = uri.getPath();
         }
@@ -113,8 +116,7 @@ public class FileUtil {
             return null;
         }
 
-        String outputString = output.toString();
-        return outputString;
+        return output.toString();
     }
 
     public static boolean isExternalStorageRemovable() {
