@@ -25,6 +25,10 @@ public interface SendMessageView extends MVPView {
 
     void onDeleteAllMessages();
 
+    void onRecordingBegin();
+
+    void onRecordingEnd();
+
     void onRecordingAmplitude(float amplitude);
 
     void onSendingMsgBegin(String tag);
@@ -32,4 +36,5 @@ public interface SendMessageView extends MVPView {
     void onSendingMsgSuccess(String tag);
 
     void onSendingMsgFail(String tag);
+
 }

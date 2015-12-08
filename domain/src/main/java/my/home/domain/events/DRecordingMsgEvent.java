@@ -25,6 +25,10 @@ public class DRecordingMsgEvent {
     private File resultFile;
     private MessageItem msgItem;
 
+    public enum TYPE {
+        START, FINISH
+    }
+
     public DRecordingMsgEvent(File file, MessageItem item) {
         msgItem = item;
         resultFile = file;

@@ -93,9 +93,8 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
 
     public void finishRecording() {
         mH.removeMessages(START_RECORD);
-        mRecordMsgUsecase
-                .setEvent(RecordMsgUsecase.Event.STOP)
-                .execute();
+        mH.removeMessages(STOP_RECORD);
+        mH.sendEmptyMessageDelayed(STOP_RECORD, 500);
     }
 
     public void cancelSending() {
@@ -104,11 +103,20 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
     }
 
     @Subscribe
+    public void onRecordingStart(DRecordingMsgEvent.TYPE startEvent) {
+        if (mMessageView.get() != null)
+            mMessageView.get().onRecordingBegin();
+    }
+
+    @Subscribe
     public void onRecordingMsgEvent(DRecordingMsgEvent event) {
         if (event.getMsgItem() != null) {
             Log.d(TAG, "onRecordingMsgEvent: " + event.getMsgItem().getTitle());
 
-            mMessageView.get().onAddMsgItem(event.getMsgItem());
+            if (mMessageView.get() != null) {
+                mMessageView.get().onAddMsgItem(event.getMsgItem());
+                mMessageView.get().onRecordingEnd();
+            }
 
             mSendingFile = event.getResultFile();
             mSendMsgUsecase
@@ -116,6 +124,8 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
                     .setEvent(SendMsgUsecase.Event.START)
                     .execute();
         } else {
+            if (mMessageView.get() != null)
+                mMessageView.get().onRecordingEnd();
             Log.d(TAG, "record fail or cancel");
         }
     }
@@ -179,6 +189,10 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
                 case CANCEL_RECORD:
                     break;
                 case STOP_RECORD:
+                    mH.removeMessages(STOP_RECORD);
+                    mRecordMsgUsecase
+                            .setEvent(RecordMsgUsecase.Event.STOP)
+                            .execute();
                     break;
             }
         }

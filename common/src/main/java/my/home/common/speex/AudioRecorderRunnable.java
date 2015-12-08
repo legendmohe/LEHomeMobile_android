@@ -19,6 +19,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -30,11 +31,13 @@ public class
 
     private boolean mStopped = false;
     private LinkedBlockingQueue<AudioRawData> mBufferQueue;
+    private WeakReference<AudioRecorderListener> mListener;
     private float mGain;
 
-    public AudioRecorderRunnable(LinkedBlockingQueue<AudioRawData> queue, float gain) {
+    public AudioRecorderRunnable(LinkedBlockingQueue<AudioRawData> queue, float gain, AudioRecorderListener listener) {
         this.mBufferQueue = queue;
         this.mGain = gain;
+        this.mListener = new WeakReference<AudioRecorderListener>(listener);
     }
 
     @Override
@@ -57,6 +60,8 @@ public class
                     n * 10);
 //                recorder.setPositionNotificationPeriod(8000);
             recorder.startRecording();
+            if (mListener.get() != null)
+                mListener.get().onRecordStart();
             while (!this.mStopped) {
                 short[] buffer = buffers[ix++ % buffers.length];
                 int numRead = recorder.read(buffer, 0, buffer.length);
@@ -81,4 +86,7 @@ public class
         this.mStopped = true;
     }
 
+    public interface AudioRecorderListener {
+        void onRecordStart();
+    }
 }

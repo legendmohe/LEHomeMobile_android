@@ -42,7 +42,10 @@ import my.home.model.manager.DBStaticManager;
 /**
  * Created by legendmohe on 15/12/5.
  */
-public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunnable.ProcessSpeexListener {
+public class RecordMsgUsecaseImpl implements
+        RecordMsgUsecase,
+        ProcessSpeexRunnable.ProcessSpeexListener,
+        AudioRecorderRunnable.AudioRecorderListener {
 
     private AudioRecorderRunnable mAudioRecorderRunnable;
     private ProcessSpeexRunnable mProcessSpeexRunnable;
@@ -94,7 +97,8 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
         );
         mAudioRecorderRunnable = new AudioRecorderRunnable(
                 mDataQueue,
-                1.6f
+                1.6f,
+                this
         );
 
         new Thread(mProcessSpeexRunnable).start();
@@ -191,6 +195,16 @@ public class RecordMsgUsecaseImpl implements RecordMsgUsecase, ProcessSpeexRunna
             mSpeexWriteClient.stop();
         }
         return saveFile;
+    }
+
+    @Override
+    public void onRecordStart() {
+        DomainUtil.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                BusProvider.getUIBusInstance().post(DRecordingMsgEvent.TYPE.START);
+            }
+        });
     }
 
     public class IdleState extends State {

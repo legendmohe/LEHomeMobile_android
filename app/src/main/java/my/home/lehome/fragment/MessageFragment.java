@@ -42,6 +42,10 @@ import my.home.model.entities.MessageItem;
 public class MessageFragment extends Fragment implements SendMessageView {
     public static final String TAG = "MessageFragment";
 
+    enum STATE {
+        IDLE, RECORDING, SENDING
+    }
+
     MessageViewPresenter mMessageViewPresenter;
 
     private int mScreenWidth;
@@ -51,14 +55,14 @@ public class MessageFragment extends Fragment implements SendMessageView {
     private Button mSendButton;
     private MessageViewHandler mHandler;
     private MessageAdapter mMessageAdapter;
+    private STATE mState = STATE.IDLE;
 
     private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mMessageViewPresenter.startRecording();
-                mSendButton.setText(getString(R.string.message_release_to_send));
-                mStateProgressBar.setVisibility(View.VISIBLE);
+
                 return true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
@@ -66,15 +70,14 @@ public class MessageFragment extends Fragment implements SendMessageView {
                 } else {
                     mMessageViewPresenter.finishRecording();
                 }
-                mSendButton.setText(getString(R.string.message_press_to_speak));
-                mStateProgressBar.setProgress(0);
-                mStateProgressBar.setVisibility(View.INVISIBLE);
                 return true;
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
-                    mSendButton.setText(getString(R.string.message_release_to_cancel));
-                } else {
-                    mSendButton.setText(getString(R.string.message_release_to_send));
+                if (mState == STATE.RECORDING) {
+                    if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
+                        mSendButton.setText(getString(R.string.message_release_to_cancel));
+                    } else {
+                        mSendButton.setText(getString(R.string.message_release_to_send));
+                    }
                 }
                 return true;
             }
@@ -189,6 +192,22 @@ public class MessageFragment extends Fragment implements SendMessageView {
     }
 
     @Override
+    public void onRecordingBegin() {
+        mSendButton.setText(getString(R.string.message_release_to_send));
+        mStateProgressBar.setProgress(0);
+        mStateProgressBar.setVisibility(View.VISIBLE);
+        mState = STATE.RECORDING;
+    }
+
+    @Override
+    public void onRecordingEnd() {
+        mSendButton.setText(getString(R.string.message_press_to_speak));
+        mStateProgressBar.setProgress(0);
+        mStateProgressBar.setVisibility(View.INVISIBLE);
+        mState = STATE.IDLE;
+    }
+
+    @Override
     public void onRecordingAmplitude(float amplitude) {
         Log.d(TAG, amplitude + " | " + (int) amplitude);
         mStateProgressBar.setProgress((int) amplitude);
@@ -199,6 +218,7 @@ public class MessageFragment extends Fragment implements SendMessageView {
         mSendButton.setText(getString(R.string.message_sending));
         mSendButton.setOnTouchListener(null);
         mSendButton.setOnClickListener(mOnClickListener);
+        mState = STATE.SENDING;
     }
 
     @Override
@@ -207,6 +227,7 @@ public class MessageFragment extends Fragment implements SendMessageView {
         mSendButton.setOnTouchListener(mOnTouchListener);
         mSendButton.setOnClickListener(null);
 
+        mState = STATE.IDLE;
         Toast.makeText(getActivity(), getString(R.string.message_sending_success), Toast.LENGTH_SHORT).show();
     }
 
@@ -216,6 +237,7 @@ public class MessageFragment extends Fragment implements SendMessageView {
         mSendButton.setOnTouchListener(mOnTouchListener);
         mSendButton.setOnClickListener(null);
 
+        mState = STATE.IDLE;
         Toast.makeText(getActivity(), getString(R.string.message_sending_fail), Toast.LENGTH_SHORT).show();
     }
 
