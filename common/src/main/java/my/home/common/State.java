@@ -56,6 +56,13 @@ public abstract class State {
 
     public void onLeave(State toState, int event, Object data) {
     }
+    
+    public void handleEvent(int event, Object data) {
+    }
+    
+    final public void nextState() {
+        mStateMachine.nextState(this);
+    }
 
     protected StateMachine getStateMachine() {
         return mStateMachine;
