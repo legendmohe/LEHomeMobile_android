@@ -32,7 +32,7 @@ public abstract class State {
         mName = name;
     }
 
-    public void moveTo(State toState, int event) {
+    public void linkTo(State toState, int event) {
         if (toState == null) {
             throw new IllegalArgumentException("toState cannot be null");
         }
