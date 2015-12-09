@@ -69,9 +69,9 @@ public class RecordMsgUsecaseImpl implements
         IdleState idleState = new IdleState();
         RecordingState recordingState = new RecordingState();
 
-        idleState.moveTo(recordingState, Event.START.getValue());
-        recordingState.moveTo(idleState, Event.CANCEL.getValue());
-        recordingState.moveTo(idleState, Event.STOP.getValue());
+        idleState.linkTo(recordingState, Event.START.getValue());
+        recordingState.linkTo(idleState, Event.CANCEL.getValue());
+        recordingState.linkTo(idleState, Event.STOP.getValue());
 
         mStateMachine.addState(idleState);
         mStateMachine.addState(recordingState);

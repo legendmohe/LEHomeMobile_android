@@ -102,31 +102,6 @@ public class StateMachine {
         });
     }
     
-    public void handleEvent(final int event, final Object data) {
-        if (mHandler == null) {
-            return;
-        }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (mHandleLock) {
-                    mCurrentState.handleEvent(event, data);
-                }
-            }
-        });
-    }
-
-    protected void nextState(State curState) {
-        State nextState = mCurrentState.mToStates.get(event);
-        if (nextState == null) {
-            mCurrentState.onUnhandleEvent(event, data);
-            return;
-        }
-        mCurrentState.onLeave(nextState, event, data);
-        nextState.onEnter(mCurrentState, event, data);
-        mCurrentState = nextState;
-    }
-    
     public boolean canMoveTo(State toState) {
         if (toState == null) {
             return false;

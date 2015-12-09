@@ -66,10 +66,10 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
         mStateMachine.addState(idleState);
         mStateMachine.addState(sendingState);
 
-        idleState.moveTo(sendingState, Event.START.getValue());
-        sendingState.moveTo(idleState, Event.FINISH.getValue());
-        sendingState.moveTo(idleState, Event.CANCEL.getValue());
-        sendingState.moveTo(idleState, Event.ERROR.getValue());
+        idleState.linkTo(sendingState, Event.START.getValue());
+        sendingState.linkTo(idleState, Event.FINISH.getValue());
+        sendingState.linkTo(idleState, Event.CANCEL.getValue());
+        sendingState.linkTo(idleState, Event.ERROR.getValue());
 
         mStateMachine.setInitState(idleState);
         mStateMachine.start();

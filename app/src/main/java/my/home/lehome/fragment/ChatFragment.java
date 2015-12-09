@@ -254,6 +254,9 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             @Override
             public void run() {
                 ChatFragment fragment = mFragment.get();
+                if (fragment.getActivity() == null) {
+                    return;
+                }
                 if (!fragment.isScrollViewInButtom()) {
                     fragment.showTip(fragment.getString(
                             R.string.chat_new_message, fragment.getNewMsgNum()
