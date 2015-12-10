@@ -283,16 +283,20 @@ public class MessageHelper {
             if (KeyValueStorage.getInstance().hasKey(MSG_SEQ_STORAGE_KEY)) {
                 resultArray = (Integer[]) KeyValueStorage.getInstance().getObject(MSG_SEQ_STORAGE_KEY, Integer[].class);
                 Arrays.sort(resultArray);
-                int idx = Arrays.binarySearch(resultArray, seq);
-                if (idx >= 0) {
-                    return true;
+                if (resultArray[0] > seq) {
+                    resultArray = new Integer[0];
+                } else {
+                    int idx = Arrays.binarySearch(resultArray, seq);
+                    if (idx >= 0) {
+                        return true;
+                    }
                 }
             }
             LinkedList<Integer> limitedQueue = new LinkedList<>();
             if (resultArray != null && resultArray.length != 0) {
                 limitedQueue.addAll(Arrays.asList(resultArray));
             }
-            limitedQueue.add(seq);
+            limitedQueue.add(0, seq);
             while (limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
                 limitedQueue.removeFirst();
             }

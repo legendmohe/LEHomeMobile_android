@@ -159,12 +159,10 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
     @Override
     public void onTextMessage(Context context, XGPushTextMessage message) {
         String text = "收到消息:" + message.toString();
-        // 获取自定义key-value
         String customContent = message.getCustomContent();
         if (customContent != null && customContent.length() != 0) {
             try {
                 JSONObject obj = new JSONObject(customContent);
-                // key1为前台配置的key
                 if (!obj.isNull("key")) {
                     String value = obj.getString("key");
                     Log.d(TAG, "get custom value:" + value);
