@@ -25,9 +25,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by legendmohe on 15/11/13.
  */
-public class
-        AudioRecorderRunnable implements Runnable {
+public class AudioRecorderRunnable implements Runnable {
     private static final String TAG = "AudioRecorderRunnable";
+
+    private static final int SAMPLE_RATE = 16000;
 
     private boolean mStopped = false;
     private LinkedBlockingQueue<AudioRawData> mBufferQueue;
@@ -52,13 +53,13 @@ public class
         int ix = 0;
         float gain = this.mGain;
         try {
-            int n = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                    8000,
+            int n = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+                    SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     n * 10);
-//                recorder.setPositionNotificationPeriod(8000);
+            recorder.setPositionNotificationPeriod(160);
             recorder.startRecording();
             if (mListener.get() != null)
                 mListener.get().onRecordStart();

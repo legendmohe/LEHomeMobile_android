@@ -55,6 +55,8 @@ public class RecordMsgUsecaseImpl implements
     private WeakReference<Context> mContext;
     private WeakReference<RecorderStateListener> mStateListener;
 
+    private AudioUtils.FFT mFFT;
+
     private StateMachine mStateMachine = new StateMachine();
     private Event mEvent;
     private int mLastEvent;
@@ -97,7 +99,7 @@ public class RecordMsgUsecaseImpl implements
         );
         mAudioRecorderRunnable = new AudioRecorderRunnable(
                 mDataQueue,
-                1.6f,
+                1.0f,
                 this
         );
 
@@ -155,6 +157,20 @@ public class RecordMsgUsecaseImpl implements
     @Override
     public void onPreProcess(short[] notProcessData, int len) {
         if (mStateListener.get() != null) {
+
+//            int length = AudioUtils.up2int(len);
+//            if (mFFT == null || mFFT.getSize() != length) {
+//                mFFT = new AudioUtils.FFT(length);
+//            }
+//
+//            double[] ri = new double[length];
+//            double[] im = new double[length];
+//            for (int i = 0; i < length; i++) {
+//                ri[i] = notProcessData[i]/32768.0;
+//                im[i] = 0;
+//            }
+//            mFFT.fft(ri, im);
+
             final float value = AudioUtils.getAmplitude(notProcessData, len);
             DomainUtil.runOnMainThread(new Runnable() {
                 @Override
@@ -184,7 +200,8 @@ public class RecordMsgUsecaseImpl implements
         File saveFile = new File(FileUtil.getDiskCacheDir(mContext.get(), fileName));
         Log.d(TAG, "save record: " + saveFile.getAbsolutePath());
 
-        mSpeexWriteClient.start(saveFile, SpeexWriteClient.MODE_NB, SpeexWriteClient.SAMPLERATE_8000, true);
+        // follow AudioRecorderRunnable.SAMPLE_RATE
+        mSpeexWriteClient.start(saveFile, SpeexWriteClient.MODE_NB, SpeexWriteClient.SAMPLERATE_16000, true);
         try {
             for (byte[] packet : data) {
                 mSpeexWriteClient.writePacket(packet, packet.length);

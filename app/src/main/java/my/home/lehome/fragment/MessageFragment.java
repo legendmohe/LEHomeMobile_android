@@ -16,6 +16,7 @@ package my.home.lehome.fragment;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +37,6 @@ import my.home.lehome.R;
 import my.home.lehome.adapter.MessageAdapter;
 import my.home.lehome.mvp.presenters.MessageViewPresenter;
 import my.home.lehome.mvp.views.SendMessageView;
-import my.home.lehome.util.Constants;
 import my.home.model.entities.MessageItem;
 
 public class MessageFragment extends Fragment implements SendMessageView {
@@ -58,28 +58,34 @@ public class MessageFragment extends Fragment implements SendMessageView {
     private STATE mState = STATE.IDLE;
 
     private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+        private Rect rect;
+
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
                 mMessageViewPresenter.startRecording();
-
+                mSendButton.setPressed(true);
                 return true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
+                if (!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                     mMessageViewPresenter.cancelRecording();
                 } else {
                     mMessageViewPresenter.finishRecording();
                 }
+                mSendButton.setPressed(false);
                 return true;
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 if (mState == STATE.RECORDING) {
-                    if (event.getRawY() / mScreenHeight <= Constants.DIALOG_CANCEL_Y_PERSENT) {
+                    if (!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                         mSendButton.setText(getString(R.string.message_release_to_cancel));
                     } else {
                         mSendButton.setText(getString(R.string.message_release_to_send));
                     }
                 }
                 return true;
+            } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                mSendButton.setPressed(false);
             }
             return false;
         }

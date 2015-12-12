@@ -296,7 +296,7 @@ public class MessageHelper {
             if (resultArray != null && resultArray.length != 0) {
                 limitedQueue.addAll(Arrays.asList(resultArray));
             }
-            limitedQueue.add(0, seq);
+            limitedQueue.add(seq);
             while (limitedQueue.size() > Constants.MESSAGE_SEQ_QUEUE_LIMIT) {
                 limitedQueue.removeFirst();
             }
