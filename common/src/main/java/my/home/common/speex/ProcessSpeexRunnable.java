@@ -67,7 +67,7 @@ public class ProcessSpeexRunnable implements Runnable {
             }
         } finally {
             if (mListener.get() != null) {
-                mListener.get().onProcessFinish(mEncodedData);
+                mListener.get().onProcessSpeexFinish(mEncodedData);
             }
 
             this.clean();
@@ -102,10 +102,6 @@ public class ProcessSpeexRunnable implements Runnable {
     }
 
     private void process(short[] buffer, int n) {
-        if (mListener.get() != null) {
-            mListener.get().onPreProcess(buffer, n);
-        }
-
         byte[] encoded = new byte[n];
         int encLen = this.mSpeexLib.encode(buffer, 0, encoded, buffer.length);
 
@@ -118,15 +114,13 @@ public class ProcessSpeexRunnable implements Runnable {
         }
 
         if (mListener.get() != null) {
-            mListener.get().onProcess(encoded, encLen);
+            mListener.get().onProcessSpeexData(encoded, encLen);
         }
     }
 
     public interface ProcessSpeexListener {
-        void onPreProcess(short[] notProcessData, int len);
+        void onProcessSpeexData(byte[] data, int len);
 
-        void onProcess(byte[] data, int len);
-
-        void onProcessFinish(List<byte[]> data);
+        void onProcessSpeexFinish(List<byte[]> data);
     }
 }

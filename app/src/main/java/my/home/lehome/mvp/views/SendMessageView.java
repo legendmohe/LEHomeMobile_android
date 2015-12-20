@@ -15,21 +15,16 @@
 package my.home.lehome.mvp.views;
 
 
-import my.home.model.entities.MessageItem;
-
 /**
  * Created by legendmohe on 15/11/28.
  */
 public interface SendMessageView extends MVPView {
-    void onAddMsgItem(MessageItem msgItem);
-
-    void onDeleteAllMessages();
 
     void onRecordingBegin();
 
     void onRecordingEnd();
 
-    void onRecordingAmplitude(float amplitude);
+    void onRecordingAmplitude(double amplitude);
 
     void onSendingMsgBegin(String tag);
 
@@ -37,4 +32,5 @@ public interface SendMessageView extends MVPView {
 
     void onSendingMsgFail(String tag);
 
+    void putDataForWaveform(short[] notProcessData, int len);
 }

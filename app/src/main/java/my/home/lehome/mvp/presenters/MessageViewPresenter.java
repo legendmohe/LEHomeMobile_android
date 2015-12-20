@@ -22,22 +22,17 @@ import com.squareup.otto.Subscribe;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import my.home.common.BusProvider;
 import my.home.common.util.PrefUtil;
 import my.home.domain.events.DRecordingMsgEvent;
 import my.home.domain.events.DSendingMsgEvent;
-import my.home.domain.usecase.CleanMsgUsecase;
-import my.home.domain.usecase.CleanMsgUsecaseImpl;
 import my.home.domain.usecase.RecordMsgUsecase;
 import my.home.domain.usecase.RecordMsgUsecaseImpl;
 import my.home.domain.usecase.SendMsgUsecase;
 import my.home.domain.usecase.SendMsgUsecaseImpl;
 import my.home.lehome.mvp.views.SendMessageView;
 import my.home.lehome.util.Constants;
-import my.home.model.entities.MessageItem;
-import my.home.model.manager.DBStaticManager;
 
 /**
  * Created by legendmohe on 15/11/28.
@@ -114,7 +109,6 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
             Log.d(TAG, "onRecordingMsgEvent: " + event.getMsgItem().getTitle());
 
             if (mMessageView.get() != null) {
-                mMessageView.get().onAddMsgItem(event.getMsgItem());
                 mMessageView.get().onRecordingEnd();
             }
 
@@ -153,27 +147,16 @@ public class MessageViewPresenter extends MVPPresenter implements RecordMsgUseca
         }
     }
 
-    public List<MessageItem> getAllMessages() {
-        if (mMessageView.get() != null)
-            return DBStaticManager.getAllMessageItems(mMessageView.get().getContext());
-        else
-            return null;
-    }
-
-    public void cleanMessages() {
-        if (mMessageView.get() != null) {
-            CleanMsgUsecase cleanMsgUsecase = new CleanMsgUsecaseImpl(
-                    mMessageView.get().getContext(),
-                    Constants.MESSAGE_PREFIX
-            );
-            cleanMsgUsecase.execute();
-            mMessageView.get().onDeleteAllMessages();
-        }
+    @Override
+    public void onGetAmplitude(double value) {
+        mMessageView.get().onRecordingAmplitude(value);
     }
 
     @Override
-    public void onGetAmplitude(float value) {
-        mMessageView.get().onRecordingAmplitude(value);
+    public void processWaveform(short[] notProcessData, int len) {
+        if (mMessageView.get() != null) {
+            mMessageView.get().putDataForWaveform(notProcessData, len);
+        }
     }
 
     private class H extends Handler {

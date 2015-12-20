@@ -37,7 +37,6 @@ import my.home.common.util.FileUtil;
 import my.home.domain.events.DRecordingMsgEvent;
 import my.home.domain.util.DomainUtil;
 import my.home.model.entities.MessageItem;
-import my.home.model.manager.DBStaticManager;
 
 /**
  * Created by legendmohe on 15/12/5.
@@ -99,7 +98,7 @@ public class RecordMsgUsecaseImpl implements
         );
         mAudioRecorderRunnable = new AudioRecorderRunnable(
                 mDataQueue,
-                1.0f,
+                1.3f,
                 this
         );
 
@@ -141,9 +140,9 @@ public class RecordMsgUsecaseImpl implements
             msgItem.setDate(new Date());
             msgItem.setState(-1);
             msgItem.setType(-1);
-            if (this.mContext.get() != null) {
-                DBStaticManager.addMessageItem(this.mContext.get(), msgItem);
-            }
+//            if (this.mContext.get() != null) {
+//                DBStaticManager.addMessageItem(this.mContext.get(), msgItem);
+//            }
         }
         final MessageItem finalMsgItem = msgItem;
         DomainUtil.runOnMainThread(new Runnable() {
@@ -155,39 +154,27 @@ public class RecordMsgUsecaseImpl implements
     }
 
     @Override
-    public void onPreProcess(short[] notProcessData, int len) {
+    public void onProcess(short[] data, int len) {
+
         if (mStateListener.get() != null) {
-
-//            int length = AudioUtils.up2int(len);
-//            if (mFFT == null || mFFT.getSize() != length) {
-//                mFFT = new AudioUtils.FFT(length);
-//            }
-//
-//            double[] ri = new double[length];
-//            double[] im = new double[length];
-//            for (int i = 0; i < length; i++) {
-//                ri[i] = notProcessData[i]/32768.0;
-//                im[i] = 0;
-//            }
-//            mFFT.fft(ri, im);
-
-            final float value = AudioUtils.getAmplitude(notProcessData, len);
+            final double value = AudioUtils.getAmplitude(data, len);
             DomainUtil.runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
                     mStateListener.get().onGetAmplitude(value);
                 }
             });
+//            mStateListener.get().processWaveform(data, len);
         }
     }
 
     @Override
-    public void onProcess(final byte[] data, final int len) {
+    public void onProcessSpeexData(final byte[] data, final int len) {
 
     }
 
     @Override
-    public void onProcessFinish(List<byte[]> data) {
+    public void onProcessSpeexFinish(List<byte[]> data) {
         File resultFile = null;
         if (mLastEvent == Event.STOP.getValue()) {
             resultFile = writeRawDataToFile(data);
@@ -196,7 +183,8 @@ public class RecordMsgUsecaseImpl implements
     }
 
     private File writeRawDataToFile(List<byte[]> data) {
-        String fileName = this.mSaveFilePrefix + gDateFormat.format(new Date()) + ".spx";
+//        String fileName = this.mSaveFilePrefix + gDateFormat.format(new Date()) + ".spx";
+        String fileName = this.mSaveFilePrefix + "_cache.spx";
         File saveFile = new File(FileUtil.getDiskCacheDir(mContext.get(), fileName));
         Log.d(TAG, "save record: " + saveFile.getAbsolutePath());
 
@@ -258,6 +246,8 @@ public class RecordMsgUsecaseImpl implements
     }
 
     public interface RecorderStateListener {
-        void onGetAmplitude(float value);
+        void onGetAmplitude(double value);
+
+        void processWaveform(short[] notProcessData, int len);
     }
 }

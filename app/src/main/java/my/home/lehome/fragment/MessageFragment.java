@@ -24,20 +24,16 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import my.home.lehome.R;
-import my.home.lehome.adapter.MessageAdapter;
 import my.home.lehome.mvp.presenters.MessageViewPresenter;
 import my.home.lehome.mvp.views.SendMessageView;
-import my.home.model.entities.MessageItem;
 
 public class MessageFragment extends Fragment implements SendMessageView {
     public static final String TAG = "MessageFragment";
@@ -50,11 +46,10 @@ public class MessageFragment extends Fragment implements SendMessageView {
 
     private int mScreenWidth;
     private int mScreenHeight;
-    private ListView mMessagesListView;
     private ProgressBar mStateProgressBar;
+    //    private WaveformView mWaveformView;
     private Button mSendButton;
     private MessageViewHandler mHandler;
-    private MessageAdapter mMessageAdapter;
     private STATE mState = STATE.IDLE;
 
     private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
@@ -142,22 +137,6 @@ public class MessageFragment extends Fragment implements SendMessageView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        setHasOptionsMenu(true);
-        registerForContextMenu(mMessagesListView);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.clean_up_messages:
-                mMessageViewPresenter.cleanMessages();
-                return true;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupData() {
@@ -173,10 +152,7 @@ public class MessageFragment extends Fragment implements SendMessageView {
         mStateProgressBar = (ProgressBar) rootView.findViewById(R.id.message_state_progressBar);
         mStateProgressBar.setVisibility(View.INVISIBLE);
 
-        mMessageAdapter = new MessageAdapter(getActivity());
-        mMessageAdapter.addAll(mMessageViewPresenter.getAllMessages());
-        mMessagesListView = (ListView) rootView.findViewById(R.id.message_listview);
-        mMessagesListView.setAdapter(mMessageAdapter);
+//        mWaveformView = (WaveformView) rootView.findViewById(R.id.message_voice_vitrualizer);
 
         setRetainInstance(true);
     }
@@ -184,17 +160,6 @@ public class MessageFragment extends Fragment implements SendMessageView {
     @Override
     public Context getContext() {
         return getActivity();
-    }
-
-    @Override
-    public void onAddMsgItem(MessageItem msgItem) {
-        mMessageAdapter.add(msgItem);
-        mMessagesListView.smoothScrollToPosition(mMessageAdapter.getCount() - 1);
-    }
-
-    @Override
-    public void onDeleteAllMessages() {
-        mMessageAdapter.clear();
     }
 
     @Override
@@ -214,7 +179,12 @@ public class MessageFragment extends Fragment implements SendMessageView {
     }
 
     @Override
-    public void onRecordingAmplitude(float amplitude) {
+    public void putDataForWaveform(short[] notProcessData, int len) {
+//        mWaveformView.updateAudioData(notProcessData, len);
+    }
+
+    @Override
+    public void onRecordingAmplitude(double amplitude) {
         Log.d(TAG, amplitude + " | " + (int) amplitude);
         mStateProgressBar.setProgress((int) amplitude);
     }

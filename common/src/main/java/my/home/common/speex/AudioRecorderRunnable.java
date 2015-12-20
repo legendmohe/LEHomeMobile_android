@@ -71,6 +71,9 @@ public class AudioRecorderRunnable implements Runnable {
                         buffer[i] = (short) Math.min((int) (buffer[i] * gain), (int) Short.MAX_VALUE);
                 }
                 this.mBufferQueue.offer(new AudioRawData(buffer, numRead));
+                if (mListener.get() != null) {
+                    mListener.get().onProcess(buffer, numRead);
+                }
             }
         } catch (Throwable x) {
             Log.w(TAG, "Error reading voice audio", x);
@@ -89,5 +92,7 @@ public class AudioRecorderRunnable implements Runnable {
 
     public interface AudioRecorderListener {
         void onRecordStart();
+
+        void onProcess(short[] data, int len);
     }
 }

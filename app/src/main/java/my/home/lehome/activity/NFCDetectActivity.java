@@ -1,4 +1,3 @@
-
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +12,18 @@
  * limitations under the License.
  */
 
-package my.home.domain.usecase;
+package my.home.lehome.activity;
 
-/**
- * Created by legendmohe on 15/12/1.
- */
-public interface MessageHistoryUsecase extends Usecase {
+import android.app.Activity;
+import android.os.Bundle;
 
-    public static final String TAG = "MessageHistoryUsecase";
+import my.home.lehome.R;
 
-    enum Mode {
-        GET_ALL, CREATE, DELETE, PLAY, STOP
+public class NFCDetectActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_nfcdetect);
     }
-
-    Mode getMode();
-
-    MessageHistoryUsecase setMode(Mode mode);
 }

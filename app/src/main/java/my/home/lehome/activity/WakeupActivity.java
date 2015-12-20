@@ -14,16 +14,18 @@
 
 package my.home.lehome.activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import my.home.lehome.R;
+import my.home.lehome.helper.NFCHelper;
 
-public class WakeupActivity extends AppCompatActivity {
+public class WakeupActivity extends Activity {
 
     public static final String TAG = WakeupActivity.class.getName();
 
@@ -46,8 +48,16 @@ public class WakeupActivity extends AppCompatActivity {
         // TODO Auto-generated method stub
         super.onResume();
         Log.d(TAG, "onResume");
-        Intent intent = new Intent(INTENT_VOICE_COMMAND);
-        startActivity(intent);
+
+        Intent intent = getIntent();
+        if (intent.getAction().equals("android.intent.action.VOICE_COMMAND")) {
+            Intent voiceIntent = new Intent(INTENT_VOICE_COMMAND);
+            startActivity(voiceIntent);
+        } else if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
+            Intent newIntent = NFCHelper.createBroadcastFromNfcIntent(intent);
+            sendBroadcast(newIntent);
+            finish();
+        }
     }
 
     @Override

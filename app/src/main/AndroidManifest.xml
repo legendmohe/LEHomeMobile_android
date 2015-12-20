@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -11,63 +12,70 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
     package="my.home.lehome"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:versionCode="1"
     android:versionName="1.0">
 
     <uses-sdk
         android:minSdkVersion="16"
-        android:targetSdkVersion="21" />
+        android:targetSdkVersion="21"/>
 
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
 
     <!-- 【必须】 信鸽SDK所需权限 -->
-    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
-    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
-    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES"/>
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT"/>
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
     <!-- 【可选】 信鸽SDK所需权限 -->
-    <uses-permission android:name="android.permission.BATTERY_STATS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BATTERY_STATS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <!-- Push service 运行需要的权限 -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
-    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <!-- 蓝牙需要。。。 -->
-    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <!-- NFC -->
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true"/>
+
+    <uses-permission android:name="android.permission.NFC"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
-        android:required="true" />
+        android:required="true"/>
 
     <application
         android:name=".application.LEHomeApplication"
@@ -82,152 +90,89 @@
             android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="my.home.lehome.VOICE_COMMAND" />
+                <action android:name="my.home.lehome.VOICE_COMMAND"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.SettingsActivity"
-            android:theme="@style/AppTheme"
+            android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity"
-            android:label="@string/title_activity_settings" />
-
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".activity.WakeupActivity"
             android:label="@string/title_activity_wakeup"
             android:launchMode="standard"
-            android:theme="@android:style/Theme.Translucent">
+            android:theme="@style/NoTitleActivity">
             <intent-filter android:priority="1000"> <!-- max 1000; min -1000 -->
-                <action android:name="android.intent.action.VOICE_COMMAND" />
+                <action android:name="android.intent.action.VOICE_COMMAND"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.nfc.action.TECH_DISCOVERED" /> -->
+            <!-- </intent-filter> -->
+
+
+            <!-- <meta-data -->
+            <!-- android:name="android.nfc.action.TECH_DISCOVERED" -->
+            <!-- android:resource="@xml/nfc_tech_filter" /> -->
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
-
-        <!--
-        <receiver
-	        android:name=".receiver.MediaButtonIntentReceiver"
-	        android:enabled="true" >
-	        <intent-filter android:priority="2147483647">
-	            <action android:name="android.intent.action.MEDIA_BUTTON" />
-	        </intent-filter>
-		</receiver>
-        -->
 
         <receiver
             android:name=".receiver.NetworkStateReceiver"
             android:process=":local_message">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.LocalMessageReceiver">
             <intent-filter>
-                <action android:name="my.home.lehome.receiver.LocalMessageReceiver" />
+                <action android:name="my.home.lehome.receiver.LocalMessageReceiver"/>
             </intent-filter>
         </receiver>
-
-        <!-- <receiver android:name=".receiver.BootCompleteReceiver" -->
-        <!-- android:enabled="false"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.BOOT_COMPLETED"></action> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-
-
-        <!-- push应用定义消息receiver声明 -->
-        <!-- <receiver android:name=".receiver.PushMessageReceiver"> -->
-        <!-- <intent-filter> -->
-
-
-        <!-- &lt;!&ndash; 接收push消息 &ndash;&gt; -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.MESSAGE" /> -->
-        <!-- &lt;!&ndash; 接收bind,unbind,fetch,delete等反馈消息 &ndash;&gt; -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.RECEIVE" /> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.notification.CLICK" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-
         <receiver android:name=".receiver.PushMessageReceiver">
             <intent-filter>
 
                 <!-- 接收消息透传 -->
-                <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
+                <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE"/>
                 <!-- 监听注册、反注册、设置/删除标签、通知被点击等处理结果 -->
-                <action android:name="com.tencent.android.tpush.action.FEEDBACK" />
+                <action android:name="com.tencent.android.tpush.action.FEEDBACK"/>
             </intent-filter>
         </receiver>
-
-        <!-- push必须的receviver和service声明 -->
-        <!-- <receiver -->
-        <!-- android:name="com.baidu.android.pushservice.PushServiceReceiver" -->
-        <!-- android:process=":bdservice_v1"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
-        <!-- <action android:name="android.net.conn.CONNECTIVITY_CHANGE" /> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.notification.SHOW" /> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.media.CLICK" /> -->
-        <!-- <action android:name="android.intent.action.MEDIA_MOUNTED" /> -->
-        <!-- <action android:name="android.intent.action.USER_PRESENT" /> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_CONNECTED" /> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-        <!-- <receiver -->
-        <!-- android:name="com.baidu.android.pushservice.RegistrationReceiver" -->
-        <!-- android:process=":bdservice_v1"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.METHOD" /> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.BIND_SYNC" /> -->
-        <!-- </intent-filter> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.PACKAGE_REMOVED" /> -->
-
-
-        <!-- <data android:scheme="package" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-
-
-        <!-- <service -->
-        <!-- android:name="com.baidu.android.pushservice.PushService" -->
-        <!-- android:exported="true" -->
-        <!-- android:process=":bdservice_v1"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="com.baidu.android.pushservice.action.PUSH_SERVICE" /> -->
-        <!-- </intent-filter> -->
-        <!-- </service> -->
-        <!-- <service -->
-        <!-- android:name="com.baidu.android.pushservice.CommandService" -->
-        <!-- android:exported="true" /> -->
-        <!-- push结束 -->
 
         <service
             android:name=".service.LocalMessageService"
             android:process=":local_message">
             <intent-filter>
-                <action android:name="my.home.lehome.service.LocalMessageService" />
+                <action android:name="my.home.lehome.service.LocalMessageService"/>
             </intent-filter>
         </service>
         <service
             android:name=".service.SendMsgIntentService"
             android:exported="false"
-            android:process=":send_msg" />
+            android:process=":send_msg"/>
         <service
             android:name=".service.LocationIntentService"
-            android:exported="false" />
+            android:exported="false"/>
 
         <!-- 在百度开发者中心查询应用的API Key -->
         <meta-data
             android:name="api_key"
-            android:value="7P5ZCG6WTAGWr5TuURBgndRH" />
+            android:value="7P5ZCG6WTAGWr5TuURBgndRH"/>
 
         <!-- 【必须】 信鸽receiver广播接收 -->
         <receiver
@@ -236,25 +181,25 @@
             <intent-filter android:priority="0x7fffffff">
 
                 <!-- 【必须】 信鸽SDK的内部广播 -->
-                <action android:name="com.tencent.android.tpush.action.SDK" />
-                <action android:name="com.tencent.android.tpush.action.INTERNAL_PUSH_MESSAGE" />
+                <action android:name="com.tencent.android.tpush.action.SDK"/>
+                <action android:name="com.tencent.android.tpush.action.INTERNAL_PUSH_MESSAGE"/>
                 <!-- 【必须】 系统广播：开屏和网络切换 -->
-                <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
 
                 <!-- 【可选】 一些常用的系统广播，增强信鸽service的复活机会，请根据需要选择。当然，你也可以添加APP自定义的一些广播让启动service -->
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
             </intent-filter>
             <!-- 【可选】 usb相关的系统广播，增强信鸽service的复活机会，请根据需要添加 -->
             <intent-filter android:priority="0x7fffffff">
-                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
-                <action android:name="android.intent.action.MEDIA_REMOVED" />
-                <action android:name="android.intent.action.MEDIA_CHECKING" />
-                <action android:name="android.intent.action.MEDIA_EJECT" />
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED"/>
+                <action android:name="android.intent.action.MEDIA_REMOVED"/>
+                <action android:name="android.intent.action.MEDIA_CHECKING"/>
+                <action android:name="android.intent.action.MEDIA_EJECT"/>
 
-                <data android:scheme="file" />
+                <data android:scheme="file"/>
             </intent-filter>
         </receiver>
 
@@ -266,7 +211,7 @@
             <intent-filter>
 
                 <!-- 若使用AndroidStudio，请设置android:name="android.intent.action" -->
-                <action android:name="android.intent.action" />
+                <action android:name="android.intent.action"/>
             </intent-filter>
         </activity>
 
@@ -275,35 +220,52 @@
             android:name="com.tencent.android.tpush.service.XGPushService"
             android:exported="true"
             android:persistent="true"
-            android:process=":xg_service_v2" />
+            android:process=":xg_service_v2"/>
 
         <!-- 【必须】 通知service，此选项有助于提高抵达率 -->
         <service
             android:name="com.tencent.android.tpush.rpc.XGRemoteService"
             android:exported="true">
             <intent-filter>
-                <action android:name="my.home.lehome.PUSH_ACTION" />
+                <action android:name="my.home.lehome.PUSH_ACTION"/>
             </intent-filter>
         </service>
 
         <!-- 【必须】 请将YOUR_ACCESS_ID修改为APP的AccessId，“21”开头的10位数字，中间没空格 -->
         <meta-data
             android:name="XG_V2_ACCESS_ID"
-            android:value="2100063377" />
+            android:value="2100063377"/>
         <!-- 【必须】 请将YOUR_ACCESS_KEY修改为APP的AccessKey，“A”开头的12位字符串，中间没空格 -->
         <meta-data
             android:name="XG_V2_ACCESS_KEY"
-            android:value="AE398MRA65DZ" />
+            android:value="AE398MRA65DZ"/>
 
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote" />
+            android:process=":remote"/>
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="XPD9jIjvcrR2DjPMuuyZ3jxF" />
+            android:value="XPD9jIjvcrR2DjPMuuyZ3jxF"/>
 
+        <receiver
+            android:name=".receiver.NDEFReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+
+                <category android:name="lehome.nfc"/>
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".activity.NFCDetectActivity"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true"
+            >
+        </activity>
     </application>
 
 </manifest>

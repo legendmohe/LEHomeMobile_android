@@ -23,36 +23,37 @@ public class AudioUtils {
     private static final float MAX_REPORTABLE_AMP = 32767f;
 
 
-    private static int getRawAmplitude(byte[] data, int len) {
+    private static double getRawAmplitude(byte[] data, int len) {
         if (len <= 0 || data == null || data.length <= 0) {
             return 0;
         }
 
-        int sum = 0;
+        double sum = 0;
         for (int i = 0; i < len; i++) {
             sum += Math.abs(data[i]);
         }
         return sum / len;
     }
 
-    private static int getRawAmplitude(short[] data, int len) {
+    private static double getRawAmplitude(short[] data, int len) {
         if (len <= 0 || data == null || data.length <= 0) {
             return 0;
         }
 
-        int sum = 0;
+        double sum = 0;
         for (int i = 0; i < len; i++) {
-            sum += Math.abs(data[i]);
+            double sample = data[i] / 32768.0;
+            sum += sample * sample;
         }
-        return sum / len;
+        return Math.sqrt(sum / len);
     }
 
-    public static float getAmplitude(byte[] data, int len) {
-        return (float) (MAX_REPORTABLE_DB + (20 * Math.log10(getRawAmplitude(data, len) / MAX_REPORTABLE_AMP)));
+    public static double getAmplitude(byte[] data, int len) {
+        return (MAX_REPORTABLE_DB + (20 * Math.log10(getRawAmplitude(data, len) / MAX_REPORTABLE_AMP)));
     }
 
-    public static float getAmplitude(short[] data, int len) {
-        return (float) (MAX_REPORTABLE_DB + (20 * Math.log10(getRawAmplitude(data, len) / MAX_REPORTABLE_AMP)));
+    public static double getAmplitude(short[] data, int len) {
+        return (MAX_REPORTABLE_DB + 20 * Math.log10(getRawAmplitude(data, len)));
     }
 
     public static class FFT {

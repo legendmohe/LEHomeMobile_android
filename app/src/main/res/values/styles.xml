@@ -42,6 +42,10 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="NoTitleActivity" parent="android:Theme.Translucent">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="SpeechDialog" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
     </style>
