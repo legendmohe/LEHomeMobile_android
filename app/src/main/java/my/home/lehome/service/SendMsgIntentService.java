@@ -56,6 +56,8 @@ public class SendMsgIntentService extends IntentService {
 
     public static final int MSG_END_SENDING = 0;
     public static final int MSG_BEGIN_SENDING = 1;
+    public final static String ACTION_SEND_MSG_BEGIN = "my.home.lehome.receiver.SendMsgIntentService:start";
+    public final static String ACTION_SEND_MSG_END = "my.home.lehome.receiver.SendMsgIntentService:end";
 
     public final static String TAG = "SendMsgIntentService";
 
