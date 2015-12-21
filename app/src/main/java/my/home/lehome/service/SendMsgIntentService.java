@@ -131,16 +131,21 @@ public class SendMsgIntentService extends IntentService {
         item.setState(Constants.CHATITEM_STATE_PENDING);
 
         Log.d(TAG, "enqueue item: \n" + item);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("update", intent.hasExtra("update"));
+        bundle.putParcelable("item", item);
         if (messenger != null) {
-            Bundle bundle = new Bundle();
-            bundle.putBoolean("update", intent.hasExtra("update"));
-            bundle.putParcelable("item", item);
             repMsg.setData(bundle);
             try {
                 messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        } else {
+            Log.d(TAG, "messager is null, send broadcast instead:" + ACTION_SEND_MSG_BEGIN);
+            Intent newIntent = new Intent(ACTION_SEND_MSG_BEGIN);
+            newIntent.putExtras(bundle);
+            sendBroadcast(newIntent);
         }
 
         intent.putExtra("pass_item", item);
@@ -291,18 +296,23 @@ public class SendMsgIntentService extends IntentService {
         }
 
         Log.d(TAG, "dequeue item: " + item);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("item", item);
+        if (newItem != null)
+            bundle.putParcelable("new_item", newItem);
+        bundle.putInt("rep_code", rep_code);
         if (messenger != null) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("item", item);
-            if (newItem != null)
-                bundle.putParcelable("new_item", newItem);
-            bundle.putInt("rep_code", rep_code);
             repMsg.setData(bundle);
             try {
                 messenger.send(repMsg);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        } else {
+            Log.d(TAG, "messager is null, send broadcast instead:" + ACTION_SEND_MSG_END);
+            Intent newIntent = new Intent(ACTION_SEND_MSG_END);
+            newIntent.putExtras(bundle);
+            sendBroadcast(newIntent);
         }
     }
 }
