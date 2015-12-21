@@ -24,6 +24,7 @@ import android.view.WindowManager;
 
 import my.home.lehome.R;
 import my.home.lehome.helper.NFCHelper;
+import my.home.common.util.PrefUtil;
 
 public class WakeupActivity extends Activity {
 
@@ -54,8 +55,10 @@ public class WakeupActivity extends Activity {
             Intent voiceIntent = new Intent(INTENT_VOICE_COMMAND);
             startActivity(voiceIntent);
         } else if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
-            Intent newIntent = NFCHelper.createBroadcastFromNfcIntent(intent);
-            sendBroadcast(newIntent);
+            if (PrefUtil.getbooleanValue(getApplicationContext(), "pref_nfc_cmd_enable", true)) {
+                Intent newIntent = NFCHelper.createBroadcastFromNfcIntent(intent);
+                sendBroadcast(newIntent);
+            }
             finish();
         }
     }
@@ -65,6 +68,6 @@ public class WakeupActivity extends Activity {
         // TODO Auto-generated method stub
         super.onPause();
         Log.d(TAG, "onPause");
-        finish();
+        finish(); // TODO - why finish here not in onResume?
     }
 }
