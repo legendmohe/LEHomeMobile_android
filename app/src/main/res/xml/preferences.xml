@@ -104,6 +104,11 @@
             android:title="@string/pref_volume_key_control_speech"
             android:summary="@string/pref_sum_volume_key_control_speech"
             android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_nfc_cmd_enable"
+            android:title="@string/pref_nfc_cmd_enable"
+            android:summary="@string/pref_sum_nfc_cmd_enable"
+            android:defaultValue="true" />
         <!--<Preference-->
         <!--android:title="@string/pref_homescreen_shortcut"-->
         <!--android:key="homescreen_shortcut" />-->
