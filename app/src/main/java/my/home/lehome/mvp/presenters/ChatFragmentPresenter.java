@@ -56,6 +56,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
     private WeakReference<ChatSuggestionView> mChatSuggestionView;
 
     public static Handler SendMsgHandler;
+    private BgMessageBroadcastReceiver mbgMessageBroadcastReceiver = new BgMessageBroadcastReceiver();
 
     private static class IntentServiceHandler extends Handler {
         private final WeakReference<ChatItemListView> mChatItemListView;
@@ -203,10 +204,17 @@ public class ChatFragmentPresenter extends MVPPresenter {
     @Override
     public void start() {
         BusProvider.getRestBusInstance().register(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_BEGIN);
+        intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_FINISH);
+        Context context = mChatItemListView.get().getContext();
+        context.registerReceiver(mbgMessageBroadcastReceiver, intentFilter);
     }
 
     @Override
     public void stop() {
+        Context context = mChatItemListView.get().getContext();
+        context.unregisterReceiver(mbgMessageBroadcastReceiver);
         BusProvider.getRestBusInstance().unregister(this);
     }
 
@@ -268,5 +276,36 @@ public class ChatFragmentPresenter extends MVPPresenter {
         final String[] location = LocationHelper.parseLocationFromSrc(src);
         CommonUtils.copyStringToClipboard(context, label, location[1]);
     }
-
+    
+    private class BgMessageBroadcastReceiver extends BroadcastReceiver {
+ 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mChatItemListView.get() == null)
+                return;
+                
+            Bundle bundle = intent.getExtras();
+            bundle.setClassLoader(ChatItem.class.getClassLoader());
+            ChatItemListView listView = mChatItemListView.get();
+            ChatItem item;
+            
+            if (intent.getAction().equals(SendMsgIntentService.ACTION_SEND_MSG_BEGIN)) {
+                item = bundle.getParcelable("item");
+                if (bundle.getBoolean("update", false)) {
+                    listView.onChatItemRequest(item, true);
+                } else {
+                    listView.onChatItemRequest(item, false);
+                }
+            } else if (intent.getAction().equals(SendMsgIntentService.ACTION_SEND_MSG_END)) {
+                int rep_code = bundle.getInt("rep_code", -1);
+                item = bundle.getParcelable("item");
+                if (rep_code == 200) {
+                    listView.onChatItemResponse(rep_code, item.getId(), item.getState(), null);
+                } else {
+                    ChatItem newItem = bundle.getParcelable("new_item");
+                    listView.onChatItemResponse(rep_code, item.getId(), item.getState(), newItem);
+                }
+            }
+        }
+    }
 }
