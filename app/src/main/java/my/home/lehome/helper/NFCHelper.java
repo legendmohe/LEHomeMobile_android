@@ -45,4 +45,10 @@ public class NFCHelper {
         NdefRecord aar = NdefRecord.createApplicationRecord(context.getPackageName());
         return new NdefMessage(new NdefRecord[]{textRecord, aar});
     }
+    
+    public static boolean isNfcEnable(Context context) {
+        NfcManager manager = (NfcManager) context.getSystemService(Context.NFC_SERVICE);
+        NfcAdapter adapter = manager.getDefaultAdapter();
+        return adapter != null && adapter.isEnabled();
+    }
 }
