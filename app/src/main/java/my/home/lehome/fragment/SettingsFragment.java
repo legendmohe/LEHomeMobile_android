@@ -136,6 +136,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             subscribeEditTextPreference.setEnabled(false);
             addressEditTextPreference.setEnabled(false);
         }
+        
+        //nfc state
+        CheckBoxPreference nfcCheckBoxPreference = (CheckBoxPreference) findPreference("pref_nfc_cmd_enable");
+        boolean enable_nfc_cmd = sharedPreferences.getBoolean("pref_nfc_cmd_enable", true);
+        nfcCheckBoxPreference.setChecked(enable_nfc_cmd);
 
 
         Intent retIntent = new Intent();
