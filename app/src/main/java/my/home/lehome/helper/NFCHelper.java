@@ -15,28 +15,15 @@
 package my.home.lehome.helper;
 
 import android.content.Context;
-import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.os.Parcelable;
+import android.nfc.NfcManager;
 
 /**
  * Created by legendmohe on 15/12/20.
  */
 public class NFCHelper {
-    public static Intent createBroadcastFromNfcIntent(Intent intent) {
-        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        Intent newIntent = new Intent();
-        newIntent.putExtra(NfcAdapter.EXTRA_NDEF_MESSAGES, rawMsgs);
-        newIntent.putExtra(NfcAdapter.EXTRA_TAG, tag);
-        newIntent.setType(intent.getType());
-        newIntent.addCategory("lehome.nfc");
-        newIntent.setAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        return newIntent;
-    }
 
     public static NdefMessage createMessage(Context context, String content) {
         if (content.length() == 0)

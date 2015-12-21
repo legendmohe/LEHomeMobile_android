@@ -14,8 +14,10 @@
 
 package my.home.lehome.mvp.presenters;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -206,7 +208,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
         BusProvider.getRestBusInstance().register(this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_BEGIN);
-        intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_FINISH);
+        intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_END);
         Context context = mChatItemListView.get().getContext();
         context.registerReceiver(mbgMessageBroadcastReceiver, intentFilter);
     }

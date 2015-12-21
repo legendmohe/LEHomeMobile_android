@@ -40,9 +40,6 @@
     <!-- 【可选】 信鸽SDK所需权限 -->
     <uses-permission android:name="android.permission.BATTERY_STATS"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <!-- Push service 运行需要的权限 -->
@@ -244,17 +241,6 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="XPD9jIjvcrR2DjPMuuyZ3jxF"/>
-
-        <receiver
-            android:name=".receiver.NDEFReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-
-                <category android:name="lehome.nfc"/>
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".activity.NFCDetectActivity"

@@ -178,4 +178,5 @@
     <string name="message_sending">正在发送,点击取消</string>
     <string name="message_sending_success">发送留言成功</string>
     <string name="message_sending_fail">发送留言失败</string>
+    <string name="toast_nfc_feature_disable">本设备不支持NFC或NFC未打开</string>
 </resources>

@@ -17,14 +17,15 @@ package my.home.lehome.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
-import my.home.lehome.R;
-import my.home.lehome.helper.NFCHelper;
 import my.home.common.util.PrefUtil;
+import my.home.lehome.R;
+import my.home.lehome.asynctask.NfcReadNdefAsyncTask;
 
 public class WakeupActivity extends Activity {
 
@@ -56,8 +57,8 @@ public class WakeupActivity extends Activity {
             startActivity(voiceIntent);
         } else if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
             if (PrefUtil.getbooleanValue(getApplicationContext(), "pref_nfc_cmd_enable", true)) {
-                Intent newIntent = NFCHelper.createBroadcastFromNfcIntent(intent);
-                sendBroadcast(newIntent);
+                Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                new NfcReadNdefAsyncTask(getApplicationContext()).execute(tag);
             }
             finish();
         }

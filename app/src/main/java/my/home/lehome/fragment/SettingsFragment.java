@@ -15,6 +15,7 @@
 package my.home.lehome.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import my.home.lehome.R;
 import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
+import my.home.lehome.helper.NFCHelper;
 import my.home.lehome.helper.NetworkHelper;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
@@ -224,6 +226,13 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         } else if (key.equals("pref_loc_me_enable")) {
             CheckBoxPreference silentLocCheckBoxPreference = (CheckBoxPreference) findPreference("pref_loc_me_silent_enable");
             silentLocCheckBoxPreference.setEnabled(sharedPreferences.getBoolean("pref_loc_me_silent_enable", false));
+        } else if (key.equals("pref_nfc_cmd_enable")) {
+            if (sharedPreferences.getBoolean("pref_nfc_cmd_enable", true)) {
+                Context context = getActivity().getApplicationContext();
+                if (!NFCHelper.isNfcEnable(context)) {
+                    Toast.makeText(context, R.string.toast_nfc_feature_disable, Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 }
