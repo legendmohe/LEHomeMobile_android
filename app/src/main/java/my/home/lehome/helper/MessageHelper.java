@@ -186,6 +186,11 @@ public class MessageHelper {
         serviceIntent.putExtra("cmd", msg);
         serviceIntent.putExtra("serverUrl", serverURL);
         serviceIntent.putExtra("deviceID", MessageHelper.getDeviceID(context));
+        
+        if (ChatFragmentPresenter.SendMsgHandler != null) {
+            serviceIntent.putExtra("messenger", new Messenger(ChatFragmentPresenter.SendMsgHandler));
+        }
+        
         context.startService(serviceIntent);
     }
 
