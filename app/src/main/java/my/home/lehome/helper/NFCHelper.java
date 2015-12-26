@@ -18,7 +18,6 @@ import android.content.Context;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.NfcManager;
 
 /**
  * Created by legendmohe on 15/12/20.
@@ -34,8 +33,11 @@ public class NFCHelper {
     }
     
     public static boolean isNfcEnable(Context context) {
-        NfcManager manager = (NfcManager) context.getSystemService(Context.NFC_SERVICE);
-        NfcAdapter adapter = manager.getDefaultAdapter();
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(context);
         return adapter != null && adapter.isEnabled();
+    }
+
+    public static boolean isNfcSupported(Context context) {
+        return NfcAdapter.getDefaultAdapter(context) != null;
     }
 }

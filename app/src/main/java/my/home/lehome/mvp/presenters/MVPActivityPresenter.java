@@ -14,25 +14,27 @@
 
 package my.home.lehome.mvp.presenters;
 
+import android.app.Activity;
+
 /**
  * Created by legendmohe on 15/3/15.
  */
 public abstract class MVPActivityPresenter extends MVPPresenter {
-    public void onActivityStart() {
+    public void onActivityStart(Activity activity) {
     }
 
-    public void onActivityStop() {
+    public void onActivityStop(Activity activity) {
     }
 
-    public void onActivityResume() {
+    public void onActivityResume(Activity activity) {
     }
 
-    public void onActivityPause() {
+    public void onActivityPause(Activity activity) {
     }
 
-    public void onActivityCreate() {
+    public void onActivityCreate(Activity activity) {
     }
 
-    public void onActivityDestory() {
+    public void onActivityDestory(Activity activity) {
     }
 }

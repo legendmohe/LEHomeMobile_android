@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 
         mMainActivityPresenter = new MainActivityPresenter(this);
         mMainActivityPresenter.start();
-        mMainActivityPresenter.onActivityCreate();
+        mMainActivityPresenter.onActivityCreate(this);
     }
 
     @Override
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         mMainActivityPresenter.stop();
-        mMainActivityPresenter.onActivityDestory();
+        mMainActivityPresenter.onActivityDestory(this);
         // recycle navigator icon
         ImageView iconImageView = (ImageView) mNavigationView.findViewById(R.id.nav_profile_icon);
         Drawable drawable = iconImageView.getDrawable();
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         MainActivity.VISIBLE = true;
         if (mMainActivityPresenter != null)
-            mMainActivityPresenter.onActivityResume();
+            mMainActivityPresenter.onActivityResume(this);
 
         if (getIntent() != null && getIntent().getAction().equals(WakeupActivity.INTENT_VOICE_COMMAND)) {
             Window wind = this.getWindow();
@@ -233,13 +234,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-        mMainActivityPresenter.onActivityStart();
+        mMainActivityPresenter.onActivityStart(this);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        mMainActivityPresenter.onActivityStop();
+        mMainActivityPresenter.onActivityStop(this);
         super.onStop();
     }
 
@@ -248,6 +249,10 @@ public class MainActivity extends AppCompatActivity
         super.onNewIntent(intent);
         Log.d(TAG, "onNewIntent: " + intent.getAction());
         setIntent(intent);
+
+        if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
+            mMainActivityPresenter.handleNfcNdefIntent(intent);
+        }
     }
 
     @Override

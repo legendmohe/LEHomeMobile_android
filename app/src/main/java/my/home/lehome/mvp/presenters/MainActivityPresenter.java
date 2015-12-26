@@ -14,6 +14,8 @@
 
 package my.home.lehome.mvp.presenters;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -23,6 +25,9 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -44,8 +49,10 @@ import my.home.common.BusProvider;
 import my.home.common.util.FileUtil;
 import my.home.common.util.PrefUtil;
 import my.home.lehome.activity.MainActivity;
+import my.home.lehome.asynctask.NfcReadNdefAsyncTask;
 import my.home.lehome.helper.LocalMsgHelper;
 import my.home.lehome.helper.MessageHelper;
+import my.home.lehome.helper.NFCHelper;
 import my.home.lehome.helper.PushSDKManager;
 import my.home.lehome.mvp.views.MainActivityView;
 import my.home.lehome.receiver.NetworkStateReceiver;
@@ -62,6 +69,9 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     private WeakReference<MainActivityView> mMainActivityView;
     private Messenger mLocalMsgService = null;
     private boolean mBinded = false;
+    private PendingIntent mPendingIntent;
+    private IntentFilter[] mNfcIntentFiltersArray;
+    private String[][] mTechListsArray;
 
     public MainActivityPresenter(MainActivityView view) {
         this.mMainActivityView = new WeakReference<MainActivityView>(view);
@@ -79,16 +89,19 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     @Override
-    public void onActivityResume() {
-        super.onActivityResume();
+    public void onActivityResume(Activity activity) {
         ImageLoader.getInstance().resume();
         MessageHelper.removeNotification(mMainActivityView.get().getContext());
+
+        if (NFCHelper.isNfcSupported(activity))
+            this.enableNFCForegroundDispatch(activity);
     }
 
     @Override
-    public void onActivityPause() {
-        super.onActivityPause();
+    public void onActivityPause(Activity activity) {
         ImageLoader.getInstance().pause();
+        if (NFCHelper.isNfcSupported(activity))
+            this.disableNFCForegroundDispatch(activity);
     }
 
     private void setupService() {
@@ -266,7 +279,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     }
 
     @Override
-    public void onActivityCreate() {
+    public void onActivityCreate(Activity activity) {
         Context context = mMainActivityView.get().getContext();
         // bind service if needed.
         if (LocalMsgHelper.inLocalWifiNetwork(context) && MessageHelper.isLocalMsgPrefEnable(context)) {
@@ -277,10 +290,13 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         stateIntentFilter.addAction(NetworkStateReceiver.VALUE_INTENT_START_LOCAL_SERVER);
         stateIntentFilter.addAction(NetworkStateReceiver.VALUE_INTENT_STOP_LOCAL_SERVER);
         context.registerReceiver(mLocalMsgStateReceiver, stateIntentFilter);
+
+        if (NFCHelper.isNfcSupported(mMainActivityView.get().getContext()))
+            this.setupNFCForegroundDispatch();
     }
 
     @Override
-    public void onActivityDestory() {
+    public void onActivityDestory(Activity activity) {
         Context context = mMainActivityView.get().getContext();
         // Unbind from the service
         if (mBinded) {
@@ -289,6 +305,38 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         }
 
         context.unregisterReceiver(mLocalMsgStateReceiver);
+    }
+
+    private void setupNFCForegroundDispatch() {
+        Context context = mMainActivityView.get().getContext();
+        mPendingIntent = PendingIntent.getActivity(
+                context, 0, new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        try {
+            ndef.addDataType("text/plain");    /* Handles all MIME based dispatches.
+                                            You should specify only the ones that you need. */
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            throw new RuntimeException("fail", e);
+        }
+        mNfcIntentFiltersArray = new IntentFilter[]{ndef,};
+        mTechListsArray = new String[][]{new String[]{Ndef.class.getName()}};
+    }
+
+    public void enableNFCForegroundDispatch(Activity activity) {
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(activity);
+        adapter.enableForegroundDispatch(activity, mPendingIntent, mNfcIntentFiltersArray, mTechListsArray);
+    }
+
+    public void disableNFCForegroundDispatch(Activity activity) {
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(activity);
+        adapter.disableForegroundDispatch(activity);
+    }
+
+    public void handleNfcNdefIntent(Intent intent) {
+        if (mMainActivityView.get() != null) {
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            new NfcReadNdefAsyncTask(mMainActivityView.get().getContext()).execute(tag);
+        }
     }
 
     private final BroadcastReceiver mLocalMsgStateReceiver = new BroadcastReceiver() {
@@ -360,4 +408,6 @@ public class MainActivityPresenter extends MVPActivityPresenter {
             mMainActivityView.get().changeNavHeaderBgImage(uri);
         }
     }
+
+
 }
