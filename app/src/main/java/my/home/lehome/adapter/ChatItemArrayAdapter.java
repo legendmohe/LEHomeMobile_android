@@ -68,7 +68,6 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
 
     @Override
     public void add(ChatItem object) {
-        Log.d(TAG, object.getContent() + " | " + object.getState() + " | " + object.getId());
         super.add(object);
     }
 

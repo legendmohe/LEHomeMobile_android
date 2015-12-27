@@ -43,4 +43,13 @@ public class CommonUtils {
         SimpleDateFormat df = new SimpleDateFormat(format, Locale.getDefault()); //called without pattern
         return df.format(c.getTime());
     }
+
+    public static String concatenateStrings(String[] targets) {
+        StringBuilder sb = new StringBuilder();
+        for (String target :
+                targets) {
+            sb.append(target);
+        }
+        return sb.toString();
+    }
 }

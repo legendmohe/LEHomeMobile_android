@@ -156,6 +156,7 @@ public class SendMsgIntentService extends IntentService {
         String servelURL = intent.getStringExtra("serverUrl");
         String deviceID = intent.getStringExtra("deviceID");
         boolean local = intent.getBooleanExtra("local", false);
+        Log.d(TAG, "dispatch cmd:" + cmd + " | servelURL:" + servelURL + " | deviceID:" + deviceID + " | local:" + local);
 
         final Context context = getApplicationContext();
         if (local) {

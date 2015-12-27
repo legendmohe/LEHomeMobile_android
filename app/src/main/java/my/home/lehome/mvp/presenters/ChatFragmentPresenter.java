@@ -119,7 +119,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
         String message;
         String serverURL;
         if (local) {
-            message = MessageHelper.getFormatLocalMessage(input);
+            message = MessageHelper.getFormatLocalMessage(context, input);
             serverURL = MessageHelper.getLocalServerURL(mChatItemListView.get().getContext());
         } else {
             message = MessageHelper.getFormatMessage(context, input);
@@ -144,7 +144,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
         String message;
         String serverURL;
         if (local) {
-            message = MessageHelper.getFormatLocalMessage(chatItem.getContent());
+            message = MessageHelper.getFormatLocalMessage(context, chatItem.getContent());
             serverURL = MessageHelper.getLocalServerURL(mChatItemListView.get().getContext());
         } else {
             message = MessageHelper.getFormatMessage(context, chatItem.getContent());

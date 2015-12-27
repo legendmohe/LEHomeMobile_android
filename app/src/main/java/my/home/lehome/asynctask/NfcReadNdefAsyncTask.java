@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import my.home.lehome.R;
@@ -34,7 +35,7 @@ import my.home.lehome.helper.MessageHelper;
 /**
  * Created by legendmohe on 15/12/20.
  */
-public class NfcReadNdefAsyncTask extends AsyncTask<Tag, Void, String> {
+public class NfcReadNdefAsyncTask extends AsyncTask<Tag, Void, ArrayList<String>> {
 
     private static final String TAG = "NfcReadNdefAsyncTask";
 
@@ -45,7 +46,7 @@ public class NfcReadNdefAsyncTask extends AsyncTask<Tag, Void, String> {
     }
 
     @Override
-    protected String doInBackground(Tag... params) {
+    protected ArrayList<String> doInBackground(Tag... params) {
         Tag tag = params[0];
 
         Ndef ndef = Ndef.get(tag);
@@ -54,20 +55,20 @@ public class NfcReadNdefAsyncTask extends AsyncTask<Tag, Void, String> {
             return null;
         }
 
+        ArrayList<String> results = new ArrayList<>();
         NdefMessage ndefMessage = ndef.getCachedNdefMessage();
-
         NdefRecord[] records = ndefMessage.getRecords();
         for (NdefRecord ndefRecord : records) {
             if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
                 try {
-                    return readText(ndefRecord);
+                    results.add(readText(ndefRecord));
                 } catch (UnsupportedEncodingException e) {
                     Log.e(TAG, "Unsupported Encoding", e);
                 }
             }
         }
 
-        return null;
+        return results;
     }
 
     private String readText(NdefRecord record) throws UnsupportedEncodingException {
@@ -97,14 +98,16 @@ public class NfcReadNdefAsyncTask extends AsyncTask<Tag, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        if (result != null) {
-            Log.d(TAG, "resolve text from tag:" + result);
+    protected void onPostExecute(ArrayList<String> results) {
+        if (results != null && results.size() != 0) {
+            Log.d(TAG, "resolve text from tag:" + results);
             if (mContext.get() != null) {
-                Toast.makeText(mContext.get(),
-                        mContext.get().getString(R.string.com_exec) + ":" + result,
-                        Toast.LENGTH_SHORT).show();
-                MessageHelper.sendMsgToServer(mContext.get(), result);
+                for (String cmd : results) {
+                    Toast.makeText(mContext.get(),
+                            mContext.get().getString(R.string.com_exec) + ":" + cmd,
+                            Toast.LENGTH_SHORT).show();
+                    MessageHelper.sendMsgToServer(mContext.get(), cmd);
+                }
             }
         }
     }

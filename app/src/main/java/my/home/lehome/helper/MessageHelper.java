@@ -51,8 +51,8 @@ public class MessageHelper {
 
     private static final int maxNotiLen = 140;
     private static int unreadMsgCount = 0;
-    public static String MESSAGE_BEGIN = "";
-    public static String MESSAGE_END = "";
+    private static String MESSAGE_BEGIN = null;
+    private static String MESSAGE_END = null;
     public static boolean inNormalState = true;
 
     public final static int NOTIFICATION_ID = 1;
@@ -73,8 +73,8 @@ public class MessageHelper {
                 MESSAGE_END = CommonUtils.removeLastChar(MESSAGE_END);
             }
         } else {
-            MESSAGE_BEGIN = "";
-            MESSAGE_END = "";
+            MESSAGE_BEGIN = null;
+            MESSAGE_END = null;
         }
     }
 
@@ -82,18 +82,26 @@ public class MessageHelper {
         if (!inNormalState) {
             return "*" + content;
         }
-        content = MESSAGE_BEGIN + content + MESSAGE_END;
+        if (MESSAGE_BEGIN == null || MESSAGE_END == null) {
+            loadPref(context);
+        }
+        String[] parts = {MESSAGE_BEGIN, content, MESSAGE_END};
+        content = CommonUtils.concatenateStrings(parts);
         if (!needCorrect(context)) {
             content = "*" + content;
         }
         return content;
     }
 
-    public static String getFormatLocalMessage(String content) {
+    public static String getFormatLocalMessage(Context context, String content) {
         if (!inNormalState) {
             return content;
         }
-        content = MESSAGE_BEGIN + content + MESSAGE_END;
+        if (MESSAGE_BEGIN == null || MESSAGE_END == null) {
+            loadPref(context);
+        }
+        String[] parts = {MESSAGE_BEGIN, content, MESSAGE_END};
+        content = CommonUtils.concatenateStrings(parts);
         return content;
     }
 
@@ -173,7 +181,7 @@ public class MessageHelper {
         boolean isLocal = MessageHelper.isLocalMsgPrefEnable(context)
                 && LocalMsgHelper.inLocalWifiNetwork(context);
         if (isLocal) {
-            message = autoFill ? MessageHelper.getFormatLocalMessage(msg) : msg;
+            message = autoFill ? MessageHelper.getFormatLocalMessage(context, msg) : msg;
             serverURL = MessageHelper.getLocalServerURL(context);
         } else {
             message = autoFill ? MessageHelper.getFormatMessage(context, msg) : msg;
