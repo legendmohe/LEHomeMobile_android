@@ -18,6 +18,8 @@ import android.content.Context;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -44,6 +46,43 @@ public class NFCHelper {
         return NfcAdapter.getDefaultAdapter(context) != null;
     }
 
+    public static boolean writableTag(Tag tag) {
+        try {
+            Ndef ndef = Ndef.get(tag);
+            if (ndef != null) {
+                ndef.connect();
+                if (!ndef.isWritable()) {
+                    ndef.close();
+                    return false;
+                }
+                ndef.close();
+                return true;
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    public static boolean supportedTechs(String[] techs) {
+        boolean ultralight = false;
+        boolean nfcA = false;
+        boolean ndef = false;
+        for (String tech : techs) {
+            if (tech.equals("android.nfc.tech.MifareUltralight")) {
+                ultralight = true;
+            } else if (tech.equals("android.nfc.tech.NfcA")) {
+                nfcA = true;
+            } else if (tech.equals("android.nfc.tech.Ndef") || tech.equals("android.nfc.tech.NdefFormatable")) {
+                ndef = true;
+            }
+        }
+        if (ultralight && nfcA && ndef) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static NdefRecord createTextRecord(String payload, Locale locale, boolean encodeInUtf8) {
         byte[] langBytes = locale.getLanguage().getBytes(Charset.forName("US-ASCII"));
         Charset utfEncoding = encodeInUtf8 ? Charset.forName("UTF-8") : Charset.forName("UTF-16");
@@ -57,5 +96,23 @@ public class NFCHelper {
         NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,
                 NdefRecord.RTD_TEXT, new byte[0], data);
         return record;
+    }
+
+    public static class WriteResponse {
+        int status;
+        String message;
+
+        public WriteResponse(int Status, String Message) {
+            this.status = Status;
+            this.message = Message;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

@@ -21,4 +21,7 @@
         android:id="@+id/copy_shortcut_item"
         android:showAsAction="withText|ifRoom"
         android:title="@string/copy_shortcut_item" />
+    <item
+        android:id="@+id/write_to_nfc_item"
+        android:title="@string/write_to_nfc_item"/>
 </menu>

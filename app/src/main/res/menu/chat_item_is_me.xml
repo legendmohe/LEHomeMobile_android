@@ -26,5 +26,7 @@
     <item
         android:id="@+id/resend_item"
         android:title="@string/com_resend" />
-
+    <item
+        android:id="@+id/write_to_nfc_item"
+        android:title="@string/write_to_nfc_item"/>
 </menu>

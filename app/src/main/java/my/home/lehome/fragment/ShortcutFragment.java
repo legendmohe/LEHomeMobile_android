@@ -19,6 +19,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.ContextMenu;
@@ -35,6 +36,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import my.home.lehome.R;
+import my.home.lehome.activity.NFCDetectDialog;
 import my.home.lehome.adapter.ShortcutArrayAdapter;
 import my.home.lehome.helper.MessageHelper;
 import my.home.model.entities.Shortcut;
@@ -87,18 +89,22 @@ public class ShortcutFragment extends ListFragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        String selectedString = adapter.getItem(info.position).getContent();
+        Shortcut shortcut = adapter.getItem(info.position);
         switch (item.getItemId()) {
             case R.id.delete_shortcut_item:
-                Shortcut shortcut = adapter.getItem(info.position);
                 adapter.remove(shortcut);
                 adapter.notifyDataSetChanged();
                 DBStaticManager.deleteShortcut(this.getActivity(), shortcut.getId());
                 return true;
             case R.id.copy_shortcut_item:
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText(getString(R.string.app_name), selectedString);
+                ClipData clip = ClipData.newPlainText(getString(R.string.app_name), shortcut.getContent());
                 clipboard.setPrimaryClip(clip);
+                return true;
+            case R.id.write_to_nfc_item:
+                Intent nfcIntent = new Intent(getActivity(), NFCDetectDialog.class);
+                nfcIntent.putExtra(NFCDetectDialog.EXTRA_TEXT_CONTENT, shortcut.getContent());
+                startActivity(nfcIntent);
                 return true;
             default:
                 return super.onContextItemSelected(item);

@@ -12,18 +12,18 @@
  * limitations under the License.
  */
 
-package my.home.lehome.activity;
+package my.home.lehome.mvp.views;
 
-import android.app.Activity;
-import android.os.Bundle;
+/**
+ * Created by legendmohe on 15/12/28.
+ */
+public interface NFCDetectView extends MVPView {
 
-import my.home.lehome.R;
+    void onViewStateChange(State state);
 
-public class NFCDetectActivity extends Activity {
+    String getTargetContent();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nfcdetect);
+    enum State {
+        DETECTING, WRITING, SUCCESS, FAIL
     }
 }

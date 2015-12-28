@@ -75,6 +75,7 @@ import my.home.common.util.ComUtil;
 import my.home.common.util.UIUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
+import my.home.lehome.activity.NFCDetectDialog;
 import my.home.lehome.adapter.AutoCompleteAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter;
 import my.home.lehome.adapter.ChatItemArrayAdapter.ResendButtonClickListener;
@@ -793,6 +794,10 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             case R.id.action_photo_extra_intent:
                 mChatFragmentPresenter.openLocationInBrowser(mAdapter.getItem(info.position));
                 return true;
+            case R.id.write_to_nfc_item:
+                Intent nfcIntent = new Intent(getActivity(), NFCDetectDialog.class);
+                nfcIntent.putExtra(NFCDetectDialog.EXTRA_TEXT_CONTENT, selectedString);
+                startActivity(nfcIntent);
             default:
                 return super.onContextItemSelected(item);
         }

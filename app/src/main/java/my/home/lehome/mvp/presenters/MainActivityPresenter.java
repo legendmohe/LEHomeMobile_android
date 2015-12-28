@@ -74,7 +74,7 @@ public class MainActivityPresenter extends MVPActivityPresenter {
     private String[][] mTechListsArray;
 
     public MainActivityPresenter(MainActivityView view) {
-        this.mMainActivityView = new WeakReference<MainActivityView>(view);
+        this.mMainActivityView = new WeakReference<>(view);
     }
 
     @Override
