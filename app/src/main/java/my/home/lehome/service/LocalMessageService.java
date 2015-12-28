@@ -14,7 +14,9 @@
 
 package my.home.lehome.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,6 +36,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import my.home.lehome.R;
+import my.home.lehome.activity.MainActivity;
 import my.home.lehome.receiver.LocalMessageReceiver;
 import my.home.lehome.receiver.ScreenStateReceiver;
 import zmq.ZError;
@@ -51,6 +54,7 @@ public class LocalMessageService extends Service {
 //    public static final int MSG_SEND_CMD = 4;
 
     public static final int MSG_SERVER_RECEIVE_MSG = 0;
+    private static final int ONGOING_NOTIFICATION_ID = 9000;
 
     private String mServiceAddress = "";
     private ScreenStateReceiver mScreenStateReceiver;
@@ -125,6 +129,18 @@ public class LocalMessageService extends Service {
             mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
             mWakeLock.acquire();
         }
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker(getText(R.string.foreground_local_msg_service_ticker))
+                        //        .setWhen(System.currentTimeMillis())
+                .setContentTitle(getText(R.string.foreground_local_msg_service_title))
+                .setContentText(getText(R.string.foreground_local_msg_service_message))
+                .setContentIntent(pendingIntent);
+        Notification notification = builder.build();
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
 
     @Override
@@ -141,6 +157,8 @@ public class LocalMessageService extends Service {
 
     @Override
     public void onDestroy() {
+        stopForeground(true);
+
         if (mSubThread != null) {
             mSubRunnable.setGoingStop(true);
             if (!mSubThread.isInterrupted()) {

@@ -179,4 +179,7 @@
     <string name="message_sending_success">发送留言成功</string>
     <string name="message_sending_fail">发送留言失败</string>
     <string name="toast_nfc_feature_disable">本设备不支持NFC或NFC未打开</string>
+    <string name="foreground_local_msg_service_title">LEHome本地消息服务</string>
+    <string name="foreground_local_msg_service_message">正在运行...</string>
+    <string name="foreground_local_msg_service_ticker">本地消息服务开启</string>
 </resources>
