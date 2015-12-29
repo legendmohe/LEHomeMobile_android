@@ -22,7 +22,7 @@ import java.util.HashMap;
  */
 public abstract class State {
 
-    HashMap<Integer, State> mToStates = new HashMap<>();
+    HashMap<Enum<?>, State> mToStates = new HashMap<>();
     private StateMachine mStateMachine;
 
     @SuppressWarnings("unused")
@@ -32,7 +32,7 @@ public abstract class State {
         mName = name;
     }
 
-    public void linkTo(State toState, int event) {
+    public void linkTo(State toState, Enum<?> event) {
         if (toState == null) {
             throw new IllegalArgumentException("toState cannot be null");
         }
@@ -48,13 +48,13 @@ public abstract class State {
     public void onReset(int cause) {
     }
 
-    public void onUnhandleEvent(int event, Object data) {
+    public void onUnhandleEvent(Enum<?> event, Object data) {
     }
 
-    public void onEnter(State fromState, int event, Object data) {
+    public void onEnter(State fromState, Enum<?> event, Object data) {
     }
 
-    public void onLeave(State toState, int event, Object data) {
+    public void onLeave(State toState, Enum<?> event, Object data) {
     }
 
     protected StateMachine getStateMachine() {
