@@ -77,11 +77,11 @@ public class StateMachine {
         }
     }
 
-    public void postEvent(int event) {
+    public void postEvent(Enum<?> event) {
         postEvent(event, null);
     }
     
-    public void postEvent(final int event, final Object data) {
+    public void postEvent(final Enum<?> event, final Object data) {
         if (mHandler == null) {
             return;
         }
@@ -107,8 +107,8 @@ public class StateMachine {
             return false;
         }
         synchronized (this) {
-            HashMap<Integer, State> states = mCurrentState.mToStates;
-            for (Integer event : states.keySet()) {
+            HashMap<Enum<?>, State> states = mCurrentState.mToStates;
+            for (Enum<?> event : states.keySet()) {
                 if (states.get(event).equals(toState)) {
                     return true;
                 }
@@ -117,7 +117,7 @@ public class StateMachine {
         }
     }
 
-    public boolean canAccept(int event) {
+    public boolean canAccept(Enum<?> event) {
         synchronized (this) {
             return mCurrentState.mToStates.containsKey(event);
         }
