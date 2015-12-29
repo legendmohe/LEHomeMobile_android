@@ -66,10 +66,10 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
         mStateMachine.addState(idleState);
         mStateMachine.addState(sendingState);
 
-        idleState.linkTo(sendingState, Event.START.getValue());
-        sendingState.linkTo(idleState, Event.FINISH.getValue());
-        sendingState.linkTo(idleState, Event.CANCEL.getValue());
-        sendingState.linkTo(idleState, Event.ERROR.getValue());
+        idleState.linkTo(sendingState, Event.START);
+        sendingState.linkTo(idleState, Event.FINISH);
+        sendingState.linkTo(idleState, Event.CANCEL);
+        sendingState.linkTo(idleState, Event.ERROR);
 
         mStateMachine.setInitState(idleState);
         mStateMachine.start();
@@ -92,14 +92,14 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
 
     @Override
     public void cancel(File file) {
-        mStateMachine.postEvent(Event.CANCEL.getValue());
+        mStateMachine.postEvent(Event.CANCEL);
     }
 
     @Override
     public void execute() {
         Log.d(TAG, "execute " + mEvent + " in state " + mStateMachine.getCurrentState());
         if (mEvent != null)
-            mStateMachine.postEvent(mEvent.getValue());
+            mStateMachine.postEvent(mEvent);
     }
 
     private class IdleState extends State {
@@ -109,9 +109,9 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass() == SendingState.class) {
-                if (event == Event.FINISH.getValue()) {
+                if (event == Event.FINISH) {
                     DomainUtil.runOnMainThread(new Runnable() {
                         @Override
                         public void run() {
@@ -121,8 +121,8 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
                             ));
                         }
                     });
-                } else if (event == Event.CANCEL.getValue()
-                        || event == Event.ERROR.getValue()) {
+                } else if (event == Event.CANCEL
+                        || event == Event.ERROR) {
                     mRequestQueue.cancelAll(mTargetFile.getAbsolutePath());
                     DomainUtil.runOnMainThread(new Runnable() {
                         @Override
@@ -147,9 +147,9 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass() == IdleState.class) {
-                if (event == Event.START.getValue()) {
+                if (event == Event.START) {
                     StringRequest stringRequest = getSendingRequest(mHomeId, mTargetFile);
                     mRequestQueue.add(stringRequest);
 
@@ -168,7 +168,7 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }
-                    mStateMachine.postEvent(Event.FINISH.getValue());
+                    mStateMachine.postEvent(Event.FINISH);
                 }
             }
         }
@@ -186,14 +186,14 @@ public class SendMsgUsecaseImpl implements SendMsgUsecase {
                         public void onResponse(String response) {
                             Log.d(TAG, "onResponse: " + response);
                             if (response.equals("ok")) {
-                                mStateMachine.postEvent(Event.FINISH.getValue());
+                                mStateMachine.postEvent(Event.FINISH);
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse: " + error);
-                    mStateMachine.postEvent(Event.ERROR.getValue());
+                    mStateMachine.postEvent(Event.ERROR);
                 }
             }
             ) {

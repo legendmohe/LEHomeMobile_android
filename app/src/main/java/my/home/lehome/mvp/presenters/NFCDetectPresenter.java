@@ -46,9 +46,10 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
     private String[][] mTechListsArray;
 
     private StateMachine mStateMachine;
-    private final static int EVENT_FOUND = 1;
-    private final static int EVENT_WRITED = 2;
-    private final static int EVENT_CANCEL = 3;
+
+    enum EVENT {
+        FOUND, WRITED, CANCEL
+    }
 
     public NFCDetectPresenter(NFCDetectView view) {
         this.mNFCDetectView = new WeakReference<>(view);
@@ -56,9 +57,9 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         DetectingState detectingState = new DetectingState();
         WritingState writingState = new WritingState();
         FinishedState finishedState = new FinishedState();
-        detectingState.linkTo(writingState, EVENT_FOUND);
-        detectingState.linkTo(finishedState, EVENT_CANCEL);
-        writingState.linkTo(finishedState, EVENT_WRITED);
+        detectingState.linkTo(writingState, EVENT.FOUND);
+        detectingState.linkTo(finishedState, EVENT.CANCEL);
+        writingState.linkTo(finishedState, EVENT.WRITED);
 
         mStateMachine.addState(writingState);
         mStateMachine.addState(finishedState);
@@ -202,7 +203,7 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass().equals(DetectingState.class)) {
 
             }
@@ -216,12 +217,8 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
         }
-    }
-
-    public enum Result {
-        CANCELED, SUCCESS, UNWRITABLE, UNSUPPORTED, READONLY, OVERSIZE, EXCEPTION
     }
 
 }

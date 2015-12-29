@@ -58,7 +58,7 @@ public class RecordMsgUsecaseImpl implements
 
     private StateMachine mStateMachine = new StateMachine();
     private Event mEvent;
-    private int mLastEvent;
+    private Enum<?> mLastEvent;
     private String mSaveFilePrefix;
     private static SimpleDateFormat gDateFormat = new SimpleDateFormat("yy年M月d日H时m分s秒", Locale.CHINA);
 
@@ -70,9 +70,9 @@ public class RecordMsgUsecaseImpl implements
         IdleState idleState = new IdleState();
         RecordingState recordingState = new RecordingState();
 
-        idleState.linkTo(recordingState, Event.START.getValue());
-        recordingState.linkTo(idleState, Event.CANCEL.getValue());
-        recordingState.linkTo(idleState, Event.STOP.getValue());
+        idleState.linkTo(recordingState, Event.START);
+        recordingState.linkTo(idleState, Event.CANCEL);
+        recordingState.linkTo(idleState, Event.STOP);
 
         mStateMachine.addState(idleState);
         mStateMachine.addState(recordingState);
@@ -126,7 +126,7 @@ public class RecordMsgUsecaseImpl implements
     @Override
     public void execute() {
         if (mEvent != null) {
-            mStateMachine.postEvent(mEvent.getValue());
+            mStateMachine.postEvent(mEvent);
         }
     }
 
@@ -176,7 +176,7 @@ public class RecordMsgUsecaseImpl implements
     @Override
     public void onProcessSpeexFinish(List<byte[]> data) {
         File resultFile = null;
-        if (mLastEvent == Event.STOP.getValue()) {
+        if (mLastEvent == Event.STOP) {
             resultFile = writeRawDataToFile(data);
         }
         postResult(resultFile);
@@ -219,9 +219,9 @@ public class RecordMsgUsecaseImpl implements
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass() == RecordingState.class) {
-                if (event == Event.CANCEL.getValue() || event == Event.STOP.getValue()) {
+                if (event == Event.CANCEL || event == Event.STOP) {
                     mLastEvent = event;
                     stopRecording();
                 }
@@ -236,9 +236,9 @@ public class RecordMsgUsecaseImpl implements
         }
 
         @Override
-        public void onEnter(State fromState, int event, Object data) {
+        public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass() == IdleState.class) {
-                if (event == Event.START.getValue()) {
+                if (event == Event.START) {
                     startRecording();
                 }
             }

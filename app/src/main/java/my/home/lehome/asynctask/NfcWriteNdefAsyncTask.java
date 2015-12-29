@@ -16,17 +16,17 @@ package my.home.lehome.asynctask;
 
 
 import android.content.Context;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import java.lang.ref.WeakReference;
+
+import my.home.common.StateMachine;
 
 /**
  * Created by legendmohe on 15/12/29.
  */
-public class NfcWriteNdefAsyncTask extends AsyncTask<String, Void, Result> {
+public class NfcWriteNdefAsyncTask extends AsyncTask<String, Void, NfcWriteNdefAsyncTask.Result> {
 
     private static final String TAG = "NfcWriteNdefAsyncTask";
 
@@ -35,18 +35,22 @@ public class NfcWriteNdefAsyncTask extends AsyncTask<String, Void, Result> {
     private Tag mTag;
 
     public NfcWriteNdefAsyncTask(Context context, StateMachine statemachine, Tag tag) {
-        mContext = new WeakReference<Context>(context);
+        mContext = new WeakReference<>(context);
         mStateMachine = statemachine;
         mTag = tag;
     }
 
     @Override
     protected Result doInBackground(String... params) {
-
+        return null;
     }
 
     @Override
     protected void onPostExecute(Result result) {
         
+    }
+
+    public enum Result {
+        CANCELED, SUCCESS, UNWRITABLE, UNSUPPORTED, READONLY, OVERSIZE, EXCEPTION
     }
 }
