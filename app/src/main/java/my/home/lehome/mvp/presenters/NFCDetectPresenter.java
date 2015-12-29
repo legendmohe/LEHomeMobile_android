@@ -99,11 +99,6 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         mPendingIntent = PendingIntent.getActivity(
                 context, 0, new Intent(context, activity.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         IntentFilter techTag = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        try {
-            techTag.addDataType("text/plain");
-        } catch (IntentFilter.MalformedMimeTypeException e) {
-            throw new RuntimeException("fail", e);
-        }
         mNfcIntentFiltersArray = new IntentFilter[]{techTag,};
         mTechListsArray = new String[][]{new String[]{Ndef.class.getName()}};
     }
@@ -146,6 +141,7 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         }
     }
 
+    // TODO 用asynctask代替(直接传入statemachine),WriteResponse删掉，用result enum
     public WriteResponse writeTag(NdefMessage message, Tag tag) {
         int size = message.toByteArray().length;
         String mess = "";
@@ -225,7 +221,7 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
     }
 
     public enum Result {
-        CANCELED, SUCCESS, FAIL
+        CANCELED, SUCCESS, UNWRITABLE, UNSUPPORTED, READONLY, OVERSIZE, EXCEPTION
     }
 
 }
