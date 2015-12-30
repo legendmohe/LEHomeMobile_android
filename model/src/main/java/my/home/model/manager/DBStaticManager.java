@@ -150,6 +150,10 @@ public class DBStaticManager {
                 .list();
     }
 
+    public static void deleteAllHistoryItems(Context context) {
+        getDaoSession(context).getHistoryItemDao().deleteAll();
+    }
+
     public static void addMsgHistoryItem(Context context, MsgHistoryItem item) {
         QueryBuilder<MsgHistoryItem> queryBuilder = getDaoSession(context).getMsgHistoryItemDao().queryBuilder();
         List<MsgHistoryItem> oldItems = queryBuilder
@@ -172,6 +176,10 @@ public class DBStaticManager {
                 .orderDesc(MsgHistoryItemDao.Properties.Id)
                 .limit(limit)
                 .list();
+    }
+
+    public static void deleteAllMsgHistoryItems(Context context) {
+        getDaoSession(context).getMsgHistoryItemDao().deleteAll();
     }
 
     public static void addMessageItem(Context context, MessageItem item) {

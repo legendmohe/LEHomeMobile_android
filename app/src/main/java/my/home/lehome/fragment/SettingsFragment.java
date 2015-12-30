@@ -26,6 +26,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.widget.Toast;
 
+import my.home.domain.usecase.DeleteAutoCompleteHistoryUsecaseImpl;
 import my.home.lehome.R;
 import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
 import my.home.lehome.helper.NFCHelper;
@@ -56,6 +57,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             beginEditTextPreference.setEnabled(false);
             endEditTextPreference.setEnabled(false);
         }
+        boolean is_autocomplete = sharedPreferences.getBoolean("pref_cmd_autocomplete", true);
+        ((CheckBoxPreference) findPreference("pref_cmd_autocomplete")).setChecked(is_autocomplete);
+
         boolean is_currect = sharedPreferences.getBoolean("pref_cmd_need_correct", true);
         ((CheckBoxPreference) findPreference("pref_cmd_need_correct")).setChecked(is_currect);
 
@@ -111,6 +115,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             public boolean onPreferenceClick(Preference arg0) {
                 String ipString = NetworkHelper.getIPAddress(true);
                 Toast.makeText(getActivity(), getResources().getString(R.string.pref_local_ip_item) + ":" + ipString, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        button = findPreference("pref_delete_autocomplete_history");
+        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new DeleteAutoCompleteHistoryUsecaseImpl(getActivity()).execute();
+                Toast.makeText(getActivity(), getResources().getString(R.string.pref_delete_autocomplete_history_toast), Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -233,6 +246,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                     Toast.makeText(context, R.string.toast_nfc_feature_disable, Toast.LENGTH_SHORT).show();
                 }
             }
+        } else if (key.equals("pref_cmd_autocomplete")) {
+            Toast.makeText(getActivity(), R.string.pref_cmd_autocomplete_set, Toast.LENGTH_SHORT).show();
         }
     }
 }

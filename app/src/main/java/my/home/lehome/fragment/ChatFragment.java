@@ -72,6 +72,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import my.home.common.util.ComUtil;
+import my.home.common.util.PrefUtil;
 import my.home.common.util.UIUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
@@ -612,11 +613,15 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().trim().length() == 0) {
-                    onShowSuggestion(null);
+                    if (mSendCmdEdittext.isAutoCompleteEnable()) {
+                        onShowSuggestion(null);
+                    }
                     mSendCmdEdittext.setCanShowDropdown(false);
                 }
             }
         });
+
+        mSendCmdEdittext.setAutoCompleteEnable(PrefUtil.getbooleanValue(getActivity(), "pref_cmd_autocomplete", true));
 
         mKeyboardListener = (new OnGlobalLayoutListener() {
             @Override

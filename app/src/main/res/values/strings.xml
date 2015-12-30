@@ -43,7 +43,7 @@
     <string name="pref_message_begin">命令头</string>
     <string name="pref_message_end">命令尾</string>
     <string name="pref_speech_cmd_need_confirm">语音命令后弹出确认窗口</string>
-    <string name="pref_cmd_need_correct">开启模糊命令</string>
+    <string name="pref_cmd_need_correct">模糊命令</string>
     <string name="pref_homescreen_shortcut">添加到homescreen</string>
     <string name="pref_auto_connect_sco">使用蓝牙耳机</string>
     <string name="pref_others_profile">其他功能</string>
@@ -190,4 +190,8 @@
     <string name="nfc_detecting">正在检测</string>
     <string name="nfc_close_dialog">关闭</string>
     <string name="nfc_empty_content">无写入内容</string>
+    <string name="pref_cmd_autocomplete">自动补全</string>
+    <string name="pref_cmd_autocomplete_set">重启应用生效</string>
+    <string name="pref_delete_autocomplete_history">删除输入历史</string>
+    <string name="pref_delete_autocomplete_history_toast">已清空输入历史</string>
 </resources>

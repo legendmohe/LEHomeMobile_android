@@ -29,6 +29,10 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_message_profile">
         <CheckBoxPreference
+            android:key="pref_cmd_autocomplete"
+            android:title="@string/pref_cmd_autocomplete"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
             android:key="pref_cmd_need_correct"
             android:title="@string/pref_cmd_need_correct"
             android:defaultValue="true" />
@@ -74,6 +78,9 @@
             android:key="pref_local_msg_subscribe_address" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
+        <Preference
+            android:title="@string/pref_delete_autocomplete_history"
+            android:key="pref_delete_autocomplete_history"/>
         <CheckBoxPreference
             android:key="pref_loc_me_enable"
             android:title="@string/pref_loc_me_enable"
