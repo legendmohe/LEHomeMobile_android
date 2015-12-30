@@ -72,7 +72,7 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
     }
 
     private static final int HISTORY_ITEM_MAX_NUM = 25;
-    private static final int MAX_MSG_HISTORY_NUM = 30;
+    private static final int MAX_MSG_HISTORY_NUM = 15;
 
     private static class SingletonHolder {
         private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();
