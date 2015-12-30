@@ -71,8 +71,8 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
         };
     }
 
-    private static final int HISTORY_ITEM_MAX_NUM = 25;
-    private static final int MAX_MSG_HISTORY_NUM = 15;
+    private static final int HISTORY_ITEM_MAX_NUM = 15;
+    private static final int MAX_MSG_HISTORY_NUM = 10;
 
     private static class SingletonHolder {
         private static final AutoCompleteItemDataSourceImpl INSTANCE = new AutoCompleteItemDataSourceImpl();
@@ -443,13 +443,13 @@ public class AutoCompleteItemDataSourceImpl implements AutoCompleteItemDataSourc
             String key = cItem.getFrom() + cItem.getTo();
             // pos weight
             float pos_w = (i + 1) * 1.0f / hLen;
-//            pos_w = pos_w * pos_w;
+            pos_w = pos_w * pos_w;
             // occ weight
             float occ_w = counter.get(key) * 1.0f / hLen;
             // ctu weight
             float ctu_w = 0.0f;
             if (lastValue.equals(key)) {
-                ctu_w = lastWeight / 8;
+                ctu_w = lastWeight / 2;
             }
             lastWeight = pos_w + occ_w + ctu_w;
             lastValue = key;
