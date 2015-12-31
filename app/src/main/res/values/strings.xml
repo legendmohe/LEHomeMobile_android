@@ -183,7 +183,7 @@
     <string name="foreground_local_msg_service_message">正在运行…</string>
     <string name="foreground_local_msg_service_ticker">本地消息服务开启</string>
     <string name="write_to_nfc_item">写入到NFC标签</string>
-    <string name="nfc_detecting_tag">靠近一个标签…</string>
+    <string name="nfc_detecting_tag">靠近一个标签</string>
     <string name="nfc_write_fail">写入失败</string>
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_writing">正在写入</string>

@@ -23,21 +23,20 @@ import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
+import android.util.Log;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import my.home.common.State;
 import my.home.common.StateMachine;
+import my.home.lehome.asynctask.NfcWriteNdefAsyncTask;
 import my.home.lehome.helper.NFCHelper;
-import my.home.lehome.helper.NFCHelper.WriteResponse;
 import my.home.lehome.mvp.views.NFCDetectView;
 
 /**
  * Created by legendmohe on 15/12/28.
  */
-public class NFCDetectPresenter extends MVPActivityPresenter {
+public class NFCDetectPresenter extends MVPActivityPresenter implements NfcWriteNdefAsyncTask.WriteNdefListener {
     public static final String TAG = "NFCDetectPresenter";
 
     private WeakReference<NFCDetectView> mNFCDetectView;
@@ -48,7 +47,7 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
     private StateMachine mStateMachine;
 
     enum EVENT {
-        FOUND, WRITED, CANCEL
+        FOUND, CANCEL, FINISH
     }
 
     public NFCDetectPresenter(NFCDetectView view) {
@@ -59,7 +58,7 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         FinishedState finishedState = new FinishedState();
         detectingState.linkTo(writingState, EVENT.FOUND);
         detectingState.linkTo(finishedState, EVENT.CANCEL);
-        writingState.linkTo(finishedState, EVENT.WRITED);
+        writingState.linkTo(finishedState, EVENT.FINISH);
 
         mStateMachine.addState(writingState);
         mStateMachine.addState(finishedState);
@@ -74,13 +73,17 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
 
     @Override
     public void stop() {
-
     }
 
     @Override
     public void onActivityCreate(Activity activity) {
         if (NFCHelper.isNfcSupported(activity))
             this.setupNFCForegroundDispatch(activity);
+    }
+
+    @Override
+    public void onActivityDestory(Activity activity) {
+        cancelDetecting();
     }
 
     @Override
@@ -114,8 +117,8 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         adapter.disableForegroundDispatch(activity);
     }
 
-    public void cancelIfDetecting() {
-
+    public void cancelDetecting() {
+        mStateMachine.postEvent(EVENT.CANCEL);
     }
 
     public void startDetecting() {
@@ -125,63 +128,14 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
     }
 
     public void onNewTagDetected(Tag detectedTag) {
-        Context context = mNFCDetectView.get().getContext();
-        if (NFCHelper.supportedTechs(detectedTag.getTechList())) {
-            if (NFCHelper.writableTag(detectedTag)) {
-                //writeTag here
-                WriteResponse wr = writeTag(NFCHelper.createNdefTextAppMessage(
-                                context, mNFCDetectView.get().getTargetContent()), detectedTag
-                );
-                int status = wr.getStatus();
-                String message = wr.getMessage();
-            } else {
+        Log.d(TAG, "found new tag:" + detectedTag);
+        mStateMachine.postEvent(EVENT.FOUND, detectedTag);
 
-            }
-        } else {
-
-        }
     }
 
-    // TODO 用asynctask代替(直接传入statemachine),WriteResponse删掉，用result enum
-    public WriteResponse writeTag(NdefMessage message, Tag tag) {
-        int size = message.toByteArray().length;
-        String mess = "";
-        try {
-            Ndef ndef = Ndef.get(tag);
-            if (ndef != null) {
-                ndef.connect();
-                if (!ndef.isWritable()) {
-                    return new WriteResponse(0, "Tag is read-only");
-                }
-                if (ndef.getMaxSize() < size) {
-                    mess = "Tag capacity is " + ndef.getMaxSize() + " bytes, message is " + size
-                            + " bytes.";
-                    return new WriteResponse(0, mess);
-                }
-                ndef.writeNdefMessage(message);
-                mess = "Wrote message to pre-formatted tag.";
-                return new WriteResponse(1, mess);
-            } else {
-                NdefFormatable format = NdefFormatable.get(tag);
-                if (format != null) {
-                    try {
-                        format.connect();
-                        format.format(message);
-                        mess = "Formatted tag and wrote message";
-                        return new WriteResponse(1, mess);
-                    } catch (IOException e) {
-                        mess = "Failed to format tag.";
-                        return new WriteResponse(0, mess);
-                    }
-                } else {
-                    mess = "Tag doesn't support NDEF.";
-                    return new WriteResponse(0, mess);
-                }
-            }
-        } catch (Exception e) {
-            mess = "Failed to write tag";
-            return new WriteResponse(0, mess);
-        }
+    @Override
+    public void onWriteFinished(NfcWriteNdefAsyncTask.Result result) {
+        mStateMachine.postEvent(EVENT.FINISH, result);
     }
 
     class DetectingState extends State {
@@ -205,7 +159,21 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
         @Override
         public void onEnter(State fromState, Enum<?> event, Object data) {
             if (fromState.getClass().equals(DetectingState.class)) {
+                mNFCDetectView.get().onViewStateChange(NFCDetectView.State.WRITING);
 
+                Tag detectedTag = (Tag) data;
+                Context context = mNFCDetectView.get().getContext();
+                if (NFCHelper.supportedTechs(detectedTag.getTechList())) {
+                    if (NFCHelper.writableTag(detectedTag)) {
+                        //writeTag here
+                        NdefMessage message = NFCHelper.createNdefTextAppMessage(context, mNFCDetectView.get().getTargetContent());
+                        new NfcWriteNdefAsyncTask(NFCDetectPresenter.this, detectedTag).execute(message);
+                    } else {
+                        mStateMachine.postEvent(EVENT.FINISH, NfcWriteNdefAsyncTask.Result.READONLY);
+                    }
+                } else {
+                    mStateMachine.postEvent(EVENT.FINISH, NfcWriteNdefAsyncTask.Result.UNSUPPORTED);
+                }
             }
         }
     }
@@ -218,6 +186,27 @@ public class NFCDetectPresenter extends MVPActivityPresenter {
 
         @Override
         public void onEnter(State fromState, Enum<?> event, Object data) {
+            if (event == EVENT.CANCEL) {
+                mNFCDetectView.get().onViewStateChange(NFCDetectView.State.CANCEL);
+            } else if (event == EVENT.FINISH) {
+                NfcWriteNdefAsyncTask.Result result = (NfcWriteNdefAsyncTask.Result) data;
+                switch (result) {
+                    case SUCCESS:
+                        mNFCDetectView.get().onViewStateChange(NFCDetectView.State.SUCCESS);
+                        break;
+                    case UNWRITABLE:
+                    case UNSUPPORTED:
+                    case READONLY:
+                    case OVERSIZE:
+                    case EXCEPTION:
+                        Log.d(TAG, "tag write fail:" + result);
+                        mNFCDetectView.get().showStateToast(result.toString());
+                        mNFCDetectView.get().onViewStateChange(NFCDetectView.State.FAIL);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 

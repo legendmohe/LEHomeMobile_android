@@ -21,9 +21,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import my.home.lehome.R;
 import my.home.lehome.mvp.presenters.NFCDetectPresenter;
@@ -35,6 +37,7 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
     public static final int RESULT_CODE_SUCCESS = 1;
     public static final int RESULT_CODE_FAIL = 2;
     public static final int RESULT_CODE_CANCEL = 3;
+    private static final String TAG = "NFCDetectDialog";
 
     private NFCDetectPresenter mNFCDetectPresenter;
     private State mState;
@@ -73,9 +76,10 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
         mCmdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "click cancel on state " + mState);
                 switch (mState) {
                     case DETECTING:
-                        mNFCDetectPresenter.cancelIfDetecting();
+                        mNFCDetectPresenter.cancelDetecting();
                         setResult(RESULT_CODE_CANCEL);
                         finish();
                         break;
@@ -92,6 +96,12 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mNFCDetectPresenter.onActivityDestory(this);
     }
 
     @Override
@@ -119,7 +129,6 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
 //                break;
 //        }
         mNFCDetectPresenter.onActivityPause(this);
-        mNFCDetectPresenter.cancelIfDetecting();
     }
 
     @Override
@@ -169,9 +178,17 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
                 mCmdButton.setEnabled(true);
                 mCmdButton.setText(R.string.nfc_close_dialog);
                 break;
+            case CANCEL:
+                finish();
+                break;
             default:
                 break;
         }
+    }
+
+    @Override
+    public void showStateToast(String content) {
+        Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
     }
 
     @Override

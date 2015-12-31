@@ -126,4 +126,8 @@ public class StateMachine {
     public State getCurrentState() {
         return mCurrentState;
     }
+
+    public boolean inState(Class<? extends State> stateClass) {
+        return mCurrentState.getClass().equals(stateClass);
+    }
 }

@@ -34,7 +34,7 @@ public class NFCHelper {
             return null;
         NdefRecord textRecord = NFCHelper.createTextRecord(content, Locale.getDefault(), true);
         NdefRecord aar = NdefRecord.createApplicationRecord(context.getPackageName());
-        return new NdefMessage(new NdefRecord[]{aar, textRecord});
+        return new NdefMessage(new NdefRecord[]{textRecord, aar});
     }
     
     public static boolean isNfcEnable(Context context) {
@@ -98,21 +98,4 @@ public class NFCHelper {
         return record;
     }
 
-    public static class WriteResponse {
-        int status;
-        String message;
-
-        public WriteResponse(int Status, String Message) {
-            this.status = Status;
-            this.message = Message;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-    }
 }

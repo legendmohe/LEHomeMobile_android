@@ -172,7 +172,7 @@ public class MessageHelper {
         MessageHelper.sendMsgToServer(context, msg, true, false, false);
     }
 
-    public static void sendMsgToServer(Context context, String msg, boolean autoFill, boolean passthrough, boolean background) {
+    public static void sendMsgToServer(Context context, String msg, boolean autoFill, boolean passthrough, boolean isSysCmd) {
         String message;
         String serverURL;
         if (!TextUtils.isEmpty(msg)) {
@@ -190,7 +190,7 @@ public class MessageHelper {
             serverURL = MessageHelper.getServerURL(context, message);
         }
         Intent serviceIntent = new Intent(context, SendMsgIntentService.class);
-        serviceIntent.putExtra("bg", background);
+        serviceIntent.putExtra("isSysCmd", isSysCmd);
         serviceIntent.putExtra("local", isLocal);
         serviceIntent.putExtra("cmdString", message);
         serviceIntent.putExtra("cmd", msg);

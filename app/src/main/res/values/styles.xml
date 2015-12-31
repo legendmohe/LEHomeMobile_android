@@ -50,6 +50,11 @@
         <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
     </style>
 
+    <style name="NFCDetectDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="PhotoViewerAcvitity" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         <item name="android:windowAnimationStyle">@style/ShowPhotoAnimation</item>
     </style>

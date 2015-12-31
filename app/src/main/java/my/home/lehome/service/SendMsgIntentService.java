@@ -115,8 +115,8 @@ public class SendMsgIntentService extends IntentService {
         Message repMsg = Message.obtain();
         repMsg.what = MSG_BEGIN_SENDING;
 
-        boolean isBackgroundCmd = intent.getBooleanExtra("bg", false);
-        if (isBackgroundCmd)
+        boolean isSysCmd = intent.getBooleanExtra("isSysCmd", false);
+        if (isSysCmd)
             return;
 
         ChatItem item = intent.getParcelableExtra("update");

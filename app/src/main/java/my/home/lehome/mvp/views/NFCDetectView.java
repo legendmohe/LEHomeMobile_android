@@ -21,9 +21,11 @@ public interface NFCDetectView extends MVPView {
 
     void onViewStateChange(State state);
 
+    void showStateToast(String content);
+
     String getTargetContent();
 
     enum State {
-        DETECTING, WRITING, SUCCESS, FAIL
+        DETECTING, WRITING, SUCCESS, CANCEL, FAIL
     }
 }

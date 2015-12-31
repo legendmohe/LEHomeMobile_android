@@ -15,42 +15,77 @@
 package my.home.lehome.asynctask;
 
 
-import android.content.Context;
+import android.nfc.NdefMessage;
 import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.nfc.tech.NdefFormatable;
 import android.os.AsyncTask;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import my.home.common.StateMachine;
 
 /**
  * Created by legendmohe on 15/12/29.
  */
-public class NfcWriteNdefAsyncTask extends AsyncTask<String, Void, NfcWriteNdefAsyncTask.Result> {
+public class NfcWriteNdefAsyncTask extends AsyncTask<NdefMessage, Void, NfcWriteNdefAsyncTask.Result> {
 
     private static final String TAG = "NfcWriteNdefAsyncTask";
 
-    private WeakReference<Context> mContext;
-    private StateMachine mStateMachine;
+    private WeakReference<WriteNdefListener> mListener;
     private Tag mTag;
 
-    public NfcWriteNdefAsyncTask(Context context, StateMachine statemachine, Tag tag) {
-        mContext = new WeakReference<>(context);
-        mStateMachine = statemachine;
+    public NfcWriteNdefAsyncTask(WriteNdefListener listener, Tag tag) {
+        mListener = new WeakReference<>(listener);
         mTag = tag;
     }
 
     @Override
-    protected Result doInBackground(String... params) {
-        return null;
+    protected Result doInBackground(NdefMessage... params) {
+        NdefMessage message = params[0];
+        int size = message.toByteArray().length;
+        try {
+            Ndef ndef = Ndef.get(mTag);
+            if (ndef != null) {
+                ndef.connect();
+                if (!ndef.isWritable()) {
+                    return Result.READONLY;
+                }
+                if (ndef.getMaxSize() < size) {
+                    return Result.OVERSIZE;
+                }
+                ndef.writeNdefMessage(message);
+                return Result.SUCCESS;
+            } else {
+                NdefFormatable format = NdefFormatable.get(mTag);
+                if (format != null) {
+                    try {
+                        format.connect();
+                        format.format(message);
+                        return Result.SUCCESS;
+                    } catch (IOException e) {
+                        return Result.EXCEPTION;
+                    }
+                } else {
+                    return Result.UNSUPPORTED;
+                }
+            }
+        } catch (Exception e) {
+            return Result.EXCEPTION;
+        }
     }
 
     @Override
     protected void onPostExecute(Result result) {
-        
+        if (mListener.get() != null)
+            mListener.get().onWriteFinished(result);
     }
 
     public enum Result {
-        CANCELED, SUCCESS, UNWRITABLE, UNSUPPORTED, READONLY, OVERSIZE, EXCEPTION
+        SUCCESS, UNWRITABLE, UNSUPPORTED, READONLY, OVERSIZE, EXCEPTION
+    }
+
+    public interface WriteNdefListener {
+        void onWriteFinished(Result result);
     }
 }
