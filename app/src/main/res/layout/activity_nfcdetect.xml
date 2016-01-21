@@ -13,15 +13,29 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".activity.NFCDetectDialog"
     android:orientation="vertical"
-    android:background="@drawable/msg_btn_bg"
+    android:background="#c8000000"
     >
+
+    <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
+                                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="fill_parent"
+                                            android:id="@+id/nfc_detect_rippleBackground"
+                                            android:layout_gravity="end"
+                                            app:rb_color="#0099CC"
+                                            app:rb_radius="16dp"
+                                            app:rb_rippleAmount="3"
+                                            app:rb_duration="2000"
+                                            app:rb_scale="12">
+
+    </com.skyfishjy.library.RippleBackground>
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,14 +43,23 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/nfc_detecting_tag"
         android:id="@+id/nfc_detect_title"
-        android:layout_margin="2dp"
-        android:layout_gravity="center"/>
+        android:layout_margin="8dp"
+        android:layout_gravity="center"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="false"
+        android:layout_centerInParent="true"
+        android:textSize="28sp"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="@string/com_cancel"
         android:id="@+id/nfc_detect_button"
-        android:layout_margin="4dp"
-        android:layout_gravity="center"/>
-</LinearLayout>
+        android:layout_gravity="center"
+        android:background="@drawable/msg_btn_bg"
+        android:textColor="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"/>
+
+</RelativeLayout>

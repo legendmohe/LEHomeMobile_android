@@ -55,6 +55,7 @@ public class LocalMessageService extends Service {
 
     public static final int MSG_SERVER_RECEIVE_MSG = 0;
     private static final int ONGOING_NOTIFICATION_ID = 9000;
+    public static final String LOCAL_MESSAGE_SERVICE_NOTIFICATION_ACTION = "LOCAL_MESSAGE_SERVICE_NOTIFICATION_ACTION";
 
     private String mServiceAddress = "";
     private ScreenStateReceiver mScreenStateReceiver;
@@ -130,6 +131,7 @@ public class LocalMessageService extends Service {
             mWakeLock.acquire();
         }
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        notificationIntent.setAction(LOCAL_MESSAGE_SERVICE_NOTIFICATION_ACTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(this)

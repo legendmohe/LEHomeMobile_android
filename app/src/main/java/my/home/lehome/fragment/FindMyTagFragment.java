@@ -29,6 +29,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.altbeacon.beacon.Beacon;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import my.home.lehome.R;
@@ -46,7 +49,8 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
     private TextView mUUIDTextView;
     private Handler mHandler;
 
-    private ArrayAdapter<String> mBeaconsArrayAdapter;
+    private BeaconChooserAdapter mBeaconsArrayAdapter;
+    private ArrayList<Beacon> mBeacons = new ArrayList<>();
     private AlertDialog mBeaconsDialog;
 
     public static FindMyTagFragment newInstance() {
@@ -110,9 +114,7 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
         mPowerTextView = (TextView) rootView.findViewById(R.id.power_textview);
         mUUIDTextView = (TextView) rootView.findViewById(R.id.uidd_textview);
 
-        mBeaconsArrayAdapter = new ArrayAdapter<>(
-                getActivity(),
-                android.R.layout.select_dialog_item);
+        mBeaconsArrayAdapter = new BeaconChooserAdapter(this.getActivity(), 0, mBeacons);
     }
 
     @Override
@@ -143,8 +145,8 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
         return getActivity().getApplicationContext();
     }
 
-    public void onBeaconEnter(String uid) {
-        final String u = uid;
+    public void onBeaconEnter(Beacon beacon) {
+        final Beacon u = beacon;
         if (mHandler != null) {
             mHandler.post(new Runnable() {
                 @Override
@@ -159,8 +161,8 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
         }
     }
 
-    public void onBeaconExit(String uid) {
-        final String u = uid;
+    public void onBeaconExit(Beacon beacon) {
+        final Beacon u = beacon;
         if (mHandler != null) {
             mHandler.post(new Runnable() {
                 @Override
@@ -216,8 +218,8 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String fliterUid = mBeaconsArrayAdapter.getItem(which);
-                        mFindMyTagPresenter.setFliterUid(fliterUid);
+                        Beacon beacon = mBeaconsArrayAdapter.getItem(which);
+                        mFindMyTagPresenter.setFliterUid(beacon.getBluetoothAddress());
                         cleanScreen();
                     }
                 });
@@ -247,6 +249,40 @@ public class FindMyTagFragment extends Fragment implements FindMyTagDistanceView
             mNameTextView.setText("...");
             mPowerTextView.setText("");
             mUUIDTextView.setText("");
+        }
+    }
+
+    class BeaconChooserAdapter extends ArrayAdapter<Beacon> {
+
+        private class ViewHolder {
+            private TextView beaconTextview;
+        }
+
+        public BeaconChooserAdapter(Context context, int textViewResourceId, ArrayList<Beacon> items) {
+            super(context, textViewResourceId, items);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(this.getContext())
+                        .inflate(R.layout.beacon_item, parent, false);
+
+                viewHolder = new ViewHolder();
+                viewHolder.beaconTextview = (TextView) convertView.findViewById(R.id.beacon_textview);
+
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            Beacon beacon = getItem(position);
+            if (beacon != null) {
+                viewHolder.beaconTextview.setText(String.format("%s(%s)", beacon.getBluetoothName(), beacon.getBluetoothAddress()));
+            }
+
+            return convertView;
         }
     }
 }

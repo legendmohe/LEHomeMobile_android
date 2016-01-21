@@ -244,7 +244,7 @@
 
         <activity
             android:name=".activity.NFCDetectDialog"
-            android:theme="@style/NFCDetectDialog"
+            android:theme="@style/InvisibleTheme"
             android:excludeFromRecents="true"
             >
         </activity>

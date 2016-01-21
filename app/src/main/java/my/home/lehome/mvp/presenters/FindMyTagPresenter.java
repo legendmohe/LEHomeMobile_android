@@ -179,7 +179,7 @@ public class FindMyTagPresenter extends MVPPresenter implements BeaconConsumer {
                     Log.i(TAG, "UUID: " + beacon.getBluetoothAddress() + " beacon: " + beacon.getBluetoothName() + " distance: " + beacon.getDistance() + " data: " + beacon.getDataFields());
 
                     String uid = beacon.getBluetoothAddress();
-                    mFindMyTagView.get().onBeaconEnter(beacon.getBluetoothName());
+                    mFindMyTagView.get().onBeaconEnter(beacon);
                     if (TextUtils.isEmpty(mFliterUid) || !uid.equals(mFliterUid))
                         return;
                     mFindMyTagView.get().onBeaconDistance(uid, beacon.getBluetoothName(), beacon.getDistance(), beacon.getDataFields());

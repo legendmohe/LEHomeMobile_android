@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.skyfishjy.library.RippleBackground;
+
 import my.home.lehome.R;
 import my.home.lehome.mvp.presenters.NFCDetectPresenter;
 import my.home.lehome.mvp.views.NFCDetectView;
@@ -43,6 +45,7 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
     private State mState;
     private Button mCmdButton;
     private TextView mTitleTextview;
+    private RippleBackground mRippleBackground;
     private String mTargetContent;
 
     @Override
@@ -80,15 +83,8 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
                 switch (mState) {
                     case DETECTING:
                         mNFCDetectPresenter.cancelDetecting();
-                        setResult(RESULT_CODE_CANCEL);
-                        finish();
-                        break;
                     case SUCCESS:
-                        setResult(RESULT_CODE_SUCCESS);
-                        finish();
-                        break;
                     case FAIL:
-                        setResult(RESULT_CODE_FAIL);
                         finish();
                         break;
                     default:
@@ -96,6 +92,8 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
                 }
             }
         });
+
+        mRippleBackground = (RippleBackground) findViewById(R.id.nfc_detect_rippleBackground);
     }
 
     @Override
@@ -113,22 +111,25 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
     @Override
     protected void onPause() {
         super.onPause();
-
-        // TODO set result here?
-//        switch (mState) {
-//            case DETECTING:
-//                setResult(RESULT_CODE_CANCEL);
-//                break;
-//            case SUCCESS:
-//                setResult(RESULT_CODE_SUCCESS);
-//                break;
-//            case FAIL:
-//                setResult(RESULT_CODE_FAIL);
-//                break;
-//            default:
-//                break;
-//        }
         mNFCDetectPresenter.onActivityPause(this);
+    }
+
+    @Override
+    public void finish() {
+        switch (mState) {
+            case DETECTING:
+                setResult(RESULT_CODE_CANCEL);
+                break;
+            case SUCCESS:
+                setResult(RESULT_CODE_SUCCESS);
+                break;
+            case FAIL:
+                setResult(RESULT_CODE_FAIL);
+                break;
+            default:
+                break;
+        }
+        super.finish();
     }
 
     @Override
@@ -162,6 +163,7 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
         mState = state;
         switch (state) {
             case DETECTING:
+                mRippleBackground.startRippleAnimation();
                 mTitleTextview.setText(R.string.nfc_detecting_tag);
                 break;
             case WRITING:
@@ -169,16 +171,19 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
                 mCmdButton.setEnabled(false);
                 break;
             case SUCCESS:
+                mRippleBackground.stopRippleAnimation();
                 mTitleTextview.setText(R.string.nfc_write_success);
                 mCmdButton.setEnabled(true);
                 mCmdButton.setText(R.string.nfc_close_dialog);
                 break;
             case FAIL:
+                mRippleBackground.stopRippleAnimation();
                 mTitleTextview.setText(R.string.nfc_write_fail);
                 mCmdButton.setEnabled(true);
                 mCmdButton.setText(R.string.nfc_close_dialog);
                 break;
             case CANCEL:
+                mRippleBackground.stopRippleAnimation();
                 finish();
                 break;
             default:
@@ -195,4 +200,5 @@ public class NFCDetectDialog extends Activity implements NFCDetectView {
     public String getTargetContent() {
         return mTargetContent;
     }
+
 }

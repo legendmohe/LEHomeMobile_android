@@ -154,13 +154,13 @@ public class RecordMsgUsecaseImpl implements
     }
 
     @Override
-    public void onProcess(short[] data, int len) {
+    public void onProcess(final short[] data, final int len) {
 
         if (mStateListener.get() != null) {
-            final double value = AudioUtils.getAmplitude(data, len);
             DomainUtil.runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
+                    double value = AudioUtils.getAmplitude(data, len);
                     mStateListener.get().onGetAmplitude(value);
                 }
             });

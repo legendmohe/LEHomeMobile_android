@@ -60,6 +60,7 @@ import my.home.lehome.fragment.ShortcutFragment;
 import my.home.lehome.mvp.presenters.MainActivityPresenter;
 import my.home.lehome.mvp.views.ActionBarControlView;
 import my.home.lehome.mvp.views.MainActivityView;
+import my.home.lehome.service.LocalMessageService;
 import my.home.lehome.util.Constants;
 
 
@@ -97,11 +98,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getIntent() != null && getIntent().getAction().equals(WakeupActivity.INTENT_VOICE_COMMAND)) {
-            Window wind = this.getWindow();
-            wind.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-            wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        if (getIntent() != null && getIntent().getAction() != null) {
+            String action = getIntent().getAction();
+            if (action.equals(WakeupActivity.INTENT_VOICE_COMMAND)) {
+                Window wind = this.getWindow();
+                wind.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+                wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            } else if (action.equals(LocalMessageService.LOCAL_MESSAGE_SERVICE_NOTIFICATION_ACTION)) {
+                PrefUtil.setIntValue(this, PREF_KEY_LAST_OPEN_FRAGMENT_INDEX, 0);
+            }
         }
         this.setupViews(null);
         STOPPED = false;

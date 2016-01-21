@@ -16,6 +16,8 @@ package my.home.lehome.mvp.views;
 
 import android.content.Context;
 
+import org.altbeacon.beacon.Beacon;
+
 import java.util.List;
 
 /**
@@ -24,7 +26,7 @@ import java.util.List;
 public interface FindMyTagDistanceView extends MVPView {
     public Context getApplicationContext();
 
-    void onBeaconEnter(String uid);
+    void onBeaconEnter(Beacon beacon);
 //
 //    void onBeaconExit(String uid);
 //
