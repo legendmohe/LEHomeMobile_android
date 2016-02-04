@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.otto.Subscribe;
@@ -77,6 +78,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
                 ChatItem item;
                 switch (msg.what) {
                     case SendMsgIntentService.MSG_BEGIN_SENDING:
+                        Log.d("IntentServiceHandler", "SendMsgIntentService.MSG_BEGIN_SENDING");
                         item = bundle.getParcelable("item");
                         if (bundle.getBoolean("update", false)) {
                             listView.onChatItemRequest(item, true);
@@ -85,13 +87,16 @@ public class ChatFragmentPresenter extends MVPPresenter {
                         }
                         break;
                     case SendMsgIntentService.MSG_END_SENDING:
+                        Log.d("IntentServiceHandler", "SendMsgIntentService.MSG_END_SENDING");
                         int rep_code = bundle.getInt("rep_code", -1);
                         item = bundle.getParcelable("item");
-                        if (rep_code == 200) {
-                            listView.onChatItemResponse(rep_code, item.getId(), item.getState(), null);
-                        } else {
-                            ChatItem newItem = bundle.getParcelable("new_item");
-                            listView.onChatItemResponse(rep_code, item.getId(), item.getState(), newItem);
+                        if (item != null) {
+                            if (rep_code == 200) {
+                                listView.onChatItemResponse(rep_code, item.getId(), item.getState(), null);
+                            } else {
+                                ChatItem newItem = bundle.getParcelable("new_item");
+                                listView.onChatItemResponse(rep_code, item.getId(), item.getState(), newItem);
+                            }
                         }
                         break;
                     default:

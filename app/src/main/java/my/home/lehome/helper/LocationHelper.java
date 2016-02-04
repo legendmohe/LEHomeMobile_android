@@ -31,7 +31,7 @@ public class LocationHelper {
 
 
     public static void enqueueLocationRequest(Context context, int seq, String type, String clientId) {
-        Log.d(TAG, "enqueu location request for: " + clientId);
+        Log.d(TAG, "enqueu location request for: " + clientId + " type:" + type);
         String clientName = PrefUtil.getStringValue(context, "pref_client_id", "");
         if (clientName.equals(clientId)) {
             if (!PrefUtil.getbooleanValue(context, "pref_loc_me_enable", true)) {

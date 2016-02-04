@@ -116,8 +116,10 @@ public class SendMsgIntentService extends IntentService {
         repMsg.what = MSG_BEGIN_SENDING;
 
         boolean isSysCmd = intent.getBooleanExtra("isSysCmd", false);
-        if (isSysCmd)
+        if (isSysCmd) {
+            Log.d(TAG, "sys cmd item");
             return;
+        }
 
         ChatItem item = intent.getParcelableExtra("update");
         if (item == null) {
@@ -297,6 +299,9 @@ public class SendMsgIntentService extends IntentService {
         }
 
         Log.d(TAG, "dequeue item: " + item);
+        if (item == null)
+            return;
+
         Bundle bundle = new Bundle();
         bundle.putParcelable("item", item);
         if (newItem != null)

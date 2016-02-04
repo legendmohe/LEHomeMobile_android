@@ -73,7 +73,7 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
             return;
         }
 
-        if (type.equals("req_loc")) {
+        if (type.equals("req_loc") || type.equals("req_geo")) {
             LocationHelper.enqueueLocationRequest(context, seq, type, msg);
             return;
         } else if (Arrays.asList(MessageHelper.NORMAIL_FILTER_TAG_LIST).contains(type)) {
@@ -171,11 +171,11 @@ public class PushMessageReceiver extends XGPushBaseReceiver {
                 e.printStackTrace();
             }
         }
+        Log.d(TAG, text);
         String content = message.getContent();
         if (!TextUtils.isEmpty(content)) {
             onMessage(context, content);
         }
-        Log.d(TAG, text);
 //        updateContent(context, text);
     }
 

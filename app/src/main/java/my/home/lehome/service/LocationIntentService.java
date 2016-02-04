@@ -95,10 +95,16 @@ public class LocationIntentService extends IntentService {
                 }
             }
         }
-        if (MainActivity.VISIBLE || !PrefUtil.getbooleanValue(getApplicationContext(), "pref_loc_me_silent_enable", false)) {
-            MessageHelper.sendServerMsgToList(seq, "client", getString(R.string.loc_sending_loc), getApplicationContext());
+        if (type.equals("req_loc")) {
+            if (MainActivity.VISIBLE || !PrefUtil.getbooleanValue(getApplicationContext(), "pref_loc_me_silent_enable", false)) {
+                MessageHelper.sendServerMsgToList(seq, "client", getString(R.string.loc_sending_loc), getApplicationContext());
+            }
+            sendResultToServer(formatLocationResponse(id));
+        } else if (type.equals("req_geo")) {
+            // do nothing now, maybe show some log
+            Log.d(TAG, "get geo location, now send result to server.");
+            sendResultToServer(formatGeoResponse(id));
         }
-        sendResultToServer(formatResponse(id));
         Log.d(TAG, "LocationIntentService exit intent.");
     }
 
@@ -106,8 +112,26 @@ public class LocationIntentService extends IntentService {
         MessageHelper.sendBackgroundMsgToServer(getApplicationContext(), broadcast);
     }
 
-    private String formatResponse(String id) {
+    private String formatLocationResponse(String id) {
         StringBuilder builder = new StringBuilder("@");  // broadcast indicator
+        builder.append(id).append("|");
+        if (TextUtils.isEmpty(mCurLocation.getAddrStr()) || mCurLocation.getAddrStr().equals("null")) {
+            mCurLocation.setAddrStr(getString(R.string.loc_no_addr, id));
+        }
+        builder.append(mCurLocation.getAddrStr()).append("|");
+        if (TextUtils.isEmpty(mCurLocation.getAddrStr())) {
+            mCurLocation.setLatitude(-1.0);
+        }
+        builder.append(mCurLocation.getLatitude()).append("|");
+        if (TextUtils.isEmpty(mCurLocation.getAddrStr())) {
+            mCurLocation.setLongitude(-1.0);
+        }
+        builder.append(mCurLocation.getLongitude());
+        return builder.toString();
+    }
+
+    private String formatGeoResponse(String id) {
+        StringBuilder builder = new StringBuilder("#");  // report indicator
         builder.append(id).append("|");
         if (TextUtils.isEmpty(mCurLocation.getAddrStr()) || mCurLocation.getAddrStr().equals("null")) {
             mCurLocation.setAddrStr(getString(R.string.loc_no_addr, id));

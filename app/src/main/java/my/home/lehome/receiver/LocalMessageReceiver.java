@@ -76,7 +76,7 @@ public class LocalMessageReceiver extends BroadcastReceiver {
                     return;
                 }
 
-                if (type.equals("req_loc")) {
+                if (type.equals("req_loc") || type.equals("req_geo")) {
                     LocationHelper.enqueueLocationRequest(context, seq, type, msg);
                     return;
                 } else if (Arrays.asList(MessageHelper.NORMAIL_FILTER_TAG_LIST).contains(type)) {
