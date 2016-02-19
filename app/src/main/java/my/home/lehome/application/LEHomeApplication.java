@@ -20,6 +20,7 @@ import android.util.Log;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import my.home.common.util.ComUtil;
 import my.home.common.util.PrefUtil;
@@ -46,6 +47,8 @@ public class LEHomeApplication extends Application {
                 .diskCacheSize(10 * 1024 * 1024).build();
 
         ImageLoader.getInstance().init(config);
+
+        CrashReport.initCrashReport(getApplicationContext(), "900019399", false);
     }
 
 }
