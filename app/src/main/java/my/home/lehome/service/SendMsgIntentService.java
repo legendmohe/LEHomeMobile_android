@@ -197,11 +197,7 @@ public class SendMsgIntentService extends IntentService {
         try {
             String response = future.get(request.getTimeoutMs() + 5000, TimeUnit.MILLISECONDS);
             Log.d(TAG, "get cmd response:" + response);
-            saveAndNotify(intent,
-                    CommandRequest.getJsonStringResponse(
-                            200,
-                            response
-                    ));
+            saveAndNotify(intent, response);
         } catch (ExecutionException e) {
             Throwable error = e.getCause();
             Log.d(TAG, "get cmd error:" + error.toString());
