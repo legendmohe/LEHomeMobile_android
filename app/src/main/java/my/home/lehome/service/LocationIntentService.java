@@ -131,7 +131,7 @@ public class LocationIntentService extends IntentService {
     }
 
     private String formatGeoResponse(String id) {
-        StringBuilder builder = new StringBuilder("#");  // report indicator
+        StringBuilder builder = new StringBuilder("^");  // report indicator
         builder.append(id).append("|");
         if (TextUtils.isEmpty(mCurLocation.getAddrStr()) || mCurLocation.getAddrStr().equals("null")) {
             mCurLocation.setAddrStr(getString(R.string.loc_no_addr, id));
