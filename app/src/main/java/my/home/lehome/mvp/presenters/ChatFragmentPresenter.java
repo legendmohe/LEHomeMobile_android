@@ -59,7 +59,7 @@ public class ChatFragmentPresenter extends MVPPresenter {
     private WeakReference<ChatSuggestionView> mChatSuggestionView;
 
     public static Handler SendMsgHandler;
-    private BgMessageBroadcastReceiver mbgMessageBroadcastReceiver = new BgMessageBroadcastReceiver();
+    private BgMessageBroadcastReceiver mbgMessageBroadcastReceiver;
 
     private static class IntentServiceHandler extends Handler {
         private final WeakReference<ChatItemListView> mChatItemListView;
@@ -214,6 +214,8 @@ public class ChatFragmentPresenter extends MVPPresenter {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_BEGIN);
         intentFilter.addAction(SendMsgIntentService.ACTION_SEND_MSG_END);
+        
+        mbgMessageBroadcastReceiver = new BgMessageBroadcastReceiver();
         Context context = mChatItemListView.get().getContext();
         context.registerReceiver(mbgMessageBroadcastReceiver, intentFilter);
     }
@@ -221,7 +223,10 @@ public class ChatFragmentPresenter extends MVPPresenter {
     @Override
     public void stop() {
         Context context = mChatItemListView.get().getContext();
-        context.unregisterReceiver(mbgMessageBroadcastReceiver);
+        if (mbgMessageBroadcastReceiver != null) {
+            context.unregisterReceiver(mbgMessageBroadcastReceiver);
+            mbgMessageBroadcastReceiver = null;
+        }
         BusProvider.getRestBusInstance().unregister(this);
     }
 
