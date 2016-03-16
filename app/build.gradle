@@ -72,13 +72,10 @@ dependencies {
     compile project(':domain')
     compile project(':model')
     compile files('libs/VoiceRecognition.jar')
-    compile files('libs/jg_filter_sdk_1.1.jar')
     compile files('libs/BaiduLBS_Android.jar')
     compile('com.doomonafireball.betterpickers:library:1.5.3') {
         exclude group: 'com.android.support', module: 'support-v4'
     }
-    compile files('libs/wup-1.0.0.E-SNAPSHOT.jar')
-    compile files('libs/Xg_sdk_v2.40_20150527_1022.jar')
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'

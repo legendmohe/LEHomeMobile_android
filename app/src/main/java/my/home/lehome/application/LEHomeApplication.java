@@ -21,6 +21,8 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.xiaomi.channel.commonutils.logger.LoggerInterface;
+import com.xiaomi.mipush.sdk.Logger;
 
 import my.home.common.util.ComUtil;
 import my.home.common.util.PrefUtil;
@@ -32,12 +34,10 @@ public class LEHomeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        XGPushConfig.enableDebug(getApplicationContext(), false);
         PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.stopping", false);
         PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.starting", false);
         if (ComUtil.isMainProcess(getApplicationContext())
                 && !PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
-            Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));
             PushSDKManager.startPushSDKService(getApplicationContext(), true);
         }
 
@@ -49,6 +49,28 @@ public class LEHomeApplication extends Application {
         ImageLoader.getInstance().init(config);
 
         CrashReport.initCrashReport(getApplicationContext(), "900019399", false);
+
+        // MIPUSH
+        LoggerInterface newLogger = new LoggerInterface() {
+
+            @Override
+            public void setTag(String tag) {
+                // ignore
+            }
+
+            @Override
+            public void log(String content, Throwable t) {
+                Log.d("MIPUSH", content, t);
+            }
+
+            @Override
+            public void log(String content) {
+                Log.d("MIPUSH", content);
+            }
+        };
+        Logger.setLogger(this, newLogger);
+
+        Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));
     }
 
 }

@@ -196,4 +196,6 @@
     <string name="pref_delete_autocomplete_history_toast">已清空输入历史</string>
     <string name="title_section6">地理围栏</string>
     <string name="nav_item_geo_fencing">地理围栏</string>
+    <string name="msg_device_unbinded">解绑成功</string>
+    <string name="msg_device_unbind_faild">解绑失败</string>
 </resources>

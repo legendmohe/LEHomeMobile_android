@@ -14,17 +14,23 @@
 
 package my.home.lehome.helper;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.tencent.android.tpush.XGIOperateCallback;
-import com.tencent.android.tpush.XGPushManager;
+import com.xiaomi.mipush.sdk.MiPushClient;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import my.home.common.util.PrefUtil;
+import my.home.lehome.receiver.RemoteMessageReceiver;
+
+//import com.tencent.android.tpush.XGIOperateCallback;
+//import com.tencent.android.tpush.XGPushManager;
 
 /**
  * Created by legendmohe on 15/4/16.
@@ -41,9 +47,8 @@ public class PushSDKManager {
 
     private static WeakReference<Context> CURRENT_CONTEXT;
 
-    private static int MAX_RETRY_TIME = 10;
-    private static int START_RETRY_TIME = 0;
-    private static int STOP_RETRY_TIME = 0;
+    public static final String APP_ID = "2882303761517427372";
+    public static final String APP_KEY = "5291742795372";
 
     private static final Handler handler = new Handler() {
         @Override
@@ -55,56 +60,40 @@ public class PushSDKManager {
             }
             if (msg.what == PushSDKManager.MSG_START_SDK) {
                 Log.d(TAG, "try start sdk.");
-                XGPushManager.registerPush(context, new XGIOperateCallback() {
-                    @Override
-                    public void onSuccess(Object o, int i) {
-                        Log.d(TAG, "start sdk succeed." + context.hashCode());
-                        START_RETRY_TIME = 0;
-                        PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, true);
-                        PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
-                    }
-
-                    @Override
-                    public void onFail(Object o, int i, String s) {
-                        Log.d(TAG, "start sdk faild.");
-                        START_RETRY_TIME++;
-                        if (START_RETRY_TIME <= MAX_RETRY_TIME) {
-                            Message msg = Message.obtain();
-                            msg.what = MSG_START_SDK;
-                            handler.sendMessageDelayed(msg, 1000);
-                        } else {
-                            PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
-                        }
-                    }
-                });
+                if (checkPushSDKStartedByPid(context)) {
+                    MiPushClient.registerPush(context, APP_ID, APP_KEY);
+                }
             } else if (msg.what == PushSDKManager.MSG_STOP_SDK) {
                 Log.d(TAG, "try stop sdk.");
-                XGPushManager.unregisterPush(context, new XGIOperateCallback() {
-                    @Override
-                    public void onSuccess(Object o, int i) {
-                        Log.d(TAG, "stop sdk succeed:" + context.hashCode());
-                        STOP_RETRY_TIME = 0;
-                        PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, false);
-                        PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
-                    }
-
-                    @Override
-                    public void onFail(Object o, int i, String s) {
-                        Log.d(TAG, "stop sdk faild.");
-                        STOP_RETRY_TIME++;
-                        if (STOP_RETRY_TIME <= MAX_RETRY_TIME) {
-                            Message msg = Message.obtain();
-                            msg.what = MSG_STOP_SDK;
-                            handler.sendMessageDelayed(msg, 1000);
-                        } else {
-                            PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
-                        }
-                    }
-                });
-
-                // don't stop sdk
-//                PrefUtil.setBooleanValue(context, "PushSDKManager.enable", false);
+                MiPushClient.unregisterPush(context);
+                PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, false);
+                PrefUtil.setBooleanValue(context, PREF_KEY_STOPPING, false);
             }
+        }
+    };
+
+    public static final RemoteMessageReceiver.RemoteMessageSDKStateHandler mRemoteStateHandler = new RemoteMessageReceiver.RemoteMessageSDKStateHandler() {
+        @Override
+        public void onReceiveRegisterResult(boolean success) {
+            final Context context = CURRENT_CONTEXT.get();
+            if (context == null) {
+                Log.d(TAG, "null context.");
+                return;
+            }
+            PrefUtil.setBooleanValue(context, PREF_KEY_ENABLE, true);
+            PrefUtil.setBooleanValue(context, PREF_KEY_STARTING, false);
+            if (!TextUtils.isEmpty(MessageHelper.getDeviceID(context)))
+                PushSDKManager.setPushTag(context, MessageHelper.getDeviceID(context));
+        }
+
+        @Override
+        public void onSubscribeTopic(boolean success) {
+
+        }
+
+        @Override
+        public void onUnsubscribeTopic(boolean success) {
+
         }
     };
 
@@ -147,11 +136,23 @@ public class PushSDKManager {
     }
 
     public static void setPushTag(Context context, String tagText) {
-        XGPushManager.setTag(context, tagText);
+        MiPushClient.subscribe(context, tagText, "LEHome");
     }
 
     public static void delPushTag(Context context, String tagText) {
-        XGPushManager.deleteTag(context, tagText);
+        MiPushClient.unsubscribe(context, tagText, "LEHome");
     }
 
+    private static boolean checkPushSDKStartedByPid(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String mainProcessName = context.getPackageName();
+        int myPid = android.os.Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
