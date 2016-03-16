@@ -54,6 +54,7 @@ import my.home.lehome.R;
 import my.home.lehome.asynctask.LoadProfileHeaderBgAsyncTask;
 import my.home.lehome.fragment.ChatFragment;
 import my.home.lehome.fragment.FindMyTagFragment;
+import my.home.lehome.fragment.GeoFencingFragment;
 import my.home.lehome.fragment.HomeStateFragment;
 import my.home.lehome.fragment.MessageFragment;
 import my.home.lehome.fragment.ShortcutFragment;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     private final String SHORTCUT_FRAGMENT_TAG = "SHORTCUT_FRAGMENT_TAG";
     private final String FIND_TAG_FRAGMENT_TAG = "FIND_TAG_FRAGMENT_TAG";
     private final String HOME_STATE_FRAGMENT_TAG = "HOME_STATE_FRAGMENT_TAG";
+    private final String GEO_FENCING_FRAGMENT_TAG = "GEO_FENCING_FRAGMENT_TAG";
     private final String MESSAGE_FRAGMENT_TAG = "MESSAGE_FRAGMENT_TAG";
 
     private static final String PREF_KEY_LAST_OPEN_FRAGMENT_INDEX = "PREF_KEY_LAST_OPEN_FRAGMENT_INDEX";
@@ -458,6 +460,9 @@ public class MainActivity extends AppCompatActivity
                 case R.id.nav_message:
                     selectNavFragment(4);
                     break;
+                case R.id.nav_geo_fencing:
+                    selectNavFragment(5);
+                    break;
                 default:
                     break;
             }
@@ -524,6 +529,14 @@ public class MainActivity extends AppCompatActivity
             fragment_tag = MESSAGE_FRAGMENT_TAG;
             fragment = messageFragment;
             titleId = R.string.title_section5;
+        } else if (index == 5) {
+            GeoFencingFragment geoFencingFragment = (GeoFencingFragment) fm.findFragmentByTag(GEO_FENCING_FRAGMENT_TAG);
+            if (geoFencingFragment == null) {
+                geoFencingFragment = GeoFencingFragment.newInstance();
+            }
+            fragment_tag = GEO_FENCING_FRAGMENT_TAG;
+            fragment = geoFencingFragment;
+            titleId = R.string.title_section6;
         }
 
         this.onFragmentAttached(index);

@@ -197,7 +197,11 @@ public class SendMsgIntentService extends IntentService {
         try {
             String response = future.get(request.getTimeoutMs() + 5000, TimeUnit.MILLISECONDS);
             Log.d(TAG, "get cmd response:" + response);
-            saveAndNotify(intent, response);
+            saveAndNotify(intent,
+                    CommandRequest.getJsonStringResponse(
+                            200,
+                            response
+                    ));
         } catch (ExecutionException e) {
             Throwable error = e.getCause();
             Log.d(TAG, "get cmd error:" + error.toString());
@@ -286,7 +290,7 @@ public class SendMsgIntentService extends IntentService {
             //TODO bug! need refresh list but no messager to use
             if (rep_code != 200) {
                 newItem = new ChatItem();
-                newItem.setContent(getString(R.string.loc_send_error));
+                newItem.setContent(getString(R.string.loc_send_error)); // TODO - not only loc report
                 newItem.setType(ChatItemConstants.TYPE_CLIENT);
                 newItem.setState(Constants.CHATITEM_STATE_SUCCESS); // always set true
                 newItem.setDate(new Date());

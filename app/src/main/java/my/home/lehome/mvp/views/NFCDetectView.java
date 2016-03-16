@@ -17,7 +17,7 @@ package my.home.lehome.mvp.views;
 /**
  * Created by legendmohe on 15/12/28.
  */
-public interface NFCDetectView extends MVPView {
+public interface NFCDetectView extends MvpBaseView {
 
     void onViewStateChange(State state);
 

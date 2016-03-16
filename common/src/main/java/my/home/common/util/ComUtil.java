@@ -48,6 +48,11 @@ public class ComUtil {
         return stringBuilder.toString();
     }
 
+    public static String getTimestamp() {
+        Long tsLong = System.currentTimeMillis() / 1000;
+        return tsLong.toString();
+    }
+
     public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

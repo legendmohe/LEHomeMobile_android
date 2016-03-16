@@ -24,6 +24,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
+import my.home.common.util.ComUtil;
 import my.home.common.util.PrefUtil;
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
@@ -144,7 +145,9 @@ public class LocationIntentService extends IntentService {
         if (TextUtils.isEmpty(mCurLocation.getAddrStr())) {
             mCurLocation.setLongitude(-1.0);
         }
-        builder.append(mCurLocation.getLongitude());
+        builder.append(mCurLocation.getLongitude()).append("|");
+
+        builder.append(ComUtil.getTimestamp());
         return builder.toString();
     }
 

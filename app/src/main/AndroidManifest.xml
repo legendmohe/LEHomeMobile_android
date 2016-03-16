@@ -66,6 +66,12 @@
     <!-- NFC -->
     <uses-permission android:name="android.permission.NFC"/>
 
+    <!-- MIPUSH -->
+    <permission
+        android:name="my.home.lehome.permission.MIPUSH_RECEIVE"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="my.home.lehome.permission.MIPUSH_RECEIVE"/>
+
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true"/>
@@ -248,6 +254,38 @@
             android:excludeFromRecents="true"
             >
         </activity>
+
+        <!-- MIPUSH -->
+
+        <service
+            android:enabled="true"
+            android:process=":pushservice"
+            android:name="com.xiaomi.push.service.XMPushService"/>
+        <service
+            android:enabled="true"
+            android:exported="true"
+            android:name="com.xiaomi.mipush.sdk.PushMessageHandler"/>
+        <service
+            android:enabled="true"
+            android:name="com.xiaomi.mipush.sdk.MessageHandleService"/>
+        <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
+        <receiver
+            android:exported="true"
+            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:exported="false"
+            android:process=":pushservice"
+            android:name="com.xiaomi.push.service.receivers.PingReceiver">
+            <intent-filter>
+                <action android:name="com.xiaomi.push.PING_TIMER"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

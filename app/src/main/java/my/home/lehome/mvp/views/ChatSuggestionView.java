@@ -19,7 +19,7 @@ import my.home.model.entities.AutoCompleteItem;
 /**
  * Created by legendmohe on 15/2/25.
  */
-public interface ChatSuggestionView extends MVPView {
+public interface ChatSuggestionView extends MvpBaseView {
     public void onShowSuggestion(AutoCompleteItem item);
 //    public void onGetAutoCompleteItems(List<AutoCompleteItem> item);
 }

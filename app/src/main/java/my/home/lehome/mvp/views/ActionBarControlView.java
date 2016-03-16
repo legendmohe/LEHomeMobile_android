@@ -17,7 +17,7 @@ package my.home.lehome.mvp.views;
 /**
  * Created by legendmohe on 15/3/2.
  */
-public interface ActionBarControlView extends MVPView {
+public interface ActionBarControlView extends MvpBaseView {
     public void showActionBar();
 
     public void hideActionBar();

@@ -20,7 +20,7 @@ import android.net.Uri;
 /**
  * Created by legendmohe on 15/3/15.
  */
-public interface MainActivityView extends MVPView {
+public interface MainActivityView extends MvpBaseView {
     public void showServerStateIndicator(boolean isLocal);
 
     public Context getApplicationContext();

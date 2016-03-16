@@ -21,7 +21,7 @@ import my.home.model.entities.ChatItem;
 /**
  * Created by legendmohe on 15/2/21.
  */
-public interface ChatItemListView extends MVPView {
+public interface ChatItemListView extends MvpBaseView {
     public void onResetDatas(List<ChatItem> chatItems);
 
     public void onChatItemRequest(ChatItem reqItem, boolean isUpdate);

@@ -19,7 +19,7 @@ import android.view.View;
 /**
  * Created by legendmohe on 15/2/19.
  */
-public interface MVPView {
+public interface MvpBaseView {
     public void setupViews(View rootView);
 
     public android.content.Context getContext();

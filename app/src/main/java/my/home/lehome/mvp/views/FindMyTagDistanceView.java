@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by legendmohe on 15/4/21.
  */
-public interface FindMyTagDistanceView extends MVPView {
+public interface FindMyTagDistanceView extends MvpBaseView {
     public Context getApplicationContext();
 
     void onBeaconEnter(Beacon beacon);
