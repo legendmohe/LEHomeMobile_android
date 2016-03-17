@@ -204,6 +204,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
             public void onClick(View v) {
                 if (mImageClickListener != null) {
                     Bundle bundle = new Bundle();
+                    bundle.putSerializable("type", ClickableImageType.LOCATION);
                     bundle.putString("imageURL", mapUrl);
                     bundle.putString("extraTitle", menuTitle);
                     bundle.putParcelable("extraIntent", LocationHelper.getBaiduMapUrlIntent(
@@ -211,6 +212,8 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
                             location[0], location[1],
                             "lehome", "lehome"
                     ));
+                    bundle.putString("longitude", longitude);
+                    bundle.putString("latitude", latitude);
                     mImageClickListener.onImageViewClicked(bundle);
                 }
             }
@@ -288,6 +291,7 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
                 if (mImageClickListener != null) {
                     Bundle bundle = new Bundle();
                     bundle.putString("imageURL", image_url);
+                    bundle.putSerializable("type", ClickableImageType.IMAGE);
                     mImageClickListener.onImageViewClicked(bundle);
                 }
             }
@@ -425,6 +429,11 @@ public class ChatItemArrayAdapter extends ArrayAdapter<ChatItem> implements Four
         RippleBackground rippleBackground;
         ImageButton errorButton;
         TextView dateTextView;
+    }
+
+    public enum ClickableImageType {
+        IMAGE,
+        LOCATION
     }
 
 	/*

@@ -69,6 +69,7 @@
     <permission
         android:name="my.home.lehome.permission.MIPUSH_RECEIVE"
         android:protectionLevel="signature"/>
+
     <uses-permission android:name="my.home.lehome.permission.MIPUSH_RECEIVE"/>
 
     <uses-feature
@@ -142,10 +143,9 @@
                 <action android:name="my.home.lehome.receiver.LocalMessageReceiver"/>
             </intent-filter>
         </receiver>
-
         <receiver
-            android:exported="true"
-            android:name=".receiver.RemoteMessageReceiver">
+            android:name=".receiver.RemoteMessageReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE"/>
             </intent-filter>
@@ -188,42 +188,52 @@
 
         <activity
             android:name=".activity.NFCDetectDialog"
-            android:theme="@style/InvisibleTheme"
             android:excludeFromRecents="true"
-            >
+            android:theme="@style/InvisibleTheme">
         </activity>
 
         <!-- MIPUSH -->
 
         <service
+            android:name="com.xiaomi.push.service.XMPushService"
             android:enabled="true"
-            android:process=":pushservice"
-            android:name="com.xiaomi.push.service.XMPushService"/>
+            android:process=":pushservice"/>
         <service
+            android:name="com.xiaomi.mipush.sdk.PushMessageHandler"
             android:enabled="true"
-            android:exported="true"
-            android:name="com.xiaomi.mipush.sdk.PushMessageHandler"/>
+            android:exported="true"/>
         <service
-            android:enabled="true"
-            android:name="com.xiaomi.mipush.sdk.MessageHandleService"/>
-        <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
+            android:name="com.xiaomi.mipush.sdk.MessageHandleService"
+            android:enabled="true"/>
+        <!-- 注：此service必须在2.2.5版本以后（包括2.2.5版本）加入 -->
         <receiver
-            android:exported="true"
-            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver">
+            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
         <receiver
+            android:name="com.xiaomi.push.service.receivers.PingReceiver"
             android:exported="false"
-            android:process=":pushservice"
-            android:name="com.xiaomi.push.service.receivers.PingReceiver">
+            android:process=":pushservice">
             <intent-filter>
                 <action android:name="com.xiaomi.push.PING_TIMER"/>
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".activity.LocationActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_location"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="my.home.lehome.activity.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

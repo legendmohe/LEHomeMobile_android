@@ -17,6 +17,7 @@ package my.home.lehome.application;
 import android.app.Application;
 import android.util.Log;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -75,6 +76,8 @@ public class LEHomeApplication extends Application {
         if (KeyValueStorage.getInstance().getStorageImpl() == null) {
             KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(getApplicationContext()));
         }
+
+        SDKInitializer.initialize(getApplicationContext());
 
         CrashReport.initCrashReport(getApplicationContext(), "900019399", false);
         Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));

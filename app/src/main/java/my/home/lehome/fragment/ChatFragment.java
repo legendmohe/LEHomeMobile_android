@@ -75,6 +75,7 @@ import my.home.common.util.ComUtil;
 import my.home.common.util.PrefUtil;
 import my.home.common.util.UIUtil;
 import my.home.lehome.R;
+import my.home.lehome.activity.LocationActivity;
 import my.home.lehome.activity.MainActivity;
 import my.home.lehome.activity.NFCDetectDialog;
 import my.home.lehome.adapter.AutoCompleteAdapter;
@@ -217,12 +218,25 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
 
     @Override
     public void onImageViewClicked(Bundle bundle) {
-        if (mPhotoDialog != null) {
-            String imageURL = bundle.getString("imageURL");
-            String extraTitle = bundle.getString("extraTitle");
-            Intent intent = bundle.getParcelable("extraIntent");
-            mPhotoDialog.setTarget(imageURL, intent, extraTitle);
-            mPhotoDialog.show();
+        ChatItemArrayAdapter.ClickableImageType type = (ChatItemArrayAdapter.ClickableImageType) bundle.getSerializable("type");
+        if (type != null) {
+            switch (type) {
+                case IMAGE:
+                    if (mPhotoDialog != null) {
+                        String imageURL = bundle.getString("imageURL");
+                        String extraTitle = bundle.getString("extraTitle");
+                        Intent intent = bundle.getParcelable("extraIntent");
+                        mPhotoDialog.setTarget(imageURL, intent, extraTitle);
+                        mPhotoDialog.show();
+                    }
+                    break;
+                case LOCATION:
+                    Intent locIntent = new Intent(getContext(), LocationActivity.class);
+                    locIntent.putExtras(bundle);
+                    startActivity(locIntent);
+                    break;
+            }
+
         }
     }
 
