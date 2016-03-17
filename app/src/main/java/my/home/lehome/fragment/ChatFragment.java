@@ -736,6 +736,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             ChatItem chatItem = mAdapter.getItem(info.position);
             if (chatItem.isClient()) {
                 inflater.inflate(R.menu.chat_item_is_me, menu);
+                MenuItem item = menu.getItem(menu.size() - 1); // nfc menuitem index
+                item.setEnabled(PrefUtil.getbooleanValue(getContext(), "pref_nfc_cmd_enable", true));
             } else if (chatItem.isServer()) {
                 inflater.inflate(R.menu.chat_item_not_me, menu);
             } else if (chatItem.isServerImageItem()) {

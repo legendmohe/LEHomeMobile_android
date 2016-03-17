@@ -240,10 +240,25 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             CheckBoxPreference silentLocCheckBoxPreference = (CheckBoxPreference) findPreference("pref_loc_me_silent_enable");
             silentLocCheckBoxPreference.setEnabled(sharedPreferences.getBoolean("pref_loc_me_silent_enable", false));
         } else if (key.equals("pref_nfc_cmd_enable")) {
-            if (sharedPreferences.getBoolean("pref_nfc_cmd_enable", true)) {
+            if (sharedPreferences.getBoolean(key, true)) {
                 Context context = getActivity().getApplicationContext();
                 if (!NFCHelper.isNfcEnable(context)) {
                     Toast.makeText(context, R.string.toast_nfc_feature_disable, Toast.LENGTH_SHORT).show();
+
+                    final String nfcKey = key;
+                    final SharedPreferences finalNfcSharedPreferences = sharedPreferences;
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // set checkbox disable state
+                            CheckBoxPreference nfcPref = (CheckBoxPreference) findPreference(nfcKey);
+                            nfcPref.setChecked(false);
+                            // set pref to false
+                            SharedPreferences.Editor prefEditor = finalNfcSharedPreferences.edit();
+                            prefEditor.putBoolean(nfcKey, false);
+                            prefEditor.apply();
+                        }
+                    });
                 }
             }
         } else if (key.equals("pref_cmd_autocomplete")) {

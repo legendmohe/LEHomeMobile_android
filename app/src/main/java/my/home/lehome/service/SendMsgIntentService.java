@@ -288,9 +288,10 @@ public class SendMsgIntentService extends IntentService {
             }
         } else {
             if (rep_code != 200) {
+                Log.d(TAG, result);
                 newItem = new ChatItem();
-                newItem.setContent(getString(R.string.loc_send_error) + " code:" + rep_code); // TODO - not only loc report
-                newItem.setType(ChatItemConstants.TYPE_CLIENT);
+                newItem.setContent(getString(R.string.loc_send_error) + ":" + desc); // TODO - not only loc report
+                newItem.setType(ChatItemConstants.TYPE_SERVER);
                 newItem.setState(Constants.CHATITEM_STATE_SUCCESS); // always set true
                 newItem.setDate(new Date());
                 DBStaticManager.addChatItem(context, newItem);
