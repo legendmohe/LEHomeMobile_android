@@ -14,7 +14,6 @@
 
 package my.home.lehome.helper;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +23,6 @@ import android.util.Log;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import my.home.common.util.PrefUtil;
 import my.home.lehome.receiver.RemoteMessageReceiver;
@@ -60,9 +58,7 @@ public class PushSDKManager {
             }
             if (msg.what == PushSDKManager.MSG_START_SDK) {
                 Log.d(TAG, "try start sdk.");
-                if (checkPushSDKStartedByPid(context)) {
-                    MiPushClient.registerPush(context, APP_ID, APP_KEY);
-                }
+                MiPushClient.registerPush(context, APP_ID, APP_KEY);
             } else if (msg.what == PushSDKManager.MSG_STOP_SDK) {
                 Log.d(TAG, "try stop sdk.");
                 MiPushClient.unregisterPush(context);
@@ -141,18 +137,5 @@ public class PushSDKManager {
 
     public static void delPushTag(Context context, String tagText) {
         MiPushClient.unsubscribe(context, tagText, "LEHome");
-    }
-
-    private static boolean checkPushSDKStartedByPid(Context context) {
-        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
-        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
-        String mainProcessName = context.getPackageName();
-        int myPid = android.os.Process.myPid();
-        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
-            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

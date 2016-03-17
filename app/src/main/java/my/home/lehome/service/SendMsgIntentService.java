@@ -287,10 +287,9 @@ public class SendMsgIntentService extends IntentService {
                 DBStaticManager.addChatItem(context, newItem);
             }
         } else {
-            //TODO bug! need refresh list but no messager to use
             if (rep_code != 200) {
                 newItem = new ChatItem();
-                newItem.setContent(getString(R.string.loc_send_error)); // TODO - not only loc report
+                newItem.setContent(getString(R.string.loc_send_error) + " code:" + rep_code); // TODO - not only loc report
                 newItem.setType(ChatItemConstants.TYPE_CLIENT);
                 newItem.setState(Constants.CHATITEM_STATE_SUCCESS); // always set true
                 newItem.setDate(new Date());

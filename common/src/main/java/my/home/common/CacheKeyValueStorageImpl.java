@@ -72,7 +72,7 @@ public abstract class CacheKeyValueStorageImpl implements KeyValueStorage.IKeySt
         synchronized (mSyncLock) {
             mSyncCache.put(key, value);
             mHandler.removeMessages(MSG_STORAGE_WHAT);
-            mHandler.sendMessageDelayed(msg, 800);
+            mHandler.sendMessageDelayed(msg, 300);
         }
     }
 

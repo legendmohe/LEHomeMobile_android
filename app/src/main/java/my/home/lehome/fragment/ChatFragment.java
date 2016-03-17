@@ -627,7 +627,7 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
             @Override
             public void onGlobalLayout() {
                 int heightDiff = getView().getRootView().getHeight() - getView().getHeight();
-                Log.v(TAG, "height" + String.valueOf(heightDiff));
+//                Log.v(TAG, "height" + String.valueOf(heightDiff));
                 if (heightDiff > 250) { // if more than 100 pixels, its probably a keyboard...
                     Log.v(TAG, "keyboard show.");
                     if (!mKeyboard_open) {

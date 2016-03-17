@@ -24,6 +24,8 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
 import com.xiaomi.mipush.sdk.Logger;
 
+import my.home.common.KeyValueStorage;
+import my.home.common.PrefKeyValueStorgeImpl;
 import my.home.common.util.ComUtil;
 import my.home.common.util.PrefUtil;
 import my.home.lehome.helper.PushSDKManager;
@@ -34,42 +36,47 @@ public class LEHomeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.stopping", false);
-        PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.starting", false);
-        if (ComUtil.isMainProcess(getApplicationContext())
-                && !PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
-            PushSDKManager.startPushSDKService(getApplicationContext(), true);
+        if (ComUtil.isMainProcess(getApplicationContext())) {
+            Log.d(TAG, "main proces start.");
+            PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.stopping", false);
+            PrefUtil.setBooleanValue(getApplicationContext(), "PushSDKManager.starting", false);
+            if (!PrefUtil.getbooleanValue(getApplicationContext(), "pref_save_power_mode", true)) {
+                PushSDKManager.startPushSDKService(getApplicationContext(), true);
+            }
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+                    getApplicationContext())
+                    .memoryCache(new LruMemoryCache(10 * 1024 * 1024))
+                    .diskCacheSize(10 * 1024 * 1024).build();
+
+            ImageLoader.getInstance().init(config);
+
+
+            // MIPUSH
+            LoggerInterface newLogger = new LoggerInterface() {
+
+                @Override
+                public void setTag(String tag) {
+                    // ignore
+                }
+
+                @Override
+                public void log(String content, Throwable t) {
+                    Log.d("MIPUSH", content, t);
+                }
+
+                @Override
+                public void log(String content) {
+                    Log.d("MIPUSH", content);
+                }
+            };
+            Logger.setLogger(this, newLogger);
         }
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-                getApplicationContext())
-                .memoryCache(new LruMemoryCache(10 * 1024 * 1024))
-                .diskCacheSize(10 * 1024 * 1024).build();
-
-        ImageLoader.getInstance().init(config);
+        if (KeyValueStorage.getInstance().getStorageImpl() == null) {
+            KeyValueStorage.getInstance().setStorgeImpl(new PrefKeyValueStorgeImpl(getApplicationContext()));
+        }
 
         CrashReport.initCrashReport(getApplicationContext(), "900019399", false);
-
-        // MIPUSH
-        LoggerInterface newLogger = new LoggerInterface() {
-
-            @Override
-            public void setTag(String tag) {
-                // ignore
-            }
-
-            @Override
-            public void log(String content, Throwable t) {
-                Log.d("MIPUSH", content, t);
-            }
-
-            @Override
-            public void log(String content) {
-                Log.d("MIPUSH", content);
-            }
-        };
-        Logger.setLogger(this, newLogger);
-
         Log.d(TAG, "start application process: " + ComUtil.getProcessName(getApplicationContext()));
     }
 
