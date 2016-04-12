@@ -74,6 +74,12 @@ public class LocationIntentService extends IntentService {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand.");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "handle new location request.");
 
@@ -87,12 +93,14 @@ public class LocationIntentService extends IntentService {
 
         synchronized (mSyncObject) {
             if (mLocationClient != null) {
-                int retCode = mLocationClient.requestLocation();
-                Log.d(TAG, "retCode:" + retCode);
-                try {
-                    mSyncObject.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while(mCurLocation == null) {
+                    int retCode = mLocationClient.requestLocation();
+                    Log.d(TAG, "mLocationClient.requestLocation() retCode:" + retCode);
+                    try {
+                        mSyncObject.wait(10 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -106,6 +114,7 @@ public class LocationIntentService extends IntentService {
             Log.d(TAG, "get geo location, now send result to server.");
             sendResultToServer(formatGeoResponse(id));
         }
+        mCurLocation = null;
         Log.d(TAG, "LocationIntentService exit intent.");
     }
 
@@ -167,8 +176,11 @@ public class LocationIntentService extends IntentService {
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            if (location == null)
-                return;
+            LocationIntentService.this.mCurLocation = location;
+            synchronized (LocationIntentService.this.mSyncObject) {
+                LocationIntentService.this.mSyncObject.notifyAll();
+            }
+
             StringBuffer sb = new StringBuffer(256);
             sb.append("time : ");
             sb.append(location.getTime());
@@ -193,11 +205,6 @@ public class LocationIntentService extends IntentService {
             }
 
             Log.d(TAG, sb.toString());
-
-            LocationIntentService.this.mCurLocation = location;
-            synchronized (LocationIntentService.this.mSyncObject) {
-                LocationIntentService.this.mSyncObject.notifyAll();
-            }
         }
     }
 }

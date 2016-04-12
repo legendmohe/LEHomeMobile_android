@@ -167,7 +167,8 @@
         <service
             android:name=".service.SendMsgIntentService"
             android:exported="false"
-            android:process=":send_msg"/>
+            />
+        <!--android:process=":send_msg"-->
         <service
             android:name=".service.LocationIntentService"
             android:exported="false"/>

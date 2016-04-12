@@ -195,7 +195,7 @@ public class SendMsgIntentService extends IntentService {
         );
         mRequestQueue.add(request);
         try {
-            String response = future.get(request.getTimeoutMs() + 5000, TimeUnit.MILLISECONDS);
+            String response = future.get(request.getTimeoutMs() + 10000, TimeUnit.MILLISECONDS);
             Log.d(TAG, "get cmd response:" + response);
             saveAndNotify(intent,
                     CommandRequest.getJsonStringResponse(

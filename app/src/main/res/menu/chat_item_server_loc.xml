@@ -22,4 +22,8 @@
         android:id="@+id/action_photo_extra_intent"
         android:title="@string/action_open_in_other_app"
         android:orderInCategory="100" />
+    <item
+        android:id="@+id/action_show_location"
+        android:title="@string/action_show_location"
+        android:orderInCategory="100"/>
 </menu>

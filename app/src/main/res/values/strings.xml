@@ -198,6 +198,7 @@
     <string name="nav_item_geo_fencing">地理围栏</string>
     <string name="msg_device_unbinded">解绑成功</string>
     <string name="msg_device_unbind_faild">解绑失败</string>
+    <string name="action_show_location">显示经纬度</string>
 
     <string name="title_activity_location">地图</string>
     <string name="location_action_button">打开百度地图</string>

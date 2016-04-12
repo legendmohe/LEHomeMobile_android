@@ -233,10 +233,13 @@ public class MainActivityPresenter extends MVPActivityPresenter {
         String old_subscribe_address = extras.getString("old_subscribe_address");
 
         MessageHelper.loadPref(context);
-        if (old_device_id != null && !old_device_id.equals(MessageHelper.getDeviceID(context))) {
+        if (!TextUtils.isEmpty(old_device_id) && !old_device_id.equals(MessageHelper.getDeviceID(context))) {
             PushSDKManager.delPushTag(context, old_device_id);
             PushSDKManager.setPushTag(context, MessageHelper.getDeviceID(context));
+        } else if (TextUtils.isEmpty(old_device_id)) {
+            PushSDKManager.setPushTag(context, MessageHelper.getDeviceID(context));
         }
+
         if (mBinded && MessageHelper.isLocalMsgPrefEnable(context)
                 && !TextUtils.isEmpty(MessageHelper.getLocalServerSubscribeURL(context))) {
             Message msg = Message.obtain(null, LocalMessageService.MSG_SET_SUBSCRIBE_ADDRESS);

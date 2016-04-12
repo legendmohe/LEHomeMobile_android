@@ -819,6 +819,8 @@ public class ChatFragment extends Fragment implements SpeechDialog.SpeechDialogL
                 Intent nfcIntent = new Intent(getActivity(), NFCDetectDialog.class);
                 nfcIntent.putExtra(NFCDetectDialog.EXTRA_TEXT_CONTENT, selectedString);
                 startActivity(nfcIntent);
+            case R.id.action_show_location:
+
             default:
                 return super.onContextItemSelected(item);
         }
