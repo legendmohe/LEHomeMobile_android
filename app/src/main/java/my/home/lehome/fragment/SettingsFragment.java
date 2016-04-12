@@ -29,6 +29,7 @@ import android.widget.Toast;
 import my.home.domain.usecase.DeleteAutoCompleteHistoryUsecaseImpl;
 import my.home.lehome.R;
 import my.home.lehome.asynctask.LoadAutoCompleteConfAsyncTask;
+import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.helper.NFCHelper;
 import my.home.lehome.helper.NetworkHelper;
 
@@ -134,21 +135,16 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         //init local server preference
         EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_server_address");
         addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_server_address", ""));
-        //init local subscribe preference
-        EditTextPreference subscribeEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_subscribe_address");
-        subscribeEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
         //init state
         CheckBoxPreference lMsgCheckBoxPreference = (CheckBoxPreference) findPreference("pref_enable_local_msg");
         boolean enable_local_msg = sharedPreferences.getBoolean("pref_enable_local_msg", false);
         if (enable_local_msg) {
             lMsgCheckBoxPreference.setChecked(true);
             ssidEditTextPreference.setEnabled(true);
-            subscribeEditTextPreference.setEnabled(true);
             addressEditTextPreference.setEnabled(true);
         } else {
             lMsgCheckBoxPreference.setChecked(false);
             ssidEditTextPreference.setEnabled(false);
-            subscribeEditTextPreference.setEnabled(false);
             addressEditTextPreference.setEnabled(false);
         }
         
@@ -157,11 +153,10 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         boolean enable_nfc_cmd = sharedPreferences.getBoolean("pref_nfc_cmd_enable", true);
         nfcCheckBoxPreference.setChecked(enable_nfc_cmd);
 
-
         Intent retIntent = new Intent();
         retIntent.putExtra("old_device_id", pubEditTextPreference.getSummary());
         retIntent.putExtra("old_local_msg_state", enable_local_msg);
-        retIntent.putExtra("old_subscribe_address", subscribeEditTextPreference.getSummary());
+        retIntent.putExtra("old_subscribe_address", MessageHelper.formatLocalServerSubscribeURL(getActivity(), addressEditTextPreference.getSummary().toString()));
         this.getActivity().setResult(Activity.RESULT_OK, retIntent);
     }
 
@@ -206,7 +201,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             if (sharedPreferences.getBoolean("pref_enable_local_msg", false)) {
                 findPreference("pref_local_msg_server_address").setEnabled(true);
                 findPreference("pref_local_ssid").setEnabled(true);
-                findPreference("pref_local_msg_subscribe_address").setEnabled(true);
 
 //                ComponentName receiver = new ComponentName(getActivity(), BootCompleteReceiver.class);
 //                PackageManager pm = getActivity().getPackageManager();
@@ -217,7 +211,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             } else {
                 findPreference("pref_local_msg_server_address").setEnabled(false);
                 findPreference("pref_local_ssid").setEnabled(false);
-                findPreference("pref_local_msg_subscribe_address").setEnabled(false);
+
 //                ComponentName receiver = new ComponentName(getActivity(), BootCompleteReceiver.class);
 //                PackageManager pm = getActivity().getPackageManager();
 //
@@ -231,9 +225,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         } else if (key.equals("pref_local_msg_server_address")) {
             EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_server_address");
             addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_server_address", ""));
-        } else if (key.equals("pref_local_msg_subscribe_address")) {
-            EditTextPreference addressEditTextPreference = (EditTextPreference) findPreference("pref_local_msg_subscribe_address");
-            addressEditTextPreference.setSummary(sharedPreferences.getString("pref_local_msg_subscribe_address", ""));
         } else if (key.equals("pref_save_power_mode")) {
             Toast.makeText(getActivity(), R.string.pref_save_power_mode_set, Toast.LENGTH_SHORT).show();
         } else if (key.equals("pref_loc_me_enable")) {

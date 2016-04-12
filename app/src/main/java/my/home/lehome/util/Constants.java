@@ -33,4 +33,9 @@ public class Constants {
     public static final long VOLUME_KEY_DOWN_DELAY = 500;
 
     public static final String MESSAGE_PREFIX = "留言";
+
+    public static final String LOCAL_SERVER_ADDRESS_PREFIX = "http://";
+    public static final String LOCAL_SERVER_ADDRESS_PORT = "8000";
+    public static final String LOCAL_SERVER_SUBSCRIBE_PREFIX = "tcp://";
+    public static final String LOCAL_SERVER_SUBSCRIBE_PORT = "9000";
 }

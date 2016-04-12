@@ -130,11 +130,19 @@ public class MessageHelper {
     }
 
     public static String getLocalServerAddress(Context context) {
-        return PrefUtil.getStringValue(context, "pref_local_msg_server_address", "http://192.168.1.111:8000");
+        return Constants.LOCAL_SERVER_ADDRESS_PREFIX
+                + PrefUtil.getStringValue(context, "pref_local_msg_server_address", "192.168.1.112")
+                + ":" + Constants.LOCAL_SERVER_ADDRESS_PORT;
     }
 
     public static String getLocalServerSubscribeURL(Context context) {
-        return PrefUtil.getStringValue(context, "pref_local_msg_subscribe_address", "tcp://192.168.1.111:9000");
+        return formatLocalServerSubscribeURL(context, PrefUtil.getStringValue(context, "pref_local_msg_server_address", "192.168.1.112"));
+    }
+
+    public static String formatLocalServerSubscribeURL(Context context, String address) {
+        return Constants.LOCAL_SERVER_SUBSCRIBE_PREFIX
+                + address
+                + ":" + Constants.LOCAL_SERVER_SUBSCRIBE_PORT;
     }
 
     public static boolean isLocalMsgPrefEnable(Context context) {

@@ -72,10 +72,6 @@
             android:title="@string/pref_local_msg_server_address"
             android:defaultValue=""
             android:key="pref_local_msg_server_address" />
-        <EditTextPreference
-            android:title="@string/pref_local_msg_subscribe_address"
-            android:defaultValue=""
-            android:key="pref_local_msg_subscribe_address" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_others_profile">
         <Preference

@@ -20,14 +20,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,6 +35,7 @@ import org.zeromq.ZMQException;
 
 import my.home.lehome.R;
 import my.home.lehome.activity.MainActivity;
+import my.home.lehome.helper.MessageHelper;
 import my.home.lehome.receiver.LocalMessageReceiver;
 import my.home.lehome.receiver.ScreenStateReceiver;
 import zmq.ZError;
@@ -121,8 +120,7 @@ public class LocalMessageService extends Service {
             registerReceiver(mScreenStateReceiver, filter);
         }
 
-        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mServiceAddress = mySharedPreferences.getString("pref_local_msg_subscribe_address", null);
+        mServiceAddress = MessageHelper.getLocalServerSubscribeURL(this);
         initSubscriber(mServiceAddress);
 
         if (mWakeLock == null) {
